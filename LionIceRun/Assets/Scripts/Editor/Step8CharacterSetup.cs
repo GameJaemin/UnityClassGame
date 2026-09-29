@@ -26,15 +26,18 @@ public static class Step8CharacterSetup
             AssetDatabase.CreateFolder("Assets/Materials", "Characters");
 
         foreach (string character in Characters)
-            ConfigureModel(character);
+            ConfigureModel(ModelFolder, character, LoopClips);
 
         AnimatorController controller = CreateController();
         SetUpPlayer(controller);
     }
 
-    static void ConfigureModel(string character)
+    // 캐릭터·방해꾼 공용: Generic 리그, 클립 이름(Rig|Walk → Walk)·반복, 색상표(*_palette.txt)로 URP 재질 연결
+    internal static void ConfigureModel(string folder, string character, string[] loopClips)
     {
-        string path = $"{ModelFolder}/{character}.fbx";
+        if (!AssetDatabase.IsValidFolder(MaterialFolder))
+            AssetDatabase.CreateFolder("Assets/Materials", "Characters");
+        string path = $"{folder}/{character}.fbx";
         var importer = AssetImporter.GetAtPath(path) as ModelImporter;
         if (importer == null)
         {
@@ -55,11 +58,11 @@ public static class Step8CharacterSetup
         {
             string name = clip.takeName.Contains("|") ? clip.takeName.Substring(clip.takeName.IndexOf('|') + 1) : clip.takeName;
             clip.name = name;
-            clip.loopTime = LoopClips.Contains(name);
+            clip.loopTime = loopClips.Contains(name);
             return clip;
         }).ToArray();
 
-        string palettePath = $"{ModelFolder}/{character}_palette.txt";
+        string palettePath = $"{folder}/{character}_palette.txt";
         if (File.Exists(palettePath))
         {
             foreach (string line in File.ReadAllLines(palettePath))

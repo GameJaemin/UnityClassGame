@@ -32,6 +32,9 @@
 | `IceGrid.cs` | 가로x세로 얼음 그리드 생성(기본 6x6). 블럭 윗면 y=0. `CellTop(cell)`, `StartCell`, `Blocks`, 바다 위치(`seaDepth` 12m) |
 | `QuarterViewCamera.cs` | 시작 전에는 그리드 전체가 보이는 거리, 게임 시작 시 `playDistance`로 부드럽게 줌인하며 플레이어를 따라감 (높이는 안 따라감) |
 | `PlayerController.cs` | Rigidbody 이동. 상태 `Normal / Diving / KnockedDown`, `KnockDown(초)`로 조작 불가 처리(시련 기절에도 사용), 가변 점프, 다이브(Ctrl) |
+| `BotManager.cs` / `BotBrain.cs` | AI 봇. 몸은 플레이어와 같은 부품을 코드로 조립하고 `PlayerController.SetExternalInput`으로 조종. 칸 단위 길 찾기(깨진 칸 1개는 점프). 바다에 빠지면 다시 떨어져 들어옴. **플레이어를 찾을 때는 `useExternalInput == false`인 쪽을 고른다** |
+| `Trials/*.cs` | 시련. `TrialBase`(버틴 시간 기준 시작·간격, 첫 등장 안내, `Targets()`=플레이어+봇, `Hit()`=방패 판정) + `SnowballTrial`, `WindTrial`, `IcicleTrial`, `PenguinTrial`, 기절 별 `StunStars`. 새 시련은 `TrialBase`를 상속하고 `Reset()`에 기본 등장 시간을 넣는다 |
+| `RepairItem.cs` / `RepairItemSpawner.cs` | 파워업 아이템 4종 (이름은 처음 얼음 복구만 있던 흔적). `PlayerPowerUps`가 방패·슈퍼 점프 상태를 가짐 |
 | `PlayerSkin.cs` | 선택한 스킨 FBX를 Player 아래 `Model`로 붙이고 캡슐 렌더러 숨김 |
 | `CharacterAnimator.cs` | Animator 파라미터 `Speed`, `WalkAnimSpeed`, `Grounded`, `VerticalSpeed`, `Down` 전달 |
 
@@ -64,6 +67,7 @@
 - UI 스프라이트는 압축 끔 + 밉맵 켬 (큰 원본을 작게 줄여 그리면 깨지기 때문), 늘려 쓰는 배경은 9-slice. 시트에 빈 형태로 없는 배경(흰 배지, 반투명 남색 패널)은 `Tools/ui/PanelGen.cs`로 그린다.
 - 화면 구성은 **Fall Guys UI**(https://www.gameuidatabase.com/gameData.php?id=1499)를 따른다: 화면 끝에 붙은 평행사변형 띠(목표 분홍, 숫자 남색, 스테이지 제목 초록, 새 기록 금색), 작은 제목 + 기울어진 분홍 배지, 화면을 가로지르는 사건 띠("시작!", "탈락!"), 반투명 키 칩, 자홍 제목 상자, 기울인 굵은 글자. 버튼·아이콘 그림은 사용자 UI 시트를 쓴다.
 - UI 입력은 새 Input System용 `InputSystemUIInputModule`을 쓴다.
+- **사용자가 GameUI에서 직접 고친 배치(위치·크기·회전·글자 크기·정렬)는 보존한다.** Step 7 UI 세팅은 다시 만들 때 요소 이름 경로로 값을 되돌려 놓는다. 그래서 UI 코드에서 **요소 이름을 바꾸면 그 요소의 사용자 배치가 사라진다** → 이름은 되도록 유지하고, 새 요소는 새 이름으로 추가한다. 코드로 바꾼 배치를 반영하려면 사용자가 "Step 7 UI 세팅 (배치 초기화)"를 써야 한다고 안내한다.
 
 ## PowerShell 스크립트 주의
 

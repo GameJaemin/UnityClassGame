@@ -49,8 +49,9 @@ public class QuarterViewCamera : MonoBehaviour
 
         if (player == null)
         {
-            PlayerController found = FindAnyObjectByType<PlayerController>();
-            if (found != null) player = found.transform;
+            // AI 봇도 PlayerController를 쓰므로 키보드로 조종하는 쪽만 고른다
+            foreach (PlayerController found in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
+                if (!found.useExternalInput) player = found.transform;
         }
         if (zoomTrigger == ZoomTrigger.OnSceneStart) BeginZoom();
         else if (GameManager.Instance != null) GameManager.Instance.StateChanged += OnStateChanged;

@@ -5,7 +5,7 @@ using UnityEngine;
 // 얼음 블럭 하나 (폴가이즈 Thin Ice를 바탕으로, 무적 시간 없이 더 긴장감 있게).
 // 밟는 순간 바로 한 단계씩: 멀쩡함 → 살짝 금 → 많이 금 → 흔들림(breakDelay 뒤 깨짐).
 // 흔들리는 블럭에서도 점프로 탈출할 수는 있지만, 다시 밟으면 즉시 깨진다.
-// 떠난 블럭은 저절로 깨지지 않는다.
+// 한 번이라도 금이 간 블럭은 아무도 밟지 않아도 decayInterval마다 한 단계씩 진행해 결국 깨진다 (천천히 부서짐).
 // 연출: 단계마다 금 간 텍스처로 바뀌며 움찔하고 얼음 가루가 튀고, 깨지면 조각으로 부서진다.
 public class IceBlock : MonoBehaviour
 {
@@ -23,6 +23,8 @@ public class IceBlock : MonoBehaviour
     Coroutine shaking;
     Coroutine punching;
     Coroutine growing;
+    Coroutine decaying;
+    float lastStageChangeTime;
     Vector3 restPosition;
     Vector3 restScale;
     int variant;
@@ -68,13 +70,64 @@ public class IceBlock : MonoBehaviour
             return;
         }
 
+        Advance();
+    }
+
+    // 시련(눈덩이): 밟힘 중복 방지 없이 한 단계. 흔들리는 중이면 바로 깨짐
+    public void ForceAdvance()
+    {
+        if (IsBroken) return;
+        if (CurrentStage == Stage.Shaking) ForceBreak();
+        else Advance();
+    }
+
+    // 시련(고드름): 단계와 상관없이 바로 깨짐
+    public void ForceBreak()
+    {
+        if (IsBroken) return;
+        if (shaking != null) StopCoroutine(shaking);
+        Break();
+    }
+
+    // 파워업(얼음 굳히기): 금 간·흔들리는 블럭을 멀쩡하게 (깨진 블럭은 그대로)
+    public void Heal()
+    {
+        if (IsBroken || CurrentStage == Stage.Clean) return;
+        if (shaking != null) StopCoroutine(shaking);
+        if (decaying != null) StopCoroutine(decaying);
+        if (growing != null) StopCoroutine(growing);
+        shaking = decaying = growing = null;
+        CurrentStage = Stage.Clean;
+        transform.localPosition = restPosition;
+        UpdateLook();
+        grid.PlayIceBurst(TopCenter, 10, 0.4f);
+        if (punching != null) StopCoroutine(punching);
+        punching = StartCoroutine(Punch());
+    }
+
+    // 한 단계 진행 (밟힘 또는 시간이 지나 저절로)
+    void Advance()
+    {
         CurrentStage++;
+        lastStageChangeTime = Time.time;
         if (growing != null) StopCoroutine(growing);
         growing = StartCoroutine(GrowCrack());
         grid.PlayIceBurst(TopCenter, 4 + 4 * (int)CurrentStage, 0.6f);
         if (punching != null) StopCoroutine(punching);
         punching = StartCoroutine(Punch());
+        if (CurrentStage == Stage.Cracked && decaying == null) decaying = StartCoroutine(Decay());
         if (CurrentStage == Stage.Shaking) shaking = StartCoroutine(ShakeThenBreak());
+    }
+
+    // 금이 간 뒤로는 마지막 단계 변화에서 decayInterval이 지날 때마다 저절로 한 단계 (흔들림 전까지)
+    IEnumerator Decay()
+    {
+        while (CurrentStage == Stage.Cracked || CurrentStage == Stage.HeavyCracked)
+        {
+            if (grid.decayInterval > 0f && Time.time - lastStageChangeTime >= grid.decayInterval) Advance();
+            yield return null;
+        }
+        decaying = null;
     }
 
     // override가 있으면 그 텍스처(금이 자라는 중간 프레임)를, 없으면 현재 단계 텍스처를 쓴다
@@ -150,6 +203,8 @@ public class IceBlock : MonoBehaviour
     {
         if (punching != null) StopCoroutine(punching);
         if (growing != null) StopCoroutine(growing);
+        if (decaying != null) StopCoroutine(decaying);
+        decaying = null;  // 복구된 뒤 다시 금이 가면 새로 시작
         transform.localPosition = restPosition;  // 흔들리던 중에 깨져도 제자리에서 부서지게
         transform.localScale = restScale;
         CurrentStage = Stage.Broken;

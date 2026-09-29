@@ -14,13 +14,34 @@ using UnityEngine.UI;
 //  - 게임 오버 뒤: 결과 카드 (자홍 제목 상자에 버틴 시간, 새 기록이면 금색 띠, 다시 하기), R 키로도 재시작
 public class GameHUD : MonoBehaviour
 {
+    public static GameHUD Instance { get; private set; }
+
     public IceGrid grid;
+
+    [Header("안내 문구 (시련 예고, 파워업 획득)")]
+    public RectTransform toast;
+    public TMP_Text toastText;
+    [Min(0.2f)] public float toastTime = 1.4f;
+
+    [Header("파워업 상태")]
+    public PlayerPowerUps playerPowerUps;
+    public GameObject powerUpBadge;
+    public TMP_Text powerUpText;
 
     [Header("위")]
     public TMP_Text iceCountText;
     public RectTransform iceBadge;
     public TMP_Text timerText;
     public TMP_Text bestText;
+
+    [Header("대기 화면 타이틀")]
+    public RectTransform title;
+
+    [Header("게임 시작 때 튀어나오는 요소 (대기 중에는 숨김)")]
+    [Tooltip("위에서 쑥 떨어지듯 나옴 (남은 얼음)")]
+    public RectTransform[] popFromTop;
+    [Tooltip("오른쪽에서 쑥 밀려 들어옴 (버틴 시간, 최고 기록)")]
+    public RectTransform[] popFromRight;
 
     [Header("아래")]
     public RectTransform introGroup;
@@ -46,9 +67,25 @@ public class GameHUD : MonoBehaviour
 
     int lastIceCount = -1;
     Vector2 introBase;
+    Vector2 titleBase;
+    Coroutine toastRoutine;
+    readonly System.Collections.Generic.Dictionary<RectTransform, Vector2> popBase = new System.Collections.Generic.Dictionary<RectTransform, Vector2>();
 
     void Awake()
     {
+        Instance = this;
+        if (title != null)
+        {
+            title.gameObject.SetActive(true);
+            titleBase = title.anchoredPosition;
+        }
+        // 대기 중에는 숨겨 두고 게임 시작 때 튀어나오게
+        foreach (RectTransform rect in PopTargets())
+        {
+            popBase[rect] = rect.anchoredPosition;
+            rect.gameObject.SetActive(false);
+        }
+        if (toast != null) toast.gameObject.SetActive(false);
         if (resultGroup != null) resultGroup.SetActive(false);
         if (banner != null) banner.gameObject.SetActive(false);
         if (introGroup != null)
@@ -65,7 +102,46 @@ public class GameHUD : MonoBehaviour
 
     void OnDestroy()
     {
+        if (Instance == this) Instance = null;
         if (GameManager.Instance != null) GameManager.Instance.StateChanged -= OnStateChanged;
+    }
+
+    // 화면 위쪽 가운데에 잠깐 뜨는 안내 (새 안내가 오면 바로 바뀜)
+    public void ShowToast(string text, Color color)
+    {
+        if (toast == null || toastText == null) return;
+        if (toastRoutine != null) StopCoroutine(toastRoutine);
+        toastRoutine = StartCoroutine(ToastRoutine(text, color));
+    }
+
+    IEnumerator ToastRoutine(string text, Color color)
+    {
+        toastText.text = text;
+        toastText.color = color;
+        toast.gameObject.SetActive(true);
+        var group = toast.GetComponent<CanvasGroup>();
+        if (group != null) group.alpha = 1f;
+        yield return Pop(toast, 1.3f);
+        yield return new WaitForSecondsRealtime(toastTime);
+        for (float t = 0f; t < 0.25f; t += Time.unscaledDeltaTime)
+        {
+            if (group != null) group.alpha = 1f - t / 0.25f;
+            yield return null;
+        }
+        toast.gameObject.SetActive(false);
+        toastRoutine = null;
+    }
+
+    void UpdatePowerUpBadge()
+    {
+        if (powerUpBadge == null || powerUpText == null || playerPowerUps == null) return;
+        string status = null;
+        float jump = playerPowerUps.SuperJumpRemaining;
+        if (playerPowerUps.HasShield && jump > 0f) status = $"방패 · 슈퍼 점프 {jump:0.0}";
+        else if (playerPowerUps.HasShield) status = "방패";
+        else if (jump > 0f) status = $"슈퍼 점프 {jump:0.0}";
+        powerUpBadge.SetActive(status != null);
+        if (status != null) powerUpText.text = status;
     }
 
     void Update()
@@ -90,6 +166,17 @@ public class GameHUD : MonoBehaviour
             }
         }
 
+        UpdatePowerUpBadge();
+
+        // 대기 화면 타이틀이 살짝 둥실거림
+        if (title != null && title.gameObject.activeSelf && GameManager.Instance != null
+            && GameManager.Instance.State == GameManager.GameState.Ready)
+        {
+            float wave = Mathf.Sin(Time.unscaledTime * 1.6f);
+            title.anchoredPosition = titleBase + Vector2.up * (wave * 10f);
+            title.localScale = Vector3.one * (1f + wave * 0.015f);
+        }
+
         GameManager manager = GameManager.Instance;
         if (manager != null && manager.State == GameManager.GameState.GameOver
             && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
@@ -101,6 +188,8 @@ public class GameHUD : MonoBehaviour
         if (state == GameManager.GameState.Playing)
         {
             if (introGroup != null) StartCoroutine(SlideOutIntro());
+            if (title != null) StartCoroutine(HideTitle());
+            StartCoroutine(PopInHud());
             StartCoroutine(PlayBanner("시작!", startBandColor, startBannerTime));
         }
         if (state == GameManager.GameState.GameOver)
@@ -129,6 +218,65 @@ public class GameHUD : MonoBehaviour
         yield return new WaitForSecondsRealtime(hold);
         yield return Slide(banner, 0f, BannerTravel, 0.22f, EaseIn);
         banner.gameObject.SetActive(false);
+    }
+
+    System.Collections.Generic.IEnumerable<RectTransform> PopTargets()
+    {
+        if (popFromTop != null) foreach (RectTransform r in popFromTop) if (r != null) yield return r;
+        if (popFromRight != null) foreach (RectTransform r in popFromRight) if (r != null) yield return r;
+    }
+
+    // 타이틀: 톡 커지며 사라짐
+    IEnumerator HideTitle()
+    {
+        var group = title.GetComponent<CanvasGroup>();
+        Vector3 start = title.localScale;
+        for (float t = 0f; t < 0.3f; t += Time.unscaledDeltaTime)
+        {
+            float p = t / 0.3f;
+            title.localScale = start * Mathf.Lerp(1f, 1.25f, p);
+            if (group != null) group.alpha = 1f - p;
+            yield return null;
+        }
+        title.gameObject.SetActive(false);
+    }
+
+    // 남은 얼음은 위에서, 버틴 시간·최고 기록은 오른쪽에서 차례로 쑥 튀어나옴
+    IEnumerator PopInHud()
+    {
+        const float delayStep = 0.08f;
+        float delay = 0.1f;
+        if (popFromTop != null)
+            foreach (RectTransform rect in popFromTop)
+            {
+                if (rect == null) continue;
+                StartCoroutine(PopIn(rect, Vector2.up * 260f, delay));
+                delay += delayStep;
+            }
+        delay = 0.15f;
+        if (popFromRight != null)
+            foreach (RectTransform rect in popFromRight)
+            {
+                if (rect == null) continue;
+                StartCoroutine(PopIn(rect, Vector2.right * 700f, delay));
+                delay += delayStep;
+            }
+        yield break;
+    }
+
+    IEnumerator PopIn(RectTransform rect, Vector2 offset, float delay)
+    {
+        Vector2 target = popBase.TryGetValue(rect, out Vector2 basePosition) ? basePosition : rect.anchoredPosition;
+        rect.anchoredPosition = target + offset;
+        yield return new WaitForSecondsRealtime(delay);
+        rect.gameObject.SetActive(true);
+        const float duration = 0.4f;
+        for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
+        {
+            rect.anchoredPosition = target + offset * (1f - EaseOutBack(t / duration));
+            yield return null;
+        }
+        rect.anchoredPosition = target;
     }
 
     IEnumerator SlideOutIntro()

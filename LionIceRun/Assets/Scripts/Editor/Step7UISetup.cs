@@ -12,7 +12,9 @@ using UnityEngine.UI;
 //  2) Windows 맑은 고딕 Bold로 TextMeshPro 글꼴(OS 글꼴을 실행 중에 읽는 방식)과 테두리·그림자 재질을 만든다
 //  3) Assets/UI/Sprites 이미지를 선명하게 보이도록 설정 (압축 끔, 밉맵 켬, 늘리는 배경은 9-slice)
 //     이미지는 Tools/ui/slice_ui.ps1이 UI 시트에서 잘라내거나 그려서 만든다.
-//  4) 씬에 GameUI 캔버스와 EventSystem을 새로 만든다 (다시 실행하면 새로 만듦, 직접 옮긴 위치는 초기화)
+//  4) 씬에 GameUI 캔버스와 EventSystem을 새로 만든다
+//     다시 실행해도 에디터에서 직접 바꾼 위치·크기·회전·글자 크기·정렬은 같은 이름의 요소에 그대로 되돌려 놓는다
+//     (처음 배치로 되돌리려면 "Step 7 UI 세팅 (배치 초기화)")
 // 메뉴: LionIceRun > Step 7 UI 세팅
 public static class Step7UISetup
 {
@@ -33,7 +35,16 @@ public static class Step7UISetup
     static Material plain;         // 밝은 바탕 위의 남색 글자
 
     [MenuItem("LionIceRun/Step 7 UI 세팅")]
-    static void Run()
+    static void Run() => Build(keepLayout: true);
+
+    [MenuItem("LionIceRun/Step 7 UI 세팅 (배치 초기화)")]
+    static void RunReset()
+    {
+        if (EditorUtility.DisplayDialog("UI 배치 초기화", "GameUI에서 직접 바꾼 위치·크기·글자 크기를 모두 처음 배치로 되돌립니다.", "초기화", "취소"))
+            Build(keepLayout: false);
+    }
+
+    static void Build(bool keepLayout)
     {
         GameManager manager = Object.FindAnyObjectByType<GameManager>();
         SurvivalTimer timer = Object.FindAnyObjectByType<SurvivalTimer>();
@@ -58,8 +69,10 @@ public static class Step7UISetup
         if (!CreateFontAndMaterials()) return;
 
         GameObject old = GameObject.Find("GameUI");
+        LayoutSnapshot snapshot = old != null && keepLayout ? LayoutSnapshot.Capture(old.transform) : null;
         if (old != null) Object.DestroyImmediate(old);
         GameHUD hud = BuildCanvas(grid);
+        int restored = snapshot != null ? snapshot.Apply(hud.transform) : 0;
         EnsureEventSystem();
         timer.showDebugHud = false;
         EditorUtility.SetDirty(timer);
@@ -67,7 +80,97 @@ public static class Step7UISetup
         EditorSceneManager.MarkSceneDirty(hud.gameObject.scene);
         EditorSceneManager.SaveOpenScenes();
         Selection.activeGameObject = hud.gameObject;
-        Debug.Log("Step 7 UI 세팅 완료: Fall Guys식 구성으로 GameUI를 만들었습니다.");
+        Debug.Log(keepLayout && snapshot != null
+            ? $"Step 7 UI 세팅 완료: GameUI를 다시 만들고, 직접 바꾼 배치를 요소 {restored}개에 되돌려 놓았습니다."
+            : "Step 7 UI 세팅 완료: 처음 배치로 GameUI를 만들었습니다.");
+    }
+
+    // 에디터에서 직접 바꾼 UI 배치를 요소 이름 경로로 기록했다가 새로 만든 UI에 되돌려 놓는다.
+    // 같은 부모 아래 같은 이름이 여럿이면 "#순번"을 붙여 구분한다 (예: Banner/Pill#2)
+    class LayoutSnapshot
+    {
+        struct RectState
+        {
+            public Vector2 anchorMin, anchorMax, pivot, anchoredPosition, sizeDelta;
+            public Quaternion rotation;
+            public Vector3 scale;
+        }
+
+        struct TextState
+        {
+            public float fontSize;
+            public FontStyles fontStyle;
+            public TextAlignmentOptions alignment;
+            public float characterSpacing;
+            public bool autoSize;
+            public float autoSizeMin, autoSizeMax;
+        }
+
+        readonly System.Collections.Generic.Dictionary<string, RectState> rects = new System.Collections.Generic.Dictionary<string, RectState>();
+        readonly System.Collections.Generic.Dictionary<string, TextState> texts = new System.Collections.Generic.Dictionary<string, TextState>();
+
+        public static LayoutSnapshot Capture(Transform root)
+        {
+            var snapshot = new LayoutSnapshot();
+            snapshot.Walk(root, "", (path, t) =>
+            {
+                if (t is RectTransform r)
+                    snapshot.rects[path] = new RectState
+                    {
+                        anchorMin = r.anchorMin, anchorMax = r.anchorMax, pivot = r.pivot,
+                        anchoredPosition = r.anchoredPosition, sizeDelta = r.sizeDelta,
+                        rotation = r.localRotation, scale = r.localScale,
+                    };
+                TMP_Text text = t.GetComponent<TMP_Text>();
+                if (text != null)
+                    snapshot.texts[path] = new TextState
+                    {
+                        fontSize = text.fontSize, fontStyle = text.fontStyle, alignment = text.alignment,
+                        characterSpacing = text.characterSpacing, autoSize = text.enableAutoSizing,
+                        autoSizeMin = text.fontSizeMin, autoSizeMax = text.fontSizeMax,
+                    };
+            });
+            return snapshot;
+        }
+
+        public int Apply(Transform root)
+        {
+            int count = 0;
+            Walk(root, "", (path, t) =>
+            {
+                bool changed = false;
+                if (t is RectTransform r && rects.TryGetValue(path, out RectState s))
+                {
+                    r.anchorMin = s.anchorMin; r.anchorMax = s.anchorMax; r.pivot = s.pivot;
+                    r.anchoredPosition = s.anchoredPosition; r.sizeDelta = s.sizeDelta;
+                    r.localRotation = s.rotation; r.localScale = s.scale;
+                    changed = true;
+                }
+                TMP_Text text = t.GetComponent<TMP_Text>();
+                if (text != null && texts.TryGetValue(path, out TextState ts))
+                {
+                    text.fontSize = ts.fontSize; text.fontStyle = ts.fontStyle; text.alignment = ts.alignment;
+                    text.characterSpacing = ts.characterSpacing; text.enableAutoSizing = ts.autoSize;
+                    text.fontSizeMin = ts.autoSizeMin; text.fontSizeMax = ts.autoSizeMax;
+                    changed = true;
+                }
+                if (changed) count++;
+            });
+            return count;
+        }
+
+        void Walk(Transform node, string path, System.Action<string, Transform> visit)
+        {
+            visit(path, node);
+            var seen = new System.Collections.Generic.Dictionary<string, int>();
+            foreach (Transform child in node)
+            {
+                seen.TryGetValue(child.name, out int index);
+                seen[child.name] = index + 1;
+                string childPath = (path.Length > 0 ? path + "/" : "") + child.name + (index > 0 ? $"#{index}" : "");
+                Walk(child, childPath, visit);
+            }
+        }
     }
 
     // ---- 스프라이트 ----
@@ -203,8 +306,13 @@ public static class Step7UISetup
         Label(goal.transform, "Text", "최대한 오래 버티세요!", 40, Color.white, outlined,
             new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(104, 2), new Vector2(480, 80), TextAlignmentOptions.Left, true);
 
-        // 위 가운데: 작은 제목 + 기울어진 분홍 배지 (Fall Guys의 LAP 1/2처럼)
-        Label(top, "IceLabel", "남은 얼음", 30, Color.white, outlinedThin,
+        // 대기 화면 위 가운데: 게임 타이틀 (게임이 시작되면 톡 커지며 사라짐)
+        Image title = Img(top, "Title", Sprite("Logo_Title"), new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -24), new Vector2(640, 406));
+        title.gameObject.AddComponent<CanvasGroup>();
+        hud.title = title.rectTransform;
+
+        // 위 가운데: 작은 제목 + 기울어진 분홍 배지 (Fall Guys의 LAP 1/2처럼). 게임 시작 때 위에서 튀어나옴
+        TMP_Text iceLabel = Label(top, "IceLabel", "남은 얼음", 30, Color.white, outlinedThin,
             new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -26), new Vector2(300, 44), TextAlignmentOptions.Center, true);
         Image badge = Img(top, "IceBadge", Sprite("Gen_BadgePink"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), new Vector2(0, -122), new Vector2(236, 104), true);
         badge.rectTransform.localRotation = Quaternion.Euler(0, 0, 3f);
@@ -224,6 +332,26 @@ public static class Step7UISetup
         Image best = Img(top, "Best", Sprite("Gen_SkewNavy"), new Vector2(1, 1), new Vector2(1, 1), new Vector2(60, -178), new Vector2(330, 64));
         hud.bestText = Label(best.transform, "Text", "최고  0:00.0", 28, Color.white, outlinedThin,
             new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-96, 0), new Vector2(240, 44), TextAlignmentOptions.Right, true);
+
+        // 대기 중에는 숨겼다가 게임 시작 때 튀어나오는 요소
+        hud.popFromTop = new[] { iceLabel.rectTransform, badge.rectTransform };
+        hud.popFromRight = new[] { timer.rectTransform, best.rectTransform };
+
+        // 최고 기록 아래: 가진 파워업 (방패 / 슈퍼 점프 남은 시간)
+        Image powerUp = Img(top, "PowerUp", Sprite("Gen_SkewGold"), new Vector2(1, 1), new Vector2(1, 1), new Vector2(60, -250), new Vector2(380, 64));
+        hud.powerUpText = Label(powerUp.transform, "Text", "방패", 28, Color.white, outlinedThin,
+            new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-96, 1), new Vector2(290, 44), TextAlignmentOptions.Right, true);
+        hud.powerUpBadge = powerUp.gameObject;
+        hud.playerPowerUps = Object.FindAnyObjectByType<PlayerPowerUps>();
+        powerUp.gameObject.SetActive(false);
+
+        // 위 가운데 배지 아래: 잠깐 뜨는 안내 (시련 예고, 파워업 획득)
+        Image toast = Img(top, "Toast", Sprite("Gen_ChipDark"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), new Vector2(0, -222), new Vector2(560, 76), true);
+        toast.gameObject.AddComponent<CanvasGroup>();
+        hud.toastText = Label(toast.transform, "Text", "눈덩이가 떨어져요!", 40, Color.white, outlined,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 3), new Vector2(540, 64), TextAlignmentOptions.Center, true);
+        hud.toast = toast.rectTransform;
+        toast.gameObject.SetActive(false);
     }
 
     static void BuildBottom(Transform root, GameHUD hud)

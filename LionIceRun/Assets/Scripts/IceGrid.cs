@@ -32,6 +32,8 @@ public class IceGrid : MonoBehaviour
     [Min(0f)] public float breakDelay = 1f;
     [Tooltip("한 블럭에 이 시간 이상 서 있으면 다시 밟지 않아도 한 단계 진행")]
     [Min(0.1f)] public float standTimeToCrack = 2f;
+    [Tooltip("금이 간 블럭은 아무도 안 밟아도 이 시간마다 한 단계씩 진행 (0이면 끔)")]
+    [Min(0f)] public float decayInterval = 6f;
     [Tooltip("단계별 색: 멀쩡함, 살짝 금, 많이 금, 흔들림")]
     public Color[] stageColors =
     {
@@ -70,6 +72,13 @@ public class IceGrid : MonoBehaviour
     public Vector2Int StartCell => new Vector2Int(width / 2, depth / 2);
     // 바다 수면 높이 (여기보다 아래로 떨어지면 게임 오버)
     public float SeaLevel => transform.position.y - seaDepth;
+
+    // 월드 좌표에서 가장 가까운 칸 (그리드 밖일 수도 있음)
+    public Vector2Int WorldToCell(Vector3 world)
+    {
+        Vector3 local = transform.InverseTransformPoint(world);
+        return new Vector2Int(Mathf.RoundToInt(local.x / Spacing + (width - 1) / 2f), Mathf.RoundToInt(local.z / Spacing + (depth - 1) / 2f));
+    }
 
     public bool InBounds(Vector2Int cell) => cell.x >= 0 && cell.y >= 0 && cell.x < width && cell.y < depth;
 

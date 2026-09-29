@@ -1,10 +1,15 @@
 using UnityEngine;
 
-// 얼음 복구 아이템. 블럭 위에서 빙글빙글 돌며 둥실거리고, 사라지기 전에는 깜빡인다.
-// 플레이어가 닿으면 스포너에게 알려 주변 깨진 칸을 다시 얼린다.
+// 파워업 아이템 (처음엔 얼음 복구만 있어서 이름이 RepairItem). 블럭 위에서 빙글빙글 돌며 둥실거리고,
+// 사라지기 전에는 깜빡인다. 종류마다 결정 색이 다르다. 플레이어가 닿으면 스포너에게 알린다.
 [RequireComponent(typeof(Collider))]
 public class RepairItem : MonoBehaviour
 {
+    public enum Kind { Repair, Shield, SuperJump, Harden }
+
+    static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+    static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
+
     [Tooltip("돌고 둥실거리는 모양 (자식 오브젝트)")]
     public Transform visual;
     [Min(0f)] public float spinSpeed = 120f;
@@ -20,16 +25,40 @@ public class RepairItem : MonoBehaviour
     Vector3 visualBase;
 
     public Vector2Int Cell { get; private set; }
+    public Kind ItemKind { get; private set; }
 
-    public void Init(RepairItemSpawner owner, Vector2Int cell, float life)
+    public static Color ColorOf(Kind kind) => kind switch
+    {
+        Kind.Shield => new Color(0.70f, 0.50f, 1f),
+        Kind.SuperJump => new Color(1f, 0.85f, 0.25f),
+        Kind.Harden => new Color(0.95f, 0.98f, 1f),
+        _ => new Color(0.6f, 0.95f, 1f),
+    };
+
+    public static string NameOf(Kind kind) => kind switch
+    {
+        Kind.Shield => "방패",
+        Kind.SuperJump => "슈퍼 점프",
+        Kind.Harden => "얼음 굳히기",
+        _ => "얼음 복구",
+    };
+
+    public void Init(RepairItemSpawner owner, Vector2Int cell, float life, Kind kind)
     {
         spawner = owner;
         Cell = cell;
         lifetime = life;
+        ItemKind = kind;
         spawnTime = Time.time;
         renderers = GetComponentsInChildren<Renderer>();
         if (visual == null && transform.childCount > 0) visual = transform.GetChild(0);
         if (visual != null) visualBase = visual.localPosition;
+
+        Color color = ColorOf(kind);
+        var properties = new MaterialPropertyBlock();
+        properties.SetColor(BaseColorId, color);
+        properties.SetColor(EmissionColorId, color * 1.2f);
+        foreach (Renderer r in renderers) r.SetPropertyBlock(properties);
     }
 
     void Update()
@@ -58,6 +87,8 @@ public class RepairItem : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponentInParent<PlayerController>() != null) spawner.OnItemCollected(this);
+        // 플레이어만 먹는다 (AI 봇은 지나가도 안 먹음)
+        PlayerController controller = other.GetComponentInParent<PlayerController>();
+        if (controller != null && !controller.useExternalInput) spawner.OnItemCollected(this, controller);
     }
 }

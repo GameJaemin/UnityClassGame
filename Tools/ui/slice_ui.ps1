@@ -37,8 +37,20 @@ Save 4 (Region 4 14) "Panel_Yellow"
 Save 4 (Region 4 15) "Panel_Blue"
 Save 4 (Region 4 16) "Panel_Pink"
 
-# 시트 7: 타이틀 로고 (나중에 타이틀 화면에서)
-Save 7 (Region 7 0)  "Logo_Title"
+# 타이틀 로고: 사용자가 따로 준 UI/Title.png (WebP였던 것을 Tools/ui/webp_to_png.py로 변환)
+# 작은 얼음 조각까지 포함되게 모든 덩어리를 감싸는 범위로 여백만 잘라낸다. 없으면 시트 7의 로고
+$titlePath = Join-Path $sheets "Title.png"
+if (Test-Path $titlePath) {
+    $parts = [SliceSheet]::FindRegions($titlePath, 40, 4, 4)
+    $minX = ($parts | Measure-Object -Property X -Minimum).Minimum
+    $minY = ($parts | Measure-Object -Property Y -Minimum).Minimum
+    $maxX = ($parts | ForEach-Object { $_.Right } | Measure-Object -Maximum).Maximum
+    $maxY = ($parts | ForEach-Object { $_.Bottom } | Measure-Object -Maximum).Maximum
+    $bounds = New-Object System.Drawing.Rectangle($minX, $minY, ($maxX - $minX), ($maxY - $minY))
+    [SliceSheet]::Crop($titlePath, $bounds, 6, (Join-Path $sprites "Logo_Title.png"))
+    Write-Host "Logo_Title  ($($bounds.Width)x$($bounds.Height), UI/Title.png)"
+}
+else { Save 7 (Region 7 0) "Logo_Title" }
 
 # 시트 1: 아이콘만 있고 글자 자리가 빈 버튼 (글자는 Unity에서 TextMeshPro로 올림)
 Save 1 (Region 1 4)  "Btn_YellowRetry"   # 노랑 + 다시 하기 아이콘

@@ -1,0 +1,6 @@
+Penguin_Back 0.160 0.190 0.270
+Penguin_Belly 1.000 1.000 0.970
+Penguin_Beak 1.000 0.620 0.160
+Penguin_Feet 1.000 0.550 0.120
+Penguin_Eye 0.060 0.060 0.080
+Penguin_Blush 1.000 0.620 0.700

@@ -27,6 +27,19 @@ foreach ($c in $characters) {
 }
 Copy-Item (Join-Path $renders "lion_anim.mp4") (Join-Path $here "animations_preview.mp4") -Force
 
+# 방해꾼(시련)은 Assets/Models/Hazards로. 스킨 미리보기 시트에는 넣지 않는다
+$unityHazards = Join-Path $here "..\..\LionIceRun\Assets\Models\Hazards"
+New-Item -ItemType Directory -Force -Path $unityHazards | Out-Null
+$hazards = @(
+    @{ Script = "make_penguin.py"; Name = "Penguin" }
+)
+foreach ($h in $hazards) {
+    & $Blender --background --factory-startup --python (Join-Path $here $h.Script) -- `
+        --fbx (Join-Path $unityHazards "$($h.Name).fbx") `
+        --palette (Join-Path $unityHazards "$($h.Name)_palette.txt") `
+        --blend (Join-Path $here "$($h.Name).blend") 2>&1 | Select-String -Pattern "Error", "Traceback", "CHARACTER_DONE" -SimpleMatch
+}
+
 # 캐릭터마다 정면 / 옆 / 뒤 3장을 한 줄로 붙이고, 전체 시트도 만든다
 Add-Type -AssemblyName System.Drawing
 $views = "front", "side", "back"

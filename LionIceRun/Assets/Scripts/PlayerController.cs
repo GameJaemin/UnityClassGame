@@ -13,6 +13,12 @@ public class PlayerController : MonoBehaviour
     [Header("시작 위치")]
     public IceGrid grid;
     [Min(0f)] public float spawnHeight = 1.05f;
+    [Tooltip("끄면 시작 칸으로 옮기지 않음 (봇은 스스로 자리를 잡는다)")]
+    public bool spawnAtStartCell = true;
+
+    [Header("입력")]
+    [Tooltip("켜면 키보드 대신 SetExternalInput으로 조종 (AI 봇)")]
+    public bool useExternalInput;
 
     [Header("이동")]
     [Min(0f)] public float moveSpeed = 5f;
@@ -56,6 +62,16 @@ public class PlayerController : MonoBehaviour
 
     Vector3 moveDirection;
     bool jumpHeld;
+    Vector3 externalMove;
+    bool externalJumpHeld;
+    bool externalJumpPressed;
+    bool externalDivePressed;
+    Vector3 pendingPush;
+    float boostJump = 1f;
+    float boostSpeed = 1f;
+    float boostUntil = float.NegativeInfinity;
+
+    bool Boosted => Time.time < boostUntil;
     bool isJumping;
     float lastJumpPressedTime = float.NegativeInfinity;
     float lastGroundedTime = float.NegativeInfinity;
@@ -75,7 +91,9 @@ public class PlayerController : MonoBehaviour
 
     // 점프 높이와 꼭대기까지 걸리는 시간으로 올라갈 때 중력과 점프 속도를 정한다
     float RiseGravity => 2f * jumpHeight / (jumpTimeToApex * jumpTimeToApex);
-    float JumpSpeed => 2f * jumpHeight / jumpTimeToApex;
+    // 슈퍼 점프 중에는 같은 중력으로 더 높이 뛴다 (높이 배율 → 속도는 제곱근 배)
+    float JumpSpeed => 2f * jumpHeight / jumpTimeToApex * (Boosted ? Mathf.Sqrt(boostJump) : 1f);
+    float MoveSpeed => moveSpeed * (Boosted ? boostSpeed : 1f);
 
     void Awake()
     {
@@ -100,7 +118,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         if (Camera.main != null) cameraTransform = Camera.main.transform;
-        if (grid != null)
+        if (grid != null && spawnAtStartCell)
         {
             body.position = grid.CellTop(grid.StartCell) + Vector3.up * spawnHeight;
             transform.position = body.position;
@@ -113,6 +131,17 @@ public class PlayerController : MonoBehaviour
         {
             moveDirection = Vector3.zero;
             jumpHeld = false;
+            return;
+        }
+
+        if (useExternalInput)
+        {
+            moveDirection = Vector3.ClampMagnitude(Vector3.ProjectOnPlane(externalMove, Vector3.up), 1f);
+            jumpHeld = externalJumpHeld;
+            if (externalJumpPressed) lastJumpPressedTime = Time.time;
+            if (externalDivePressed) diveQueued = true;
+            externalJumpPressed = externalDivePressed = false;
+            if (moveDirection.sqrMagnitude > 0.01f || jumpHeld || diveQueued) HasMoved = true;
             return;
         }
 
@@ -170,7 +199,51 @@ public class PlayerController : MonoBehaviour
         diveQueued = false;
 
         ApplyGravity(ref velocity);
+        velocity += pendingPush * Time.fixedDeltaTime;
+        pendingPush = Vector3.zero;
         body.linearVelocity = velocity;
+    }
+
+    // AI 봇용 입력. move는 월드 방향(크기 0~1), 누름(pressed)은 다음 Update에서 한 번 처리된다
+    public void SetExternalInput(Vector3 move, bool holdJump, bool pressJump, bool pressDive)
+    {
+        externalMove = move;
+        externalJumpHeld = holdJump;
+        externalJumpPressed |= pressJump;
+        externalDivePressed |= pressDive;
+    }
+
+    // 시련: 세게 밀려나며 넘어짐 (펭귄 충돌 등)
+    public void Knockback(Vector3 velocity, float downTime)
+    {
+        body.linearVelocity = velocity;
+        IsGrounded = false;
+        KnockDown(downTime);
+    }
+
+    // 시련: 계속 미는 힘 (찬바람). 부른 프레임의 물리 단계에서 한 번 더해진다
+    public void AddPush(Vector3 acceleration) => pendingPush += acceleration;
+
+    // 파워업: 일정 시간 점프 높이·이동 속도 배율 (슈퍼 점프)
+    public void SetBoost(float jumpMultiplier, float speedMultiplier, float duration)
+    {
+        boostJump = jumpMultiplier;
+        boostSpeed = speedMultiplier;
+        boostUntil = Time.time + duration;
+    }
+
+    public float BoostRemaining => Mathf.Max(0f, boostUntil - Time.time);
+
+    // 봇이 다시 떨어져 들어올 때 상태를 처음으로
+    public void ResetMotion(Vector3 position)
+    {
+        body.isKinematic = false;
+        body.position = position;
+        transform.position = position;
+        body.linearVelocity = Vector3.zero;
+        SetState(MoveState.Normal);
+        lastJumpPressedTime = float.NegativeInfinity;
+        diveQueued = false;
     }
 
     // 몇 초 동안 조작을 막는다. 다이브 착지, 눈덩이 기절 등에서 공통으로 쓴다.
@@ -183,7 +256,7 @@ public class PlayerController : MonoBehaviour
         SetState(MoveState.KnockedDown);
     }
 
-    void ApplyMovement(ref Vector3 velocity, float control) => ApplyMovement(ref velocity, control, moveDirection * moveSpeed);
+    void ApplyMovement(ref Vector3 velocity, float control) => ApplyMovement(ref velocity, control, moveDirection * MoveSpeed);
 
     void ApplyMovement(ref Vector3 velocity, float control, Vector3 targetHorizontal)
     {

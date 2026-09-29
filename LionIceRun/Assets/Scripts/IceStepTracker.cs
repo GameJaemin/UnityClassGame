@@ -28,6 +28,7 @@ public class IceStepTracker : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (grid == null) grid = player.grid;  // 봇처럼 코드로 만들 때 grid가 나중에 들어오는 경우
         IceBlock block = FindBlockUnderPlayer();
         if (block == null)
         {
