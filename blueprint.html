@@ -1,0 +1,385 @@
+<title>사자 타일 러너 Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column; rules table up top, then stage checklists with per-stage progress. Voxel-square motifs (square checks, 6x6 map). */
+:root {
+  --bg: #f1f5f8;
+  --surface: #ffffff;
+  --fg: #1f2733;
+  --muted: #5f6b7a;
+  --line: #d6dee7;
+  --mane: #d98a0b;
+  --mane-soft: #fbe8c6;
+  --grass: #1f8f7a;
+  --hole: #e5ebf1;
+  --ice: #bfe6f7;
+  --ice-edge: #8ccbe8;
+  --sea: #2f6f9f;
+  --pink: #f06fa6;
+  --font-display: "Do Hyeon", "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121820; --surface: #1b2330; --fg: #e6edf5; --muted: #95a3b4; --line: #2e3a4a;
+    --mane: #f0ad3c; --mane-soft: #3a2f1c; --grass: #4fc7ae; --hole: #243040;
+    --ice: #7fc4e4; --ice-edge: #a9dcf2; --sea: #0d2b45; --pink: #f58bb8; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121820; --surface: #1b2330; --fg: #e6edf5; --muted: #95a3b4; --line: #2e3a4a;
+  --mane: #f0ad3c; --mane-soft: #3a2f1c; --grass: #4fc7ae; --hole: #243040;
+  --ice: #7fc4e4; --ice-edge: #a9dcf2; --sea: #0d2b45; --pink: #f58bb8; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 40px; }
+h1, h2 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 2.4rem; }
+h2 { font-size: 1.5rem; }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: .86em; background: var(--hole); padding: 1px 5px; border-radius: 3px; }
+.eyebrow { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* header */
+header { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+header .intro { display: grid; gap: 10px; min-width: 0; }
+header .intro p { color: var(--muted); max-width: 52ch; }
+.map { display: grid; grid-template-columns: repeat(6, 22px); gap: 3px; padding: 6px; background: var(--sea); border-radius: 6px; }
+.map span { width: 22px; height: 22px; background: var(--ice); box-shadow: inset 0 -3px 0 var(--ice-edge); border-radius: 3px; position: relative; }
+.map span.hole { background: transparent; box-shadow: none; }
+.map span.crack { background: linear-gradient(135deg, var(--ice) 45%, var(--ice-edge) 45%, var(--ice-edge) 55%, var(--ice) 55%); }
+.map span.item::after { content: ""; position: absolute; inset: 7px; background: var(--pink); border-radius: 50%; }
+.map span.lion { background: var(--mane); box-shadow: inset 0 -3px 0 var(--mane-soft); }
+.legend { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font-size: .72rem; color: var(--muted); margin-top: 6px; }
+.legend b { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.map-cap { font-family: var(--font-mono); font-size: .7rem; color: var(--muted); margin-top: 6px; text-align: center; }
+
+/* overall progress */
+.overall { display: grid; gap: 8px; }
+.overall .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.overall strong { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.bar { height: 10px; background: var(--hole); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--mane); transition: width .3s ease; }
+.reset { font: inherit; font-size: .8rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+.reset.armed { color: var(--fg); border-color: var(--mane); background: var(--mane-soft); }
+
+/* rules */
+.rules { display: grid; gap: 14px; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+tr:last-child th, tr:last-child td { border-bottom: 0; }
+th { font-weight: 600; white-space: nowrap; color: var(--muted); width: 1%; }
+.hint { font-size: .82rem; color: var(--muted); }
+.later { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .06em; color: var(--muted); border: 1px dashed var(--muted); border-radius: 999px; padding: 1px 10px; }
+.stage.is-later { border-style: dashed; }
+.win { color: var(--grass); font-weight: 600; }
+.lose { color: var(--mane); font-weight: 600; }
+
+/* stages */
+.stages { display: grid; gap: 14px; }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; display: grid; gap: 10px; }
+.stage.done { border-color: var(--grass); }
+.stage-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.stage-head .num { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); }
+.stage-head h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; margin: 0; flex: 1; min-width: 0; }
+.stage-head .count { font-family: var(--font-mono); font-size: .8rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.stage.done .count { color: var(--grass); font-weight: 500; }
+.stage .bar { height: 4px; }
+.stage.done .bar i { background: var(--grass); }
+ul.tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
+.task label { display: flex; gap: 10px; align-items: flex-start; padding: 5px 6px; border-radius: 4px; cursor: pointer; }
+.task label:hover { background: var(--hole); }
+.task input { appearance: none; flex: none; width: 18px; height: 18px; margin: 3px 0 0; border: 2px solid var(--muted); border-radius: 2px; background: var(--surface); cursor: pointer; display: grid; place-items: center; }
+.task input:checked { background: var(--grass); border-color: var(--grass); }
+.task input:checked::after { content: ""; width: 5px; height: 9px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: translateY(-1px) rotate(45deg); }
+.task input:focus-visible { outline: 2px solid var(--mane); outline-offset: 2px; }
+.task input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+
+/* open questions */
+.open { border-left: 3px solid var(--mane); padding: 4px 0 4px 16px; display: grid; gap: 6px; }
+.open ul { margin: 0; padding-left: 18px; }
+.note { font-size: .82rem; color: var(--muted); }
+
+@media (max-width: 520px) {
+  h1 { font-size: 1.9rem; }
+  header { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="intro">
+      <span class="eyebrow">Unity 3D · 개발 계획</span>
+      <h1>사자 타일 러너</h1>
+      <p>두 발로 걷는 복셀 사자가 펭귄 얼음깨기 맵 위를 돌아다니며 아이템을 모두 모으는 게임. 밟은 얼음은 깨지고, 바다로 떨어지면 게임이 끝난다. 전체 느낌은 폴가이즈 스타일.</p>
+    </div>
+    <div>
+      <div class="map" aria-label="6x6 얼음 맵 예시">
+        <span class="lion"></span><span class="crack"></span><span></span><span class="item"></span><span></span><span></span>
+        <span class="hole"></span><span class="hole"></span><span></span><span></span><span class="crack"></span><span class="item"></span>
+        <span></span><span class="item"></span><span></span><span class="hole"></span><span></span><span></span>
+        <span></span><span></span><span class="crack"></span><span></span><span class="item"></span><span></span>
+        <span class="item"></span><span></span><span></span><span></span><span class="hole"></span><span></span>
+        <span></span><span></span><span class="item"></span><span></span><span></span><span class="crack"></span>
+      </div>
+      <div class="legend">
+        <span><b style="background: var(--mane)"></b>사자</span>
+        <span><b style="background: var(--pink); border-radius: 50%"></b>아이템</span>
+        <span><b style="background: var(--sea)"></b>깨진 칸</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="overall" aria-label="전체 진행률">
+    <div class="row">
+      <span class="eyebrow">전체 진행률</span>
+      <strong id="overall-text">0 / 0</strong>
+    </div>
+    <div class="bar"><i id="overall-bar"></i></div>
+    <div class="row">
+      <span class="note">체크 상태는 이 브라우저에만 저장됩니다.</span>
+      <button class="reset" id="reset-btn" type="button">진행 초기화</button>
+    </div>
+  </section>
+
+  <section class="rules">
+    <h2>게임 규칙</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>개발 환경</th><td>Unity 6000.6.3f1 · Universal 3D (URP) · 새 Input System · <code>D:\UnityClassGame\LionIceRun</code></td></tr>
+        <tr><th>분위기</th><td>폴가이즈 느낌 · 밝은 파스텔 색, 통통하고 짧은 비율, 말랑하게 튀는 움직임</td></tr>
+        <tr><th>캐릭터</th><td>인체형 복셀 사자, 두 발 보행 · 큰 머리와 몸통, 짧은 팔다리, 갈기와 꼬리</td></tr>
+        <tr><th>맵</th><td>펭귄 얼음깨기 · 기본 6x6 얼음 블럭 (에디터에서 가로·세로 설정 가능), 아래는 차가운 바다</td></tr>
+        <tr><th>이동</th><td>자유 이동 · WASD / 방향키</td></tr>
+        <tr><th>점프</th><td>Space 키 · 깨진 빈칸을 건너는 용도</td></tr>
+        <tr><th>카메라</th><td>고정 쿼터뷰 · 그리드 크기에 맞춰 맵 전체가 보이도록 자동 배치</td></tr>
+        <tr><th>얼음 깨짐</th><td>폴가이즈 Thin Ice 방식 · 밟을 때마다 한 단계씩: 1번째 살짝 금 → 2번째 많이 금 → 3번째 흔들린 뒤 1초 뒤 깨짐</td></tr>
+        <tr><th>떠난 블럭</th><td>금 간 상태 그대로 유지 · 다시 밟기 전까지 저절로 깨지지 않음</td></tr>
+        <tr><th>오래 서 있기</th><td>한 블럭에 2초 이상 서 있으면 한 단계 진행</td></tr>
+        <tr><th>보호 시간</th><td>단계가 바뀐 직후 약 1초 동안은 다시 밟아도 그대로</td></tr>
+        <tr><th>떨어짐</th><td>가장자리 밖이나 깨진 칸으로 가면 바다로 떨어짐 · Y 좌표가 기준값(예: -5) 아래면 게임 종료</td></tr>
+        <tr><th>아이템</th><td>게임 시작 시 얼음 블럭 위에 랜덤 생성 · 중복 없음, 시작 블럭 제외</td></tr>
+        <tr><th>결과</th><td><span class="win">성공</span> 아이템 모두 획득 &nbsp;·&nbsp; <span class="lose">실패</span> 바다로 떨어짐</td></tr>
+        <tr><th>재시작</th><td>재시작 버튼 또는 R 키 · 현재 씬 다시 로드</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="rules">
+    <div class="stage-head"><h2>시련</h2><span class="later">후순위</span></div>
+    <p class="note">핵심 시스템(STEP 1~10)을 완성한 뒤 진행합니다. 모든 시련은 미리 예고해서 피할 수 있게 하고, 아이템을 모을수록 하나씩 늘어나며, 남은 아이템에 갈 수 없는 상황은 만들지 않습니다.</p>
+    <div class="table-scroll">
+      <table>
+        <tr><th>눈덩이 낙하</th><td>맞으면 2초 기절, 블럭에 떨어지면 1단계 깨짐<br><span class="hint">예고: 그림자가 1.5초 동안 점점 커짐</span></td></tr>
+        <tr><th>랜덤 금 가기</th><td>몇 초마다 랜덤 블럭 2~3개가 한 단계 깨짐<br><span class="hint">예고: 블럭이 1초 동안 반짝임</span></td></tr>
+        <tr><th>펭귄 슬라이딩</th><td>펭귄이 한 줄을 미끄러져 지나감, 부딪히면 크게 밀려남<br><span class="hint">예고: 줄 끝에서 1초 동안 준비 동작</span></td></tr>
+        <tr><th>찬바람</th><td>3초 동안 한 방향으로 밀어냄<br><span class="hint">예고: 바람 방향 화살표와 눈보라</span></td></tr>
+        <tr><th>고드름</th><td>떨어진 블럭은 바로 깨짐 (드물게 등장)<br><span class="hint">예고: 블럭 위 붉은 원</span></td></tr>
+        <tr><th>도망가는 아이템</th><td>오래 방치한 아이템이 옆 블럭으로 이동<br><span class="hint">예고: 아이템이 떨림</span></td></tr>
+        <tr><th>시간 제한</th><td>제한 시간(예: 90초) 안에 아이템을 모두 모아야 함<br><span class="hint">예고: 화면 상단 타이머</span></td></tr>
+      </table>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <tr><th>아이템 0개</th><td>시련 없음 (조작 익히기)</td></tr>
+        <tr><th>1개 이상</th><td>눈덩이 낙하</td></tr>
+        <tr><th>3개 이상</th><td>+ 랜덤 금 가기</td></tr>
+        <tr><th>5개 이상</th><td>+ 펭귄 슬라이딩</td></tr>
+      </table>
+    </div>
+    <p class="note">안전장치: 아이템이 놓인 블럭은 랜덤 금 가기·고드름 대상에서 제외하고, 기절한 동안에는 오래 서 있기 타이머를 멈춥니다.</p>
+  </section>
+
+  <section class="stages">
+    <h2>할 일 목록</h2>
+    <div id="stage-list"></div>
+  </section>
+
+  <section class="open">
+    <h2>미정 사항</h2>
+    <ul>
+      <li>아이템 개수 (6x6 기준 기본값 6개, 조정 가능)</li>
+      <li>얼음 깨짐 수치 (기본값: 3번 밟으면 깨짐, 오래 서 있기 2초, 보호 시간 1초)</li>
+      <li>얼음 미끄러짐 적용 여부 (Thin Ice는 미끄러움, 선택)</li>
+      <li>게임 시작 시 처음부터 빈칸을 둘지 여부</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const STAGES = [
+  { title: "Unity 3D 프로젝트 생성", tasks: [
+    { text: "Unity 버전 결정 (6000.6.3f1)", done: true },
+    { text: "템플릿 결정 (Universal 3D)", done: true },
+    { text: "Universal 3D 템플릿으로 새 프로젝트 생성 (<code>LionIceRun</code>)", done: true },
+    { text: "폴더 구조 구성 (Scenes, Scripts, Prefabs, Models, Materials, Animations, UI)", done: true },
+    { text: "메인 씬 생성 및 저장 (<code>Assets/Scenes/Main.unity</code>, 빌드 설정 등록 확인)", done: true },
+    { text: "템플릿 안내 파일 정리 (TutorialInfo, Readme 삭제)", done: true } ]},
+  { title: "펭귄 얼음깨기 맵 및 카메라", tasks: [
+    "얼음 블럭 프리팹 제작 (하늘색 재질, 캐릭터 그림자가 보이도록 불투명)",
+    { text: "IceGrid 스크립트 작성: Inspector에서 설정 가능한 값", sub: [
+      "가로 칸 수 (기본 6)", "세로 칸 수 (기본 6)", "블럭 크기와 블럭 사이 간격", "얼음 블럭 프리팹" ]},
+    "설정값으로 게임 시작 시 그리드 자동 생성 (맵 중앙이 원점에 오도록)",
+    "에디터에서 미리보기 버튼 추가 (<code>[ContextMenu]</code>로 그리드 생성·삭제)",
+    "맵 아래 바다(물) 평면 배치 (그리드 크기에 맞춰 크기 조정)",
+    "펭귄 등 배경 장식 배치 (선택)",
+    "밝은 조명과 하늘 설정 (폴가이즈 톤)",
+    "고정 쿼터뷰 카메라가 그리드 크기에 맞춰 위치·거리 자동 조정",
+    "4x4, 6x6, 8x8로 바꿔 보며 맵 생성과 카메라 확인" ]},
+  { title: "캐릭터 이동 (임시 캐릭터)", tasks: [
+    "캡슐로 임시 플레이어 오브젝트 생성",
+    "이동 컴포넌트 결정 (Rigidbody 또는 CharacterController)",
+    "WASD / 방향키 자유 이동 구현",
+    "이동 방향으로 캐릭터 회전",
+    "바닥 체크 구현",
+    "Space 키 점프 구현",
+    "한 칸 빈칸을 점프로 건널 수 있는지 테스트 (점프 거리 조정)" ]},
+  { title: "얼음 깨짐", tasks: [
+    "캐릭터가 블럭에 새로 올라섰는지 감지 (올라선 순간 1회만 카운트)",
+    "블럭별 밟힌 횟수(단계) 저장: 멀쩡함 → 살짝 금 → 많이 금 → 흔들림",
+    "단계별 연출 (금 텍스처 또는 색 변화, 3단계 흔들림)",
+    "3번째 밟힘 → 흔들린 뒤 1초 뒤 블럭이 깨져 떨어지고 사라짐",
+    "오래 서 있기 타이머: 한 블럭에 2초 이상 서 있으면 한 단계 진행",
+    "보호 시간: 단계가 바뀐 직후 1초 동안 단계 변경 막기",
+    "시작 블럭은 첫 이동 전까지 깨지지 않게 처리",
+    "수치 조정 (깨지는 횟수, 오래 서 있기 시간, 보호 시간)" ]},
+  { title: "아이템", tasks: [
+    "아이템 개수를 Inspector에서 설정 가능하게 (6x6 기준 기본 6개, 블럭 수보다 많으면 자동 제한)",
+    "아이템 프리팹 제작 (회전, 통통 튀는 연출)",
+    "블럭 위치 목록에서 랜덤 선택 로직 구현 (중복 없음, 시작 블럭 제외)",
+    "게임 시작 시 얼음 블럭 위에 아이템 생성",
+    "캐릭터와 충돌(Trigger) 시 아이템 획득 처리" ]},
+  { title: "게임 상태 관리 (GameManager)", tasks: [
+    "GameManager 스크립트 생성 (진행 중 / 성공 / 실패)",
+    "떨어짐 판정 (Y 좌표 기준값 이하 → 실패)",
+    "아이템 전부 획득 → 성공",
+    "게임 종료 시 플레이어 조작 막기" ]},
+  { title: "UI 및 재시작", tasks: [
+    "폴가이즈 스타일 UI 톤 정하기 (둥글고 굵은 글꼴, 밝은 파스텔 색)",
+    "아이템 획득 수 표시 (예: 2 / 6)",
+    "성공 화면 제작",
+    "실패 화면 제작",
+    "재시작 버튼 구현",
+    "R 키 재시작 구현 (<code>SceneManager.LoadScene</code>으로 현재 씬 다시 로드)" ]},
+  { title: "인체형 복셀 사자 캐릭터 제작", tasks: [
+    "복셀 툴 결정 (예: MagicaVoxel)",
+    "폴가이즈 비율로 사자 디자인 (큰 머리, 통통한 몸통, 짧은 팔다리, 갈기, 꼬리 끝 털)",
+    { text: "애니메이션을 위해 부위별로 분리 제작", sub: [
+      "머리 (갈기 포함)", "몸통", "팔 2개", "다리 2개", "꼬리" ]},
+    "부위별 모델 내보내기 (.obj 등) 및 Unity로 가져오기",
+    "부모 오브젝트 아래로 조립 (팔·다리·꼬리의 회전 기준점을 관절 위치에 맞추기)",
+    "임시 캡슐 캐릭터를 사자로 교체 (콜라이더 크기 조정)" ]},
+  { title: "사자 애니메이션 (폴가이즈 느낌)", tasks: [
+    "Idle 클립 제작 (몸 살짝 출렁임, 꼬리 흔들기)",
+    "Walk 클립 제작 (두 발 교차 걸음 + 팔 반대로 흔들기 + 몸 좌우로 뒤뚱)",
+    "Jump 클립 제작 (점프 전 찌그러짐, 공중에서 늘어남, 착지 시 찌그러짐)",
+    "Fall 클립 제작 (떨어질 때 팔 허우적거리기, 선택)",
+    "Animator Controller 생성 및 상태 전환 설정 (이동 속도, 바닥 여부 파라미터)",
+    "이동 스크립트와 Animator 파라미터 연결" ]},
+  { title: "마무리", tasks: [
+    "얼음 깨지는 소리, 점프, 아이템 획득 효과음 (선택)",
+    "전체 플레이 테스트 (성공 / 실패 / 재시작)",
+    "버그 수정",
+    "빌드 및 실행 확인" ]},
+  { title: "시련", later: true, tasks: [
+    "적용할 시련 최종 선택",
+    "시련 관리 스크립트 작성 (획득한 아이템 수에 따라 시련 활성화)",
+    "기절 상태 구현 (조작 막기, 별 연출, 오래 서 있기 타이머 정지)",
+    "눈덩이 낙하 (그림자 예고 → 낙하 → 기절 / 블럭 1단계 깨짐)",
+    "랜덤 금 가기 (반짝임 예고 → 블럭 2~3개 한 단계 진행, 아이템 블럭 제외)",
+    "펭귄 슬라이딩 (준비 동작 예고 → 한 줄 통과 → 부딪히면 밀려남)",
+    "찬바람 (선택)",
+    "고드름 (선택)",
+    "도망가는 아이템 (선택)",
+    "시간 제한 (선택)",
+    "시련 수치 조정 및 플레이 테스트" ]}
+];
+
+const KEY = "lion-tile-runner-progress-v2";
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} };
+
+function taskHTML(id, text, done) {
+  const checked = id in saved ? saved[id] : !!done;
+  return `<li class="task"><label><input type="checkbox" id="${id}"${done ? ' data-default="1"' : ""} ${checked ? "checked" : ""}><span>${text}</span></label>`;
+}
+function listHTML(tasks, prefix) {
+  return `<ul class="tasks">` + tasks.map((t, i) => {
+    const id = `${prefix}-${i + 1}`;
+    if (typeof t === "string") return taskHTML(id, t) + `</li>`;
+    return taskHTML(id, t.text, t.done) + (t.sub ? listHTML(t.sub, id) : "") + `</li>`;
+  }).join("") + `</ul>`;
+}
+
+const list = document.getElementById("stage-list");
+list.style.display = "grid";
+list.style.gap = "14px";
+list.innerHTML = STAGES.map((s, i) => `
+  <article class="stage${s.later ? " is-later" : ""}" data-stage="${i + 1}">
+    <div class="stage-head">
+      <span class="num">STEP ${i + 1}</span>
+      <h3>${s.title}${s.later ? ' <span class="later">후순위</span>' : ""}</h3>
+      <span class="count"></span>
+    </div>
+    <div class="bar"><i></i></div>
+    ${listHTML(s.tasks, "s" + (i + 1))}
+  </article>`).join("");
+
+function update() {
+  let all = 0, done = 0;
+  document.querySelectorAll(".stage").forEach(stage => {
+    const boxes = stage.querySelectorAll("input[type=checkbox]");
+    const n = boxes.length, d = [...boxes].filter(b => b.checked).length;
+    all += n; done += d;
+    stage.querySelector(".count").textContent = d === n ? `완료 ${d}/${n}` : `${d}/${n}`;
+    stage.querySelector(".bar i").style.width = (d / n * 100) + "%";
+    stage.classList.toggle("done", d === n);
+  });
+  document.getElementById("overall-text").textContent = `${done} / ${all}`;
+  document.getElementById("overall-bar").style.width = (all ? done / all * 100 : 0) + "%";
+}
+
+list.addEventListener("change", e => {
+  const box = e.target;
+  if (box.type !== "checkbox") return;
+  // 상위 항목을 체크하면 하위 항목도 같이 체크
+  box.closest("li").querySelectorAll("ul input").forEach(c => { c.checked = box.checked; saved[c.id] = c.checked; });
+  // 하위 항목이 모두 체크되면 상위 항목 체크
+  const parentLi = box.closest("ul").closest("li.task");
+  if (parentLi) {
+    const parent = parentLi.querySelector(":scope > label input");
+    parent.checked = [...parentLi.querySelectorAll("ul input")].every(c => c.checked);
+    saved[parent.id] = parent.checked;
+  }
+  saved[box.id] = box.checked;
+  save();
+  update();
+});
+
+const resetBtn = document.getElementById("reset-btn");
+let armTimer;
+resetBtn.addEventListener("click", () => {
+  if (!resetBtn.classList.contains("armed")) {
+    resetBtn.classList.add("armed");
+    resetBtn.textContent = "한 번 더 누르면 초기화";
+    armTimer = setTimeout(() => { resetBtn.classList.remove("armed"); resetBtn.textContent = "진행 초기화"; }, 3000);
+    return;
+  }
+  clearTimeout(armTimer);
+  saved = {}; save();
+  list.querySelectorAll("input[type=checkbox]").forEach(c => c.checked = c.dataset.default === "1");
+  resetBtn.classList.remove("armed");
+  resetBtn.textContent = "진행 초기화";
+  update();
+});
+
+update();
+</script>
