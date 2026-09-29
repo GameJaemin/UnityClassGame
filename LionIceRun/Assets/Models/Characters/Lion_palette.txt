@@ -1,0 +1,7 @@
+Lion_Fur 1.000 0.780 0.350
+Lion_Mane 0.950 0.500 0.160
+Lion_Cream 1.000 0.930 0.760
+Lion_Nose 0.330 0.170 0.120
+Lion_Eye 0.080 0.080 0.100
+Lion_EyeShine 1.000 1.000 1.000
+Lion_Blush 1.000 0.620 0.660

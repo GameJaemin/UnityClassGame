@@ -20,7 +20,8 @@ public class IceGrid : MonoBehaviour
 
     [Header("바다")]
     public Transform sea;
-    [Min(0f)] public float seaDepth = 3f;
+    [Tooltip("블럭 윗면에서 바다 수면까지 깊이. 떨어지는 모습이 보이도록 깊게 (6x6 기준 15m를 넘으면 화면 밖)")]
+    [Min(0f)] public float seaDepth = 12f;
     [Min(0f)] public float seaMargin = 30f;
 
     readonly List<GameObject> blocks = new List<GameObject>();

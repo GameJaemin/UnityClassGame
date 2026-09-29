@@ -6,6 +6,9 @@ param(
 
 $here = $PSScriptRoot
 $renders = Join-Path $env:TEMP "voxel_character_renders"
+# FBX와 색상표는 Unity 프로젝트로 바로 내보낸다
+$unityModels = Join-Path $here "..\..\LionIceRun\Assets\Models\Characters"
+New-Item -ItemType Directory -Force -Path $unityModels | Out-Null
 $characters = @(
     @{ Script = "make_lion.py";      Name = "Lion" },
     @{ Script = "make_polarbear.py"; Name = "PolarBear" },
@@ -17,7 +20,8 @@ foreach ($c in $characters) {
     # 애니메이션은 모든 캐릭터가 같으므로 사자만 영상으로 확인
     if ($c.Name -eq "Lion") { $extra = @("--anim-preview", $renders) }
     & $Blender --background --factory-startup --python (Join-Path $here $c.Script) -- `
-        --fbx (Join-Path $here "$($c.Name).fbx") `
+        --fbx (Join-Path $unityModels "$($c.Name).fbx") `
+        --palette (Join-Path $unityModels "$($c.Name)_palette.txt") `
         --blend (Join-Path $here "$($c.Name).blend") `
         --preview $renders @extra 2>&1 | Select-String -Pattern "Error", "Traceback", "CHARACTER_DONE" -SimpleMatch
 }

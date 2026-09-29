@@ -353,6 +353,11 @@ def run(name, palette, build_parts):
     clips = create_clips(rig)
     if "fbx" in args:
         export_fbx(rig, mesh, args["fbx"])
+    if "palette" in args:
+        # FBX 안의 색은 선형/감마 변환이 섞일 수 있어서, Unity 머티리얼용 원래 색(sRGB)을 따로 적는다
+        with open(args["palette"], "w", encoding="utf-8") as f:
+            for color, rgb in palette.items():
+                f.write(f"{name}_{color} {rgb[0]:.3f} {rgb[1]:.3f} {rgb[2]:.3f}\n")
     if "blend" in args:
         os.makedirs(os.path.dirname(args["blend"]), exist_ok=True)
         bpy.context.preferences.filepaths.save_version = 0  # .blend1 백업 파일을 만들지 않음

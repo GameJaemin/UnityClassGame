@@ -169,7 +169,7 @@ ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
         <tr><th>떠난 블럭</th><td>금 간 상태 그대로 유지 · 다시 밟기 전까지 저절로 깨지지 않음</td></tr>
         <tr><th>오래 서 있기</th><td>한 블럭에 2초 이상 서 있으면 한 단계 진행</td></tr>
         <tr><th>보호 시간</th><td>단계가 바뀐 직후 약 1초 동안은 다시 밟아도 그대로</td></tr>
-        <tr><th>떨어짐</th><td>가장자리 밖이나 깨진 칸으로 가면 바다로 떨어짐 · Y 좌표가 기준값(예: -5) 아래면 게임 종료</td></tr>
+        <tr><th>떨어짐</th><td>가장자리 밖이나 깨진 칸으로 가면 바다로 떨어짐 · 바다 수면(블럭 아래 12m)에 닿으면 게임 종료 · 약 1.2초 동안 허우적대며 떨어짐</td></tr>
         <tr><th>아이템</th><td>게임 시작 시 얼음 블럭 위에 랜덤 생성 · 중복 없음, 시작 블럭 제외</td></tr>
         <tr><th>결과</th><td><span class="win">성공</span> 아이템 모두 획득 &nbsp;·&nbsp; <span class="lose">실패</span> 바다로 떨어짐</td></tr>
         <tr><th>재시작</th><td>재시작 버튼 또는 R 키 · 현재 씬 다시 로드</td></tr>
@@ -270,7 +270,7 @@ const STAGES = [
     "캐릭터와 충돌(Trigger) 시 아이템 획득 처리" ]},
   { title: "게임 상태 관리 (GameManager)", tasks: [
     "GameManager 스크립트 생성 (진행 중 / 성공 / 실패)",
-    "떨어짐 판정 (Y 좌표 기준값 이하 → 실패)",
+    "떨어짐 판정 (바다 수면 아래로 내려가면 → 실패, 수면 높이는 IceGrid의 Sea Depth 사용)",
     "아이템 전부 획득 → 성공",
     "게임 종료 시 플레이어 조작 막기" ]},
   { title: "UI 및 재시작", tasks: [

@@ -28,7 +28,8 @@ public class PlayerController : MonoBehaviour
     [Min(1f)] public float jumpCutGravityScale = 3f;
     [Tooltip("떨어질 때 중력 배율 (올라갈 때 중력 기준)")]
     [Min(1f)] public float fallGravityScale = 1.5f;
-    [Min(1f)] public float maxFallSpeed = 20f;
+    [Tooltip("최고 낙하 속도. 점프 후 떨어질 때(최대 약 9.8)는 걸리지 않고, 맵 밖으로 떨어질 때 Fall 애니메이션이 보이게 천천히 떨어진다")]
+    [Min(1f)] public float maxFallSpeed = 12f;
     [Min(0f)] public float coyoteTime = 0.08f;
     [Min(0f)] public float jumpBufferTime = 0.12f;
     [Min(0f)] public float groundCheckDistance = 0.15f;
