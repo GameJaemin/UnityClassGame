@@ -28,6 +28,19 @@
 - 💎 **파워업 아이템** — 얼음 복구, 방패, 슈퍼 점프, 얼음 굳히기
 - 🎨 **Fall Guys 스타일** — 밝은 파스텔 톤, 말랑하게 튀는 움직임, 기울어진 굵은 UI
 
+## 📸 스크린샷
+
+<div align="center">
+
+<img src="docs/screenshots/play.png" alt="플레이 화면" width="820">
+
+| 🏁 대기 화면 | ❄️ 시련 등장 | 🏆 결과 화면 |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/title.png" width="270"> | <img src="docs/screenshots/trial.png" width="270"> | <img src="docs/screenshots/result.png" width="270"> |
+| 움직이면 시작! | 버틸수록 늘어나는 방해 | 버틴 시간과 최고 기록 |
+
+</div>
+
 ## 🕹️ 조작법
 
 | 키 | 동작 |
@@ -114,6 +127,7 @@ UnityClassGame/
 │   ├── ui/                     # UI 시트 자르기 스크립트
 │   └── docs/                   # blueprint 동기화 스크립트
 ├── UI/                         # UI 시트 원본, 타이틀 로고
+├── docs/screenshots/           # README용 게임 화면
 └── blueprint.md                # 전체 계획과 진행 상황
 ```
 </details>
