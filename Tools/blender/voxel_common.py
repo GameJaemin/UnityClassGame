@@ -32,9 +32,10 @@ def mx(x):
 
 
 class Part:
-    def __init__(self, name):
+    def __init__(self, name, pivots=None):
+        """pivots를 주지 않으면 플레이어 스킨 공통 뼈대(PIVOTS)를 쓴다. 방해꾼은 전용 뼈대를 넘긴다."""
         self.name = name
-        self.pivot, self.parent = PIVOTS[name]
+        self.pivot, self.parent = (pivots or PIVOTS)[name]
         self.voxels = {}
 
     def box(self, x0, x1, y0, y1, z0, z1, color):
@@ -288,7 +289,7 @@ def render_animation_preview(rig, mesh, clips, folder, file_prefix):
         label.size = 0.45
         label.align_x = "CENTER"
         text = bpy.data.objects.new(f"Label_{clip}", label)
-        text.location = (copy_rig.location.x, -1.6, 0.01)
+        text.location = (copy_rig.location.x, -1.3, 0.01)
         text_material = bpy.data.materials.new("LabelMaterial")
         text_material.diffuse_color = (0.05, 0.08, 0.15, 1)
         label.materials.append(text_material)
@@ -308,8 +309,11 @@ def render_animation_preview(rig, mesh, clips, folder, file_prefix):
     camera.data.type = "ORTHO"
     camera.data.ortho_scale = len(names) * spacing + 0.4
     camera.constraints.clear()
-    camera.location = (0, -12, 5.2)
-    camera.rotation_euler = (math.radians(72), 0, 0)
+    # 발밑 약간 앞(이름표 포함)을 화면 중앙에 두고 비스듬히 내려다본다
+    pitch = math.radians(72)
+    target = Vector((0, -0.5, 0.4))
+    camera.location = target - Vector((0, math.sin(pitch), -math.cos(pitch))) * 12
+    camera.rotation_euler = (pitch, 0, 0)
     scene.render.resolution_x = 1600
     scene.render.resolution_y = 640
 
@@ -344,13 +348,14 @@ def parse_args():
     return args
 
 
-def run(name, palette, build_parts):
-    """인자: --fbx <경로> --blend <경로> --preview <폴더> [--anim-preview <폴더>]"""
-    from voxel_anim import create_clips
+def run(name, palette, build_parts, clips=None):
+    """인자: --fbx <경로> --palette <경로> --blend <경로> --preview <폴더> [--anim-preview <폴더>]
+    clips를 주지 않으면 플레이어 스킨 공통 클립(voxel_anim.CLIPS)을 쓴다. 방해꾼은 전용 클립을 넘긴다."""
+    from voxel_anim import CLIPS, create_clips
 
     args = parse_args()
     rig, mesh = build_character(name, palette, build_parts())
-    clips = create_clips(rig)
+    clips = create_clips(rig, CLIPS if clips is None else clips)
     if "fbx" in args:
         export_fbx(rig, mesh, args["fbx"])
     if "palette" in args:
@@ -364,6 +369,6 @@ def run(name, palette, build_parts):
         bpy.ops.wm.save_as_mainfile(filepath=args["blend"])
     if "preview" in args:
         render_previews(args["preview"], name.lower())
-    if "anim-preview" in args:
+    if "anim-preview" in args and clips:
         render_animation_preview(rig, mesh, clips, args["anim-preview"], name.lower())
     print("CHARACTER_DONE", name, len(mesh.data.polygons), "faces", {k: v for k, v in clips.items()})

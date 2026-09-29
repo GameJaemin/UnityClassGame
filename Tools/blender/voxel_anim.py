@@ -151,11 +151,11 @@ def insert(pb, prop, frame):
     pb.keyframe_insert(prop, frame=frame, group=pb.name)
 
 
-def create_clips(rig):
-    """CLIPS를 rig의 액션으로 만든다. 반환: {이름: (길이, 반복 여부)}"""
+def create_clips(rig, clips):
+    """clips({이름: 만드는 함수})를 rig의 액션으로 만든다. 반환: {이름: (길이, 반복 여부)}"""
     rig.animation_data_create()
     info = {}
-    for name, build in CLIPS.items():
+    for name, build in clips.items():
         length, loop, keys = build()
         action = bpy.data.actions.new(name)
         action.use_fake_user = True
