@@ -6,10 +6,11 @@
 ## 작업 규칙
 
 - 사용자와의 대화, 문서, 코드 주석은 한국어로 쓴다. 코드 식별자는 영어.
-- 할 일을 끝내거나 규칙이 바뀌면 **`blueprint.md`와 `blueprint.html`을 같이 고친다**. HTML은 고친 뒤 Artifact로 다시 게시한다 (기존 주소: https://claude.ai/artifact/365Pc5zVb3RJoA5kd9QTbp, 새 대화에서는 `url`로 지정해서 게시).
-  - HTML 할 일 목록은 `<script>`의 `STAGES` 배열이다. 완료 항목은 `{ text: "...", done: true }`로 적는다.
+- 할 일을 끝내거나 규칙이 바뀌면 **`blueprint.md`만 고치고** `powershell -ExecutionPolicy Bypass -File Tools\docs\sync_blueprint.ps1`로 `blueprint.html`을 다시 만든 뒤 Artifact로 다시 게시한다 (기존 주소: https://claude.ai/artifact/365Pc5zVb3RJoA5kd9QTbp, 새 대화에서는 `url`로 지정해서 게시).
+  - 스크립트는 HTML의 `GEN:INTRO / GEN:TOP / GEN:OPEN / GEN:STAGES` 표시 사이만 바꾼다. 내용은 HTML에 손으로 적지 않는다 (디자인·동작만 HTML에서 고침).
+  - md 형식: `## 섹션`은 표·목록·인용·`**굵은 제목**`으로 그대로 옮겨짐, `## 할 일 목록` 아래 `### 번호. 제목` = 단계, `- [x]` 체크, 2칸 들여쓰기 = 하위 항목, `**묶음 제목**` 줄과 `>` 인용은 체크 없는 제목·설명, 표 첫 칸 `ㄴ `은 들여쓴 줄.
+  - 할 일 목록이 바뀌면 브라우저에 저장된 체크는 버려지고 md의 체크 상태를 따른다.
   - 사용자가 직접 확인한 항목만 체크한다. 코드만 작성하고 테스트 전이면 체크하지 않는다.
-- 시련(방해 요소)은 후순위. 핵심 시스템(blueprint 1~10단계)을 먼저 만든다.
 - git: 이 PC에는 git CLI가 없다. 사용자가 직접 커밋하므로, 요청하면 **마지막 커밋 이후 바뀐 파일 목록 + 커밋 제목/설명**을 정리해 준다. `.git/objects`를 직접 읽어 비교할 수 있다. 기존 `.gitignore`, `.gitattributes`는 덮어쓰지 않는다.
 
 ## 개발 환경

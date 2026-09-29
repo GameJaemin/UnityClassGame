@@ -101,6 +101,16 @@ ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
 .task input:focus-visible { outline: 2px solid var(--mane); outline-offset: 2px; }
 .task input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
 
+/* generated sections (status, setup order, trials) */
+.rules h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; margin: 4px 0 0; }
+.rules ol, .rules ul { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.rules thead th { width: auto; }
+.rules td.sub-row, .rules th.sub-row { padding-left: 30px; }
+.rules a, .stage a { color: var(--sea); }
+li.group { font-family: var(--font-display); font-size: 1.05rem; padding: 10px 6px 2px; }
+li.group .hint { font-family: var(--font-body); }
+li.note { font-size: .82rem; color: var(--muted); padding: 2px 6px 4px; }
+
 /* open questions */
 .open { border-left: 3px solid var(--mane); padding: 4px 0 4px 16px; display: grid; gap: 6px; }
 .open ul { margin: 0; padding-left: 18px; }
@@ -109,6 +119,8 @@ ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
 @media (max-width: 520px) {
   h1 { font-size: 1.9rem; }
   header { grid-template-columns: 1fr; }
+  th { white-space: normal; width: 30%; }
+  th, td { padding: 8px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
 </style>
@@ -118,7 +130,10 @@ ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
     <div class="intro">
       <span class="eyebrow">Unity 3D · 개발 계획</span>
       <h1>사자 타일 러너</h1>
-      <p>두 발로 걷는 복셀 사자가 펭귄 얼음깨기 맵 위에서 <strong>얼마나 오래 버티는지</strong> 겨루는 서바이벌 게임. 밟은 얼음은 깨지고, 바다로 떨어지면 끝나며 버틴 시간이 기록이 된다. 전체 느낌은 폴가이즈 스타일.</p>
+      <!-- GEN:INTRO -->
+      <p>두 발로 걷는 인체형 복셀 사자 캐릭터가 펭귄 얼음깨기 맵(기본 6x6 얼음 블럭) 위에서 <strong>얼마나 오래 버티는지</strong> 겨루는 3D 서바이벌 게임. 밟은 얼음은 깨지고, 바다로 떨어지면 게임이 끝나며 버틴 시간이 기록이 된다. 전체적인 느낌은 폴가이즈(Fall Guys) 스타일로 간다.</p>
+      <p class="hint">블럭은 모두 결국 깨지므로 버틸 수 있는 시간에는 한계가 있다 (블럭 하나당 최대 약 5초, 6x6 기준 잘하면 1분 30초~3분). 점프·다이브로 밟는 횟수를 아끼는 실력이 곧 기록이 된다. 맵을 돌아다니는 AI 봇도 얼음을 깨고, 시간이 지날수록 시련(눈덩이·찬바람·고드름·펭귄)이 늘어나며, 가끔 나오는 파워업으로 버틴다.</p>
+      <!-- /GEN:INTRO -->
     </div>
     <div>
       <div class="map" aria-label="6x6 얼음 맵 예시">
@@ -149,133 +164,110 @@ ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
     </div>
   </section>
 
+  <!-- GEN:TOP -->
   <section class="rules">
-    <h2>게임 규칙</h2>
-    <div class="table-scroll">
-      <table>
-        <tr><th>개발 환경</th><td>Unity 6000.6.3f1 · Universal 3D (URP) · 새 Input System · <code>D:\UnityClassGame\LionIceRun</code></td></tr>
-        <tr><th>분위기</th><td>폴가이즈 느낌 · 밝은 파스텔 색, 통통하고 짧은 비율, 말랑하게 튀는 움직임</td></tr>
-        <tr><th>캐릭터</th><td>인체형 복셀 사자, 두 발 보행 · 큰 머리와 몸통, 짧은 팔다리, 갈기와 꼬리</td></tr>
-        <tr><th>스킨</th><td>사자(기본), 북극곰(파란 목도리), 호랑이 · 능력은 같고 겉모습만 다름 · 같은 뼈대라 애니메이션 공유</td></tr>
-        <tr><th>맵</th><td>펭귄 얼음깨기 · 기본 6x6 얼음 블럭 (에디터에서 가로·세로 설정 가능), 아래는 차가운 바다</td></tr>
-        <tr><th>이동</th><td>자유 이동 · WASD / 방향키</td></tr>
-        <tr><th>조작감</th><td>폴가이즈 느낌 · 살짝 묵직한 관성, 공중에서는 방향 전환이 둔함</td></tr>
-        <tr><th>점프</th><td>Space 키 · 길게 누르면 높게(최대 약 1m), 짧게 누르면 낮게(약 0.35m) · 블럭 끝에서 떨어진 직후·착지 직전 입력도 인정</td></tr>
-        <tr><th>다이브</th><td>Ctrl 키 (게임패드 X) · 바라보는 방향으로 몸을 날림 · 점프 꼭대기에서 해야 가장 멀리 감 · 착지 후 0.4초 조작 불가</td></tr>
-        <tr><th>거리 설계</th><td>깨진 블럭 1칸 = 빈칸 약 1.7m, 2칸 = 약 3.3m · 1칸만 건널 수 있고 2칸은 못 건넘 (땅 다이브는 1칸을 아슬아슬하게)</td></tr>
-        <tr><th>넘어짐</th><td>일정 시간 조작 불가 후 일어남 · 다이브 착지, 시련에서 공통으로 사용</td></tr>
-        <tr><th>카메라</th><td>고정 쿼터뷰 · 그리드 크기에 맞춰 맵 전체가 보이도록 자동 배치</td></tr>
-        <tr><th>얼음 깨짐</th><td>Thin Ice 바탕, 무적 시간 없음 · 1번째 살짝 금 → 2번째 많이 금 → 3번째 흔들림 → 1초 뒤 깨짐</td></tr>
-        <tr><th>밟는 순간</th><td>걷기·점프 착지·다이브 착지 모두 <strong>밟는 순간 바로 한 단계 진행</strong> · 이음새 중복 방지 0.2초만 있음</td></tr>
-        <tr><th>흔들리는 블럭</th><td>1초 안에 점프 한 번으로 탈출 가능 · 다시 밟으면 <strong>즉시 깨짐</strong></td></tr>
-        <tr><th>천천히 부서짐</th><td>한 번이라도 금이 간 블럭은 아무도 안 밟아도 <strong>6초마다 한 단계씩</strong> 진행해 결국 깨짐</td></tr>
-        <tr><th>AI 봇</th><td>사람처럼 걷고·점프하고·다이브하는 봇 3마리 (스킨 무작위) · 봇이 밟아도 얼음이 깨짐 · 플레이어 근처를 좋아해 압박 · 바다에 빠지면 5~8초(무작위) 뒤 하늘에서 다시 들어옴 (플레이어 근처 제외) · 얼음 복구는 못 먹음</td></tr>
-        <tr><th>오래 서 있기</th><td>한 블럭에 2초 이상 서 있으면 한 단계 진행 · 넘어져 있는 동안은 멈춤</td></tr>
-        <tr><th>시작 블럭</th><td>처음 이동·점프·다이브 입력 전까지 깨지지 않음</td></tr>
-        <tr><th>떨어짐</th><td>가장자리 밖이나 깨진 칸으로 가면 바다로 떨어짐 · 바다 수면(블럭 아래 12m)에 닿으면 게임 종료 · 약 1.2초 동안 허우적대며 떨어짐</td></tr>
-        <tr><th>목표</th><td><strong>최대한 오래 버티기</strong> · 따로 성공 조건 없음 · 블럭이 모두 결국 깨지므로 6x6 기준 잘하면 1분 30초~3분</td></tr>
-        <tr><th>생존 시간</th><td>처음 이동·점프·다이브 입력 순간부터 잼 · 화면 상단에 0.1초 단위 표시</td></tr>
-        <tr><th>게임 오버</th><td><span class="lose">바다로 떨어짐</span> · 결과 화면에 버틴 시간, 최고 기록, 새 기록 여부</td></tr>
-        <tr><th>최고 기록</th><td>이 PC에 저장 (<code>PlayerPrefs</code>) · 게임을 껐다 켜도 유지</td></tr>
-        <tr><th>파워업 (보상)</th><td>버틴 지 10초부터 한 번에 하나씩 빛나는 결정이 나타남 · 8초 뒤 사라짐, 12초마다 다시 · 플레이어만 먹음 · 쓸모 없는 종류는 안 나옴</td></tr>
-        <tr><th>ㄴ 얼음 복구</th><td>하늘색 · 주변 3x3의 <strong>깨진 칸이 다시 얼어붙음</strong></td></tr>
-        <tr><th>ㄴ 방패</th><td>보라 · 시련에 <strong>한 번 맞는 것을 막음</strong> (기절·밀치기), 몸 주위 거품</td></tr>
-        <tr><th>ㄴ 슈퍼 점프</th><td>노랑 · <strong>6초 동안</strong> 점프 1.6배·속도 1.25배 → 깨진 칸 2개도 넘음</td></tr>
-        <tr><th>ㄴ 얼음 굳히기</th><td>흰색 · 주변 5x5의 <strong>금 간 칸을 멀쩡하게</strong></td></tr>
-        <tr><th>재시작</th><td>결과 화면의 재시작 버튼 또는 R 키 · 현재 씬 다시 로드</td></tr>
-      </table>
-    </div>
+    <h2>현재 상태 (2026-09-29)</h2>
+    <div class="table-scroll"><table><tbody><tr><th scope="row">맵·카메라·바다</th><td>동작 확인. 카메라 줌인·따라가기는 확인 필요</td></tr><tr><th scope="row">조작 (이동·가변 점프·다이브)</th><td>동작 확인</td></tr><tr><th scope="row">얼음 깨짐 + 그래픽</th><td>동작 확인. 천천히 부서짐·금 무늬 4벌은 확인 필요</td></tr><tr><th scope="row">캐릭터 스킨 3종 + 애니메이션</th><td>Unity에 들어옴(화면 확인). 애니메이션 전환은 확인 필요</td></tr><tr><th scope="row">AI 봇</th><td>배치 확인. 돌아다니기·재등장은 확인 필요</td></tr><tr><th scope="row">생존 시간·최고 기록·게임 오버</th><td>동작 확인</td></tr><tr><th scope="row">UI (Fall Guys식)</th><td>플레이 중 화면 확인. 타이틀·튀어나오기·결과 화면은 확인 필요</td></tr><tr><th scope="row">시련 4개 + 파워업 4종</th><td>코드 완성, 확인 필요</td></tr><tr><th scope="row">효과음, 빌드, 추가 화면(타이틀·스킨 선택·일시정지)</th><td>아직</td></tr></tbody></table></div>
   </section>
 
   <section class="rules">
-    <div class="stage-head"><h2>시련</h2></div>
-    <p class="note">플레이어와 AI 봇 모두에게 적용됩니다. 모든 시련은 예고 뒤에 일어나 피할 수 있고, <strong>버틴 시간이 길어질수록</strong> 하나씩 늘어나며, 처음 나올 때 안내 문구가 뜹니다.</p>
-    <div class="table-scroll">
-      <table>
-        <tr><th>눈덩이 낙하</th><td>15초~ · 맞으면 2초 기절, 떨어진 칸 1단계 깨짐, 시간이 지날수록 개수 증가<br><span class="hint">예고: 그림자가 1.5초 동안 커지고 눈덩이가 내려옴</span></td></tr>
-        <tr><th>찬바람</th><td>30초~ · 3초 동안 한 방향으로 모두를 밀어냄<br><span class="hint">예고: "찬바람! →" 안내 + 눈보라 줄기</span></td></tr>
-        <tr><th>고드름</th><td>45초~ · 떨어진 칸 즉시 깨짐 + 1초 기절<br><span class="hint">예고: 붉은 원이 1.3초 동안 깜빡이며 커짐</span></td></tr>
-        <tr><th>펭귄 슬라이딩</th><td>60초~ · 한 줄을 미끄러져 지나감 (깨진 칸 위도), 부딪히면 크게 밀려남<br><span class="hint">예고: 줄 끝에서 1초 뒤뚱 + 지나갈 줄이 붉게 표시</span></td></tr>
-      </table>
-    </div>
-    <div class="table-scroll">
-      <table>
-        <tr><th>0 ~ 15초</th><td>시련 없음 (조작 익히기)</td></tr>
-        <tr><th>15초 ~</th><td>눈덩이 낙하 (4~6초마다)</td></tr>
-        <tr><th>30초 ~</th><td>+ 찬바람 (12~16초마다)</td></tr>
-        <tr><th>45초 ~</th><td>+ 고드름 (6~9초마다)</td></tr>
-        <tr><th>60초 ~</th><td>+ 펭귄 슬라이딩 (7~10초마다)</td></tr>
-      </table>
-    </div>
-    <p class="note">버틴 시간 기준이며 수치는 플레이 테스트로 조정합니다. 방패는 맞는 것만 막고 고드름이 블럭을 깨는 것은 못 막습니다. 기절한 동안에는 오래 서 있기 타이머를 멈춥니다.</p>
+    <h2>세팅 메뉴 실행 순서 (새 씬에서 처음부터)</h2>
+    <p>Unity 상단 메뉴 <strong>LionIceRun</strong>에서 위에서부터 차례로 실행한다. 모든 메뉴는 여러 번 실행해도 안전하다.</p>
+    <ol><li><strong>Step 2 맵 세팅</strong> → <strong>Step 2 바다 꾸미기</strong></li><li><strong>Step 3 플레이어 세팅</strong></li><li><strong>Step 4 얼음 깨짐 세팅</strong> → <strong>Step 4 얼음 그래픽 세팅</strong></li><li><strong>Step 5 생존 시간 세팅</strong> → <strong>Step 6 게임 매니저 세팅</strong></li><li><strong>Step 8 캐릭터 가져오기</strong> (먼저 <code>Tools/blender/build_all.ps1</code>로 FBX 출력)</li><li><strong>AI 봇 세팅</strong> → <strong>시련·보상 세팅</strong></li><li><strong>Step 7 UI 세팅</strong> (마지막에. 처음엔 TextMeshPro 리소스를 가져온 뒤 한 번 더 실행. 직접 고친 배치는 유지되고, 되돌리려면 "배치 초기화")</li></ol>
+    <p>UI 이미지를 다시 만들려면 <code>Tools/ui/slice_ui.ps1</code>, 캐릭터·펭귄을 다시 만들려면 <code>Tools/blender/build_all.ps1</code>.</p>
   </section>
+
+  <section class="rules">
+    <h2>개발 환경</h2>
+    <div class="table-scroll"><table><tbody><tr><th scope="row">엔진</th><td>Unity 6000.6.3f1</td></tr><tr><th scope="row">템플릿</th><td>Universal 3D (URP)</td></tr><tr><th scope="row">프로젝트 위치</th><td><code>D:\UnityClassGame\LionIceRun</code></td></tr><tr><th scope="row">입력</th><td>새 Input System (<code>com.unity.inputsystem</code> 1.20.0, Active Input Handling = Input System)</td></tr></tbody></table></div>
+  </section>
+
+  <section class="rules">
+    <h2>콘셉트</h2>
+    <div class="table-scroll"><table><tbody><tr><th scope="row">분위기</th><td>폴가이즈 느낌: 밝은 파스텔 색, 통통하고 짧은 비율, 말랑하게 튀는 움직임</td></tr><tr><th scope="row">캐릭터</th><td>인체형 복셀 사자, 두 발 보행 (큰 머리와 몸통, 짧은 팔다리, 갈기와 꼬리)</td></tr><tr><th scope="row">스킨</th><td>사자(기본), 북극곰(파란 목도리), 호랑이. 능력은 같고 겉모습만 다름. 부위 이름·관절 위치가 같아서 애니메이션 공유</td></tr><tr><th scope="row">맵</th><td>펭귄 얼음깨기: 기본 6x6 얼음 블럭 (에디터에서 가로·세로 크기 설정 가능), 아래는 차가운 바다</td></tr></tbody></table></div>
+  </section>
+
+  <section class="rules">
+    <h2>게임 규칙</h2>
+    <div class="table-scroll"><table><tbody><tr><th scope="row">이동 방식</th><td>자유 이동 (WASD / 방향키)</td></tr><tr><th scope="row">조작감</th><td>폴가이즈 느낌: 살짝 묵직한 관성, 공중에서는 방향 전환이 둔함</td></tr><tr><th scope="row">점프</th><td>Space 키. 슈퍼마리오처럼 길게 누르면 높게(최대 약 1m), 짧게 누르면 낮게(약 0.35m) 뜀. 블럭 끝에서 떨어진 직후·착지 직전 입력도 인정</td></tr><tr><th scope="row">다이브</th><td>Ctrl 키 (게임패드 X). 바라보는 방향으로 몸을 날림. 점프 꼭대기에서 다이브해야 가장 멀리 감. 착지 후 0.4초 동안 일어나느라 조작 불가</td></tr><tr><th scope="row">거리 설계</th><td>깨진 블럭 1칸 = 빈칸 약 1.7m, 2칸 = 약 3.3m. 모든 동작으로 1칸만 건널 수 있고 2칸은 못 건넘 (땅 다이브는 1칸을 아슬아슬하게)</td></tr><tr><th scope="row">넘어짐</th><td>일정 시간 조작 불가 후 일어남. 다이브 착지, 시련(눈덩이·고드름 기절, 펭귄 밀치기)에서 공통으로 사용</td></tr><tr><th scope="row">카메라</th><td>쿼터뷰. 대기 중에는 그리드 전체가 보이는 거리, 게임 시작 시 정해 둔 거리(Play Distance)로 1.2초 동안 줌인하며 플레이어를 따라감 (높이는 안 따라가서 떨어지는 모습이 보임)</td></tr><tr><th scope="row">얼음 깨짐</th><td>폴가이즈 Thin Ice 바탕, 무적 시간 없이 더 긴장감 있게. 1번째 밟으면 살짝 금 → 2번째 많이 금 → 3번째 흔들림 → 1초 뒤 깨져서 떨어짐</td></tr><tr><th scope="row">밟는 순간</th><td>걸어서 올라서든 점프·다이브로 착지하든 <strong>밟는 순간 바로 한 단계 진행</strong> (원작의 1초 무적 없음, 이음새 중복 방지 0.2초만 있음)</td></tr><tr><th scope="row">흔들리는 블럭</th><td>깨지기 전 1초 안에 <strong>점프 한 번으로 탈출 가능</strong>. 다시 착지하거나 올라서면 <strong>즉시 깨짐</strong> (제자리 점프로 버티기 불가)</td></tr><tr><th scope="row">천천히 부서짐</th><td>한 번이라도 금이 간 블럭은 아무도 밟지 않아도 <strong>6초마다 한 단계씩</strong> 진행해 결국 깨짐 (마지막 단계 변화 기준)</td></tr><tr><th scope="row">AI 봇</th><td>사람처럼 걷고, 점프하고, 다이브하며 맵을 돌아다니는 봇 3마리 (스킨 무작위). 봇이 밟아도 얼음이 깨짐. 플레이어 가까운 칸을 좋아해서 주변 얼음을 깨며 압박. 바다에 빠지면 5~8초(봇마다 무작위) 뒤 하늘에서 다시 떨어져 들어옴 (플레이어 칸·옆 칸은 피함, 게임 오버 후엔 안 들어옴). 시련은 똑같이 맞고, 파워업 아이템은 못 먹음. 봇 수는 BotManager의 Bot Count (0~12)</td></tr><tr><th scope="row">오래 서 있기</th><td>한 블럭에 2초 이상 서 있으면 다시 밟지 않아도 한 단계 진행 (넘어져 있는 동안은 멈춤)</td></tr><tr><th scope="row">시작 블럭</th><td>처음 이동·점프·다이브 입력 전까지 깨지지 않음</td></tr><tr><th scope="row">떨어짐</th><td>블럭이 없는 위치(맵 가장자리 밖 또는 깨진 칸)로 가면 바다로 떨어짐 → 바다 수면(블럭 아래 12m)에 닿으면 게임 종료. 최고 낙하 속도 12m/s로 약 1.2초 동안 허우적대며 떨어지는 모습이 보임</td></tr><tr><th scope="row">목표</th><td><strong>최대한 오래 버티기.</strong> 따로 성공 조건은 없음</td></tr><tr><th scope="row">생존 시간</th><td>처음 이동·점프·다이브 입력 순간부터 잼 (시작 블럭 보호가 풀리는 순간과 같음). 화면 상단에 0.1초 단위로 표시</td></tr><tr><th scope="row">게임 오버</th><td>바다로 떨어지면 끝. 결과 화면에 버틴 시간, 최고 기록, 새 기록 여부 표시</td></tr><tr><th scope="row">최고 기록</th><td>이 PC에 저장 (<code>PlayerPrefs</code>), 게임을 껐다 켜도 유지</td></tr><tr><th scope="row">파워업 아이템 (보상)</th><td>버틴 지 10초부터 한 번에 하나씩 멀쩡한 블럭 위에 빛나는 결정으로 나타남. 8초 뒤 사라지고(마지막 2초 깜빡임), 먹거나 사라진 뒤 12초마다 다시 나옴. 놓인 블럭이 깨지면 같이 사라짐. 플레이어만 먹음</td></tr><tr><th scope="row" class="sub-row">얼음 복구 (하늘색)</th><td>주변 3x3의 <strong>깨진 칸이 다시 얼어붙음</strong>. 깨진 칸이 많은 곳일수록 잘 나옴, 깨진 칸이 없으면 안 나옴</td></tr><tr><th scope="row" class="sub-row">방패 (보라)</th><td>시련에 <strong>한 번 맞는 것을 막음</strong> (눈덩이·고드름 기절, 펭귄 밀치기). 몸 주위 반투명 거품. 이미 있으면 안 나옴</td></tr><tr><th scope="row" class="sub-row">슈퍼 점프 (노랑)</th><td><strong>6초 동안</strong> 점프 높이 1.6배·이동 속도 1.25배 → 깨진 칸 2개도 넘을 수 있음</td></tr><tr><th scope="row" class="sub-row">얼음 굳히기 (흰색)</th><td>주변 5x5의 <strong>금 간·흔들리는 칸을 멀쩡하게</strong> (깨진 칸은 그대로). 금 간 칸이 없으면 안 나옴</td></tr><tr><th scope="row">재시작</th><td>결과 화면의 재시작 버튼 또는 R 키 → 현재 씬 다시 로드</td></tr></tbody></table></div>
+  </section>
+
+  <section class="rules">
+    <h2>시련</h2>
+    <p class="hint">솔로 플레이의 긴장감을 위한 방해 요소. 플레이어와 AI 봇 모두에게 적용된다. 구현: <code>Assets/Scripts/Trials/</code> (메뉴 <strong>LionIceRun &gt; 시련·보상 세팅</strong>).</p>
+    <h3>원칙</h3>
+    <ul><li>모든 시련은 미리 예고해서 피할 수 있게 한다.</li><li><strong>버틴 시간이 길어질수록</strong> 시련이 하나씩 추가된다.</li><li>시련이 플레이어가 서 있는 블럭을 예고 없이 바로 깨뜨리지 않는다.</li><li>맞으면 폴가이즈처럼 넘어지거나 밀려나는 우스꽝스러운 결과가 나온다.</li></ul>
+    <div class="table-scroll"><table><thead><tr><th>시련</th><th>시작 / 간격</th><th>동작</th><th>예고 방법</th></tr></thead><tbody><tr><th scope="row">눈덩이 낙하</th><td>15초~ / 4~6초</td><td>맞으면 2초 기절 (머리 위 별). 떨어진 칸 1단계 깨짐. 30초마다 한 번에 떨어지는 수 +1 (최대 4)</td><td>떨어질 자리에 그림자가 1.5초 동안 커지고 눈덩이가 내려옴</td></tr><tr><th scope="row">찬바람</th><td>30초~ / 12~16초</td><td>3초 동안 맵 가로·세로 한 방향으로 모두를 밀어냄 (공중에 뜨면 더 밀림)</td><td>"찬바람! →" 안내(화면 기준 화살표) + 눈보라 줄기 1.5초</td></tr><tr><th scope="row">고드름</th><td>45초~ / 6~9초</td><td>떨어진 칸은 단계와 상관없이 즉시 깨짐, 맞으면 1초 기절</td><td>붉은 원이 1.3초 동안 깜빡이며 커짐</td></tr><tr><th scope="row">펭귄 슬라이딩</th><td>60초~ / 7~10초</td><td>한 줄을 배로 미끄러져 지나감 (깨진 칸 위도 그대로), 부딪히면 크게 밀려나며 넘어짐. 60% 확률로 플레이어 줄</td><td>줄 끝 바깥에 펭귄이 나타나 1초 뒤뚱 + 지나갈 줄이 붉게 표시</td></tr><tr><th scope="row">랜덤 금 가기</th><td>(이번엔 안 넣음)</td><td>몇 초마다 랜덤 블럭 2~3개가 한 단계 깨짐</td><td>블럭이 1초 동안 반짝임</td></tr></tbody></table></div>
+    <h3>원칙 지키기</h3>
+    <ul><li>모든 시련은 예고 뒤에 일어나서 피할 수 있다. 처음 나올 때 한 번 안내 문구가 뜬다.</li><li>방패는 맞는 것(기절·밀치기)만 막는다. 고드름이 블럭을 깨는 것은 못 막으니 붉은 원을 피해야 한다.</li><li>기절한 동안에는 오래 서 있기 타이머를 멈춘다.</li></ul>
+  </section>
+  <!-- /GEN:TOP -->
 
   <section class="stages">
     <h2>할 일 목록</h2>
     <div id="stage-list"></div>
   </section>
 
+  <!-- GEN:OPEN -->
   <section class="open">
     <h2>미정 사항</h2>
-    <ul>
-      <li>시련 시작 시간 (눈덩이 15초 / 찬바람 30초 / 고드름 45초 / 펭귄 60초, 플레이 테스트로 조정)</li>
-      <li>얼음 깨짐 수치 (기본값: 3번 밟으면 흔들림, 흔들림 1초 뒤 깨짐, 오래 서 있기 2초)</li>
-      <li>얼음 미끄러짐 적용 여부 (Thin Ice는 미끄러움, 선택)</li>
-      <li>게임 시작 시 처음부터 빈칸을 둘지 여부</li>
-      <li>펭귄 슬라이딩: 깨진 블럭(빈칸)을 지날 때 → 우선 추천안(그대로 미끄러져 지나감)으로 구현함</li>
-    </ul>
+    <ul><li>시련 시작 시간 (눈덩이 15초 / 찬바람 30초 / 고드름 45초 / 펭귄 60초, 플레이 테스트로 조정)</li><li>얼음 깨짐 수치 (기본값: 3번 밟으면 흔들림, 흔들림 1초 뒤 깨짐, 오래 서 있기 2초, 조정 가능)</li><li>얼음 미끄러짐 적용 여부 (Thin Ice는 미끄러움, 선택)</li><li>게임 시작 시 처음부터 빈칸을 둘지 여부</li><li>펭귄 슬라이딩: 깨진 블럭(빈칸)을 지날 때 → 우선 추천안(그대로 미끄러져 지나감)으로 구현함. 바꾸려면 요청</li></ul>
   </section>
+  <!-- /GEN:OPEN -->
 </div>
 
 <script>
+// GEN:STAGES
 const STAGES = [
-  { title: "Unity 3D 프로젝트 생성", tasks: [
+  { num: "1", title: "Unity 3D 프로젝트 생성", tasks: [
     { text: "Unity 버전 결정 (6000.6.3f1)", done: true },
     { text: "템플릿 결정 (Universal 3D)", done: true },
     { text: "Universal 3D 템플릿으로 새 프로젝트 생성 (<code>LionIceRun</code>)", done: true },
     { text: "폴더 구조 구성 (Scenes, Scripts, Prefabs, Models, Materials, Animations, UI)", done: true },
     { text: "메인 씬 생성 및 저장 (<code>Assets/Scenes/Main.unity</code>, 빌드 설정 등록 확인)", done: true },
-    { text: "템플릿 안내 파일 정리 (TutorialInfo, Readme 삭제)", done: true } ]},
-  { title: "펭귄 얼음깨기 맵 및 카메라", tasks: [
+    { text: "템플릿 안내 파일 정리 (TutorialInfo, Readme 삭제)", done: true }
+  ] },
+  { num: "2", title: "펭귄 얼음깨기 맵 및 카메라", tasks: [
     { text: "얼음 블럭 프리팹 제작 (하늘색 재질, 캐릭터 그림자가 보이도록 불투명)", done: true },
-    { text: "IceGrid 스크립트 작성: Inspector에서 설정 가능한 값", done: true, sub: [
-      { text: "가로 칸 수 (기본 6)", done: true }, { text: "세로 칸 수 (기본 6)", done: true },
-      { text: "블럭 크기와 블럭 사이 간격", done: true }, { text: "얼음 블럭 프리팹", done: true } ]},
+    { text: "IceGrid 스크립트 작성: Inspector에서 설정 가능한 값", done: true, sub: [{ text: "가로 칸 수 (기본 6)", done: true }, { text: "세로 칸 수 (기본 6)", done: true }, { text: "블럭 크기와 블럭 사이 간격", done: true }, { text: "얼음 블럭 프리팹", done: true }] },
     { text: "설정값으로 게임 시작 시 그리드 자동 생성 (맵 중앙이 원점에 오도록)", done: true },
     { text: "에디터에서 미리보기 버튼 추가 (<code>[ContextMenu]</code>로 그리드 생성·삭제)", done: true },
     { text: "맵 아래 바다(물) 평면 배치 (그리드 크기에 맞춰 크기 조정)", done: true },
-    "펭귄 등 배경 장식 배치 (선택)",
+    { text: "펭귄 등 배경 장식 배치 (선택)", done: false },
     { text: "밝은 조명과 하늘 설정 (폴가이즈 톤)", done: true },
     { text: "고정 쿼터뷰 카메라가 그리드 크기에 맞춰 위치·거리 자동 조정", done: true },
     { text: "여러 크기로 바꿔 보며 맵 생성과 카메라 확인", done: true },
-    "게임 시작 시 정해 둔 거리(Play Distance)로 부드럽게 줌인 (기본 1.2초)",
-    "줌인하면서 화면 중심이 플레이어를 부드럽게 따라감 (맵 밖 제한, 높이는 안 따라감)",
-    { text: "바다 폴리싱 (메뉴 LionIceRun > Step 2 바다 꾸미기, <code>StylizedSea</code> 셰이더)", sub: [
-      "바다 크기 약 200m, 파도용으로 잘게 나눈 메시",
-      "움직이는 파도 (사인파 3개, 수면이 오르내림)",
-      "흘러가는 잔물결 노이즈",
-      "깊이 색 (가운데 청록 → 멀리 남색), 파도 마루 밝게·골 어둡게",
-      "하늘 반사, 햇빛 하이라이트 + 반짝이 알갱이",
-      "파도 마루 물거품",
-      "얼음판·캐릭터 그림자가 수면에 떨어짐",
-      "먼 곳은 배경색으로 녹아듦",
-      "주변에 떠다니는 유빙 (장식)" ]} ]},
-  { title: "캐릭터 이동 (임시 캐릭터)", tasks: [
+    { text: "게임 시작 시 정해 둔 거리(<code>Play Distance</code>)로 부드럽게 줌인 (기본 1.2초, 처음 움직이는 순간 또는 씬 시작)", done: false },
+    { text: "줌인하면서 화면 중심이 플레이어를 부드럽게 따라감 (맵 밖으로 너무 안 나가게 제한, 높이는 안 따라가서 떨어지는 모습이 보임)", done: false },
+    { head: "바다 폴리싱 <span class=\"hint\">(메뉴 <strong>LionIceRun &gt; Step 2 바다 꾸미기</strong>, 셰이더 <code>Assets/Shaders/StylizedSea.shader</code>, 조정은 Sea 재질에서)</span>" },
+    { text: "바다 크기 약 200m (화면 끝까지), 파도용으로 잘게 나눈 메시 (<code>SeaSurface</code>)", done: true },
+    { text: "움직이는 파도 (방향·길이가 다른 사인파 5개, 반복 주기가 길게)", done: true },
+    { text: "흘러가는 잔물결 노이즈 (4겹 노이즈, 반복 무늬 제거)", done: true },
+    { text: "깊이 색 (얼음판 아래 밝은 청록 → 멀리 짙은 남색), 파도 마루 밝게·골 어둡게", done: true },
+    { text: "하늘 반사 (비스듬히 볼수록), 햇빛 하이라이트 + 반짝이 알갱이 (가까운 곳에만)", done: true },
+    { text: "파도 마루 물거품 (도메인 워핑 + 거품 구역, 반복 무늬 제거)", done: true },
+    { text: "얼음판·캐릭터 그림자가 수면에 떨어짐 (그림자 거리 90m)", done: true },
+    { text: "먼 곳은 배경색으로 녹아듦 (공기 원근감)", done: true },
+    { text: "주변에 떠다니는 유빙 22개 (<code>IceFloes</code>, 장식)", done: true }
+  ] },
+  { num: "3", title: "캐릭터 이동 (임시 캐릭터)", tasks: [
     { text: "캡슐로 임시 플레이어 오브젝트 생성", done: true },
     { text: "이동 컴포넌트 결정 → Rigidbody (블럭 깨짐·밀려남·기절 같은 물리 반응을 넣기 쉬움)", done: true },
     { text: "WASD / 방향키 자유 이동 구현", done: true },
     { text: "이동 방향으로 캐릭터 회전", done: true },
     { text: "바닥 체크 구현", done: true },
     { text: "Space 키 점프 구현", done: true },
-    "한 칸 빈칸을 점프로 건널 수 있는지 테스트 (점프 거리 조정)",
+    { text: "한 칸 빈칸을 점프로 건널 수 있는지 테스트 (점프 거리 조정)", done: false },
     { text: "폴가이즈 조작감: 관성 (가속 25, 감속 35)과 공중 제어 50%", done: true },
     { text: "점프 보정: 코요테 타임 0.08초, 점프 버퍼 0.12초", done: true },
     { text: "가변 점프: 길게 누르면 높게, 짧게 누르면 낮게 (점프 높이 1m, 꼭대기까지 0.25초)", done: true },
     { text: "다이브 (Ctrl / 게임패드 X): 순간 가속 → 착지 → 0.4초 일어나기", done: true },
     { text: "넘어짐 상태 (<code>KnockDown(초)</code>): 조작 불가 후 복귀", done: true },
-    "점프+다이브로 빈칸 건너기 테스트 및 수치 조정" ]},
-  { title: "얼음 깨짐", tasks: [
-    { text: "캐릭터가 블럭에 새로 올라섰는지 감지 (걷기·점프 착지·다이브 착지 모두, 잠깐 뜬 0.12초 미만 제외)", done: true },
+    { text: "점프+다이브로 빈칸 건너기 테스트 및 수치 조정", done: false }
+  ] },
+  { num: "4", title: "얼음 깨짐", tasks: [
+    { note: "구현: <code>IceBlock</code>(블럭 상태, 게임 시작 시 IceGrid가 자동 부착), <code>IceStepTracker</code>(Player에 부착, 메뉴 <strong>LionIceRun &gt; Step 4 얼음 깨짐 세팅</strong>). 수치는 IceGrid Inspector의 \"얼음 깨짐\"에서 조정." },
+    { text: "캐릭터가 블럭에 새로 올라섰는지 감지 (걷기·점프 착지·다이브 착지 모두, 걷다가 잠깐 뜬 0.12초 미만은 제외)", done: true },
     { text: "밟는 순간 바로 한 단계 진행 (무적 시간 없음, 이음새 중복 방지 0.2초)", done: true },
     { text: "블럭별 단계 저장: 멀쩡함 → 살짝 금 → 많이 금 → 흔들림 → 깨짐", done: true },
     { text: "단계별 연출 (색이 점점 짙어짐, 흔들림은 깨질수록 세게)", done: true },
@@ -283,114 +275,124 @@ const STAGES = [
     { text: "흔들리는 블럭: 점프로 탈출 가능, 다시 밟으면 즉시 깨짐", done: true },
     { text: "오래 서 있기 타이머: 한 블럭에 2초 이상 서 있으면 한 단계 진행 (넘어져 있는 동안 정지)", done: true },
     { text: "시작 블럭은 첫 이동 전까지 깨지지 않게 처리", done: true },
-    "천천히 부서짐: 금 간 블럭은 안 밟아도 6초마다 한 단계 (Decay Interval)",
-    "수치 조정 (흔들림 시간, 오래 서 있기 시간, 천천히 부서지는 간격, 단계별 색)",
-    { text: "그래픽 폴리싱 (메뉴 LionIceRun > Step 4 얼음 그래픽 세팅)", sub: [
-      { text: "금 간 얼음 텍스처 4단계 (서리+밝은 테두리 → 금 3줄 → 갈라지는 금 → 거미줄 금)", done: true },
-      { text: "금 갈 때 움찔 눌림 + 얼음 가루", done: true },
-      { text: "깨질 때 얼음 조각 18개로 부서져 튀며 떨어지고 사라짐 + 파편 가루", done: true },
-      { text: "단계가 바뀔 때 새 금이 충격점에서 바깥으로 뻗어 나가는 애니메이션 (0.25초)", done: true },
-      "금 무늬 4벌을 블럭마다 무작위로 + 가로·세로 무작위 뒤집기 (겉보기 16가지)",
-      "효과음 (금 가는 소리, 깨지는 소리) - 10단계 마무리에서" ]} ]},
-  { title: "AI 봇 (난이도 + 얼음 깨기)", tasks: [
-    "봇 생성 (기본 3마리, 스킨 무작위, 조작감은 플레이어와 동일, 시작 칸 주변 제외)",
-    "게임 시작부터 움직임, 그 전엔 가만히",
-    "목표 칸 고르기 (멀쩡할수록, 플레이어와 가까울수록)",
-    "길 찾기 (걷기, 깨진 칸 1개는 점프, 가끔 점프+다이브)",
-    "사람 같은 움직임 (쉬기·제자리 점프, 가끔 통통·다이브, 봇마다 성격 다름)",
-    "흔들리는 칸이면 피하기, 막히면 길 다시 찾기",
-    "바다에 빠지면 5~8초(무작위) 뒤 하늘에서 다시 떨어져 들어옴 (플레이어 근처 제외, 게임 오버 후 중지)",
-    "얼음 복구 아이템은 플레이어만 먹음",
-    "수치 조정 (봇 수, 다시 들어오는 시간, 성격)" ]},
-  { title: "생존 시간과 최고 기록 + 얼음 복구 아이템", tasks: [
+    { text: "천천히 부서짐: 금 간 블럭은 안 밟아도 6초마다 한 단계 (IceGrid의 Decay Interval, 0이면 끔)", done: false },
+    { text: "수치 조정 (흔들림 시간, 오래 서 있기 시간, 천천히 부서지는 간격, 단계별 색)", done: false },
+    { head: "그래픽 폴리싱 <span class=\"hint\">(메뉴 <strong>LionIceRun &gt; Step 4 얼음 그래픽 세팅</strong>)</span>" },
+    { text: "금 간 얼음 텍스처 4단계 (서리+밝은 테두리 → 금 3줄 → 갈라지는 금 → 거미줄 금, <code>Assets/Textures/Ice/</code>)", done: true },
+    { text: "금 갈 때 움찔 눌림 + 얼음 가루", done: true },
+    { text: "깨질 때 얼음 조각 18개로 부서져 튀며 떨어지고 작아지며 사라짐 + 파편 가루", done: true },
+    { text: "단계가 바뀔 때 새 금이 충격점에서 바깥으로 뻗어 나가는 애니메이션 (0.25초, 중간 텍스처 3장씩)", done: true },
+    { text: "금 무늬 4벌을 블럭마다 무작위로 + 가로·세로 무작위 뒤집기 (겉보기 16가지, <code>Assets/Textures/Ice/V1~V4/</code>, 1번은 처음 무늬 그대로)", done: false },
+    { text: "효과음 (금 가는 소리, 깨지는 소리) - 10단계 마무리에서", done: false }
+  ] },
+  { num: "4-1", title: "AI 봇 (난이도 + 얼음 깨기)", tasks: [
+    { note: "구현: <code>BotManager</code>(GameSystems), <code>BotBrain</code>(봇의 머리). 몸은 플레이어와 같은 부품(<code>PlayerController</code>를 <code>SetExternalInput</code>으로 조종, <code>IceStepTracker</code>, <code>CharacterAnimator</code>, <code>PlayerSkin</code>). 메뉴 <strong>LionIceRun &gt; AI 봇 세팅</strong>." },
+    { text: "봇 생성 (기본 3마리, 스킨 무작위, 조작감 수치는 플레이어와 동일, 플레이어 시작 칸 주변 제외, 칸이 부족하면 자동으로 줄임)", done: true },
+    { text: "게임 시작(플레이어가 처음 움직임)부터 움직임, 그 전엔 가만히 서 있음", done: true },
+    { text: "목표 칸 고르기 (멀쩡할수록, 플레이어와 가까울수록)", done: false },
+    { text: "길 찾기 (멀쩡한 칸은 걷기, 깨진 칸 1개는 가장자리에서 점프, 가끔 점프 꼭대기에서 다이브)", done: false },
+    { text: "사람 같은 움직임 (도착 후 쉬기·제자리 점프, 가끔 통통, 곧은 길에서 가끔 다이브, 봇마다 걷는 속도·성격 다름)", done: false },
+    { text: "흔들리는 칸이면 바로 옆 칸으로 피하기, 막히면 길 다시 찾기", done: false },
+    { text: "바다에 빠지면 물보라 → 5~8초(무작위) 뒤 멀쩡한 칸 위 7m에서 다시 떨어져 들어옴 (플레이어 칸·옆 칸 제외, 게임 오버 후 중지)", done: false },
+    { text: "파워업 아이템은 플레이어만 먹음", done: false },
+    { text: "수치 조정 (봇 수, 다시 들어오는 시간, 성격)", done: false }
+  ] },
+  { num: "5", title: "생존 시간과 최고 기록 + 얼음 복구 아이템", tasks: [
+    { note: "구현: <code>SurvivalTimer</code>, <code>RepairItemSpawner</code>(씬의 GameSystems 오브젝트), <code>RepairItem</code>(프리팹 <code>Assets/Prefabs/IceRepairItem.prefab</code>), <code>IceBlock.Restore()</code>. 메뉴 <strong>LionIceRun &gt; Step 5 생존 시간 세팅</strong>. UI 전까지는 화면 왼쪽 위 임시 표시." },
     { text: "생존 타이머: 처음 이동·점프·다이브 입력 순간 시작, 바다에 떨어지면 멈춤", done: true },
-    { text: "최고 기록 저장·불러오기 (<code>PlayerPrefs</code>, 컴포넌트 메뉴로 초기화)", done: true },
+    { text: "최고 기록 저장·불러오기 (<code>PlayerPrefs</code>, 컴포넌트 메뉴 \"최고 기록 지우기\"로 초기화)", done: true },
     { text: "새 기록 판정", done: true },
     { text: "버틴 시간을 다른 시스템에서 읽을 수 있게 제공 (<code>SurvivalTimer.Instance.Elapsed</code>)", done: true },
-    { text: "얼음 복구 아이템 모양 (빛나는 얼음 결정, 돌며 둥실, 사라지기 전 깜빡임)", done: true },
-    { text: "아이템 등장 규칙 (10초부터, 한 번에 하나, 8초 유지, 12초 간격, 깨진 칸 많은 곳 우선)", done: true },
-    { text: "먹으면 주변 3x3 깨진 칸 복구 (톡 솟아오르며 얼어붙음, 떨어지는 중인 플레이어 칸 제외)", done: true },
-    "수치 조정 (등장 시간·간격·유지 시간·복구 범위)" ]},
-  { title: "게임 상태 관리 (GameManager)", tasks: [
-    { text: "GameManager 스크립트 생성 (대기 / 진행 중 / 게임 오버, <code>StateChanged</code> 이벤트)", done: true },
+    { text: "얼음 복구 아이템 모양 (빛나는 얼음 결정 두 겹, 돌며 둥실거림, 사라지기 전 깜빡임)", done: true },
+    { text: "아이템 등장 규칙 (10초부터, 한 번에 하나, 8초 유지, 12초 간격, 깨진 칸이 많은 곳일수록 잘 나옴)", done: true },
+    { text: "먹으면 주변 3x3 깨진 칸 복구 (톡 솟아오르며 얼어붙음 + 얼음 가루, 떨어지는 중인 플레이어가 있는 칸은 제외)", done: true },
+    { text: "수치 조정 (등장 시간·간격·유지 시간·복구 범위)", done: false }
+  ] },
+  { num: "6", title: "게임 상태 관리 (GameManager)", tasks: [
+    { note: "구현: <code>GameManager</code>(GameSystems 오브젝트), 메뉴 <strong>LionIceRun &gt; Step 6 게임 매니저 세팅</strong>. 시작·떨어짐 판정을 SurvivalTimer에서 GameManager로 옮김." },
+    { text: "GameManager 스크립트 생성 (대기 / 진행 중 / 게임 오버, 상태가 바뀌면 <code>StateChanged</code> 이벤트)", done: true },
     { text: "대기 → 진행 중: 처음 이동·점프·다이브 입력 순간 타이머 시작", done: true },
     { text: "떨어짐 판정 (바다 수면 아래로 내려가면 → 게임 오버, 수면 높이는 IceGrid의 Sea Depth 사용)", done: true },
     { text: "게임 오버 시 타이머 멈춤, 기록 저장, 플레이어 조작 막기 (<code>PlayerController.InputEnabled</code>)", done: true },
     { text: "바다에 빠질 때 물보라 + 제자리에 멈춤", done: true },
-    { text: "재시작 기능 <code>GameManager.Restart()</code> (Step 7 버튼·R 키에서 사용)", done: true } ]},
-  { title: "UI 및 재시작", tasks: [
+    { text: "재시작 기능 <code>GameManager.Restart()</code> (Step 7 버튼·R 키에서 사용)", done: true }
+  ] },
+  { num: "7", title: "UI 및 재시작", tasks: [
+    { note: "구현: UI 시트(<code>D:\\UnityClassGame\\UI</code>)를 <code>Tools/ui/slice_ui.ps1</code>로 잘라 <code>Assets/UI/Sprites/</code>에 저장 (원본은 <code>Assets/UI/Source/</code>). <code>GameHUD</code>, 메뉴 <strong>LionIceRun &gt; Step 7 UI 세팅</strong>으로 씬에 GameUI 캔버스 생성. 글자는 TextMeshPro + 맑은 고딕 Bold(Windows 글꼴을 실행 중에 읽음).<br>메뉴를 다시 실행해도 GameUI에서 직접 고친 위치·크기·회전·글자 크기·정렬은 요소 이름 기준으로 유지된다. 처음 배치로 되돌리려면 <strong>Step 7 UI 세팅 (배치 초기화)</strong>." },
     { text: "폴가이즈 스타일 UI 톤 (제공된 UI 시트: 둥글고 광택 있는 버튼, 굵은 글자 + 두꺼운 남색 테두리)", done: true },
-    { text: "UI 시트에서 필요한 요소 잘라내기 + 시트에 없는 배경은 코드로 그림 (<code>Tools/ui/slice_ui.ps1</code>)", done: true },
-    "글자 선명하게: TextMeshPro + 맑은 고딕 Bold, 두꺼운 남색 테두리 + 아래 그림자",
-    "이미지 선명하게: 압축 끔, 밉맵 켬, 늘리는 배경은 9-slice",
-    "대기 화면: 위 가운데 게임 타이틀 로고 (둥실거림), 게임 시작 때 톡 커지며 사라짐",
-    "남은 얼음·버틴 시간·최고 기록: 대기 중 숨김 → 게임 시작 때 쑥 튀어나옴",
-    "Fall Guys식 왼쪽 위: 분홍 목표 띠 \"최대한 오래 버티세요!\"",
-    "Fall Guys식 위 가운데: \"남은 얼음\" + 기울어진 분홍 배지 (값이 바뀌면 톡 튐)",
-    "Fall Guys식 오른쪽 위: 남색 띠 (버틴 시간) + 최고 기록",
-    "Fall Guys식 오른쪽 아래: 키 칩 [WASD] 이동 · [Space] 점프 · [Ctrl] 다이브",
-    "시작 전 왼쪽 아래: 초록 제목 띠 \"얼음 깨기\" + 설명, 움직이면 빠져나감",
-    "사건 띠 배너: \"시작!\" / \"탈락!\"",
-    "결과 카드: 자홍 제목 상자 \"0:23.4 버텼어요!\", 새 기록이면 금색 띠, 톡 튀어 올라옴",
-    "다시 하기 버튼 (노란 버튼 + 실제 글자, 마우스 반응) + [R] 키 칩",
-    "R 키 재시작 (결과 화면에서)",
-    { text: "추가 UI (UI 시트에 시안 있음, 나중에)", sub: [
-      "타이틀 화면 (로고, 게임 시작, 스킨 선택, 설정)",
-      "스킨 선택 화면 (사자 / 북극곰 / 호랑이)",
-      "일시정지 메뉴 (계속하기, 다시 시작, 설정, 메인 메뉴로)",
-      "게임 설명 (기본 조작, 얼음 깨짐, 얼음 복구, 시련, 목표)",
-      "설정 (사운드 볼륨 등)" ]} ]},
-  { title: "인체형 복셀 사자 캐릭터 제작", tasks: [
+    { text: "UI 시트에서 필요한 요소 잘라내기 (버튼, 배너, 아이콘, 빈 패널) + 시트에 없는 배경은 코드로 그림 (평행사변형 띠, 사건 띠, 칩, 배지)", done: true },
+    { text: "글자 선명하게: TextMeshPro + 맑은 고딕 Bold (OS 글꼴 방식), 두꺼운 남색 테두리 + 아래 그림자 재질", done: true },
+    { text: "이미지 선명하게: 압축 끔, 밉맵 켬, 늘리는 배경은 9-slice", done: true },
+    { text: "다시 세팅해도 직접 고친 배치 유지 + 배치 초기화 메뉴", done: false },
+    { note: "구성 기준: Fall Guys UI (<a href=\"https://www.gameuidatabase.com/gameData.php?id=1499\" target=\"_blank\" rel=\"noopener\">gameuidatabase.com</a>) — 화면 끝에 붙은 평행사변형 띠, 기울어진 배지, 화면을 가로지르는 사건 띠, 키 칩, 기울인 굵은 글자" },
+    { text: "대기 화면: 위 가운데 게임 타이틀 로고 (사용자 제공 <code>UI/Title.png</code>, 둥실거림), 게임 시작 때 톡 커지며 사라짐", done: false },
+    { text: "남은 얼음·버틴 시간·최고 기록은 대기 중엔 숨김 → 게임 시작 때 쑥 튀어나옴 (남은 얼음은 위에서, 시간은 오른쪽에서, 차례로)", done: false },
+    { text: "왼쪽 위: 분홍 목표 띠 \"최대한 오래 버티세요!\"", done: true },
+    { text: "위 가운데: \"남은 얼음\" + 기울어진 분홍 배지 (얼음 큐브 + 28 / 36, 값이 바뀌면 톡 튐)", done: true },
+    { text: "오른쪽 위: 남색 띠 (스톱워치 + \"버틴 시간\" + 0.1초 단위 시간) + 아래 최고 기록", done: true },
+    { text: "오른쪽 아래: 키 칩 [WASD] 이동 · [Space] 점프 · [Ctrl] 다이브", done: true },
+    { text: "시작 전 왼쪽 아래: 초록 제목 띠 \"얼음 깨기\" + 반투명 설명 (\"움직이면 시작!\")", done: true },
+    { text: "움직이면 소개가 왼쪽으로 빠져나감", done: false },
+    { text: "사건 띠 배너: 게임 시작 \"시작!\", 떨어지면 \"탈락!\" (화면을 가로질러 휙 들어왔다 나감)", done: false },
+    { text: "결과 카드: 자홍 제목 상자 \"0:23.4 버텼어요!\", 새 기록이면 금색 띠, 최고 기록, 아래에서 톡 튀어 올라옴", done: false },
+    { text: "다시 하기 버튼 (시트의 노란 버튼 + 실제 글자, 마우스 반응) + [R] 키 칩", done: false },
+    { text: "R 키 재시작 (결과 화면에서)", done: false },
+    { head: "추가 UI (UI 시트에 시안 있음, 나중에)" },
+    { text: "타이틀 화면 (로고, 게임 시작, 스킨 선택, 설정)", done: false },
+    { text: "스킨 선택 화면 (사자 / 북극곰 / 호랑이)", done: false },
+    { text: "일시정지 메뉴 (계속하기, 다시 시작, 설정, 메인 메뉴로)", done: false },
+    { text: "게임 설명 (기본 조작, 얼음 깨짐, 얼음 복구, 시련, 목표)", done: false },
+    { text: "설정 (사운드 볼륨 등)", done: false }
+  ] },
+  { num: "8", title: "인체형 복셀 사자 캐릭터 제작", tasks: [
     { text: "복셀 툴 결정 → Blender 5.2 + 파이썬 스크립트 (<code>Tools/blender/make_lion.py</code>, 복셀 1칸 0.1m)", done: true },
     { text: "폴가이즈 비율로 사자 디자인 (큰 머리, 통통한 몸통, 짧은 팔다리, 갈기, 꼬리 끝 털)", done: true },
-    { text: "애니메이션을 위해 부위별로 분리 제작 (원점 = 관절 위치)", done: true, sub: [
-      { text: "머리 (갈기 포함)", done: true }, { text: "몸통", done: true }, { text: "팔 2개", done: true },
-      { text: "다리 2개", done: true }, { text: "꼬리", done: true } ]},
+    { text: "애니메이션을 위해 부위별로 분리 제작 (원점 = 관절 위치)", done: true, sub: [{ text: "머리 (갈기 포함)", done: true }, { text: "몸통", done: true }, { text: "팔 2개", done: true }, { text: "다리 2개", done: true }, { text: "꼬리", done: true }] },
     { text: "부위별 모델 내보내기 (<code>Tools/blender/Lion.fbx</code>, 미리보기 <code>lion_preview.png</code>)", done: true },
     { text: "스킨 추가: 북극곰, 호랑이 (같은 뼈대, <code>Tools/blender/build_all.ps1</code>로 한 번에 다시 생성)", done: true },
-    "Unity로 가져오기 (URP 머티리얼 연결)",
-    "스킨 교체 방법 정하기 (Inspector에서 선택 또는 시작 화면 선택)",
-    "부모 오브젝트 아래로 조립 (팔·다리·꼬리의 회전 기준점을 관절 위치에 맞추기)",
-    "임시 캡슐 캐릭터를 사자로 교체 (콜라이더 크기 조정)" ]},
-  { title: "사자 애니메이션 (폴가이즈 느낌)", tasks: [
-    { text: "뼈대(Rig) 추가: 부위마다 뼈 하나, 이름을 <code>Rig</code>/<code>Mesh</code>로 통일해 세 스킨이 클립 공유", done: true },
-    { text: "Blender에서 클립 제작 (<code>Tools/blender/voxel_anim.py</code>, 24fps, FBX 안에 포함)", done: true },
+    { text: "Unity로 가져오기 (<code>Assets/Models/Characters/</code>, 색상표로 URP 머티리얼 연결, 메뉴 <strong>Step 8 캐릭터 가져오기</strong>)", done: true },
+    { text: "스킨 교체 방법 → 지금은 Player의 <strong>PlayerSkin → Skin</strong>에서 선택 (시작 화면 선택은 추가 UI에서)", done: true },
+    { text: "부위 조립 → 뼈대(Rig) 방식으로 대체 (관절마다 뼈, 9단계 참고)", done: true },
+    { text: "임시 캡슐 캐릭터를 모델로 교체 (충돌은 캡슐 그대로, 게임 중 캡슐 모양은 숨김)", done: true }
+  ] },
+  { num: "9", title: "사자 애니메이션 (폴가이즈 느낌)", tasks: [
+    { text: "뼈대(Rig) 추가: 부위마다 뼈 하나, 오브젝트 이름 <code>Rig</code>/<code>Mesh</code>로 통일해 세 스킨이 클립 공유", done: true },
+    { text: "Blender에서 클립 제작 (<code>Tools/blender/voxel_anim.py</code>, 24fps, FBX 안에 <code>Rig|클립이름</code>으로 포함)", done: true },
     { text: "Idle 클립 제작 (48프레임 반복: 몸 살짝 출렁임, 팔 살랑, 꼬리 흔들기)", done: true },
-    { text: "Walk 클립 제작 (16프레임 반복: 교차 걸음, 팔 흔들기, 좌우 뒤뚱, 위아래 통통)", done: true },
+    { text: "Walk 클립 제작 (16프레임 반복: 두 발 교차 걸음 + 팔 반대로 흔들기 + 몸 좌우로 뒤뚱 + 위아래 통통)", done: true },
     { text: "Jump 클립 제작 (12프레임, 마지막 자세 유지: 찌그러짐 → 쭉 늘어나며 팔 벌리기)", done: true },
     { text: "Fall 클립 제작 (12프레임 반복: 팔 허우적, 다리 버둥)", done: true },
-    { text: "Dive 클립 제작 (10프레임, 마지막 자세 유지: 앞으로 몸 던지고 팔 앞으로 쭉)", done: true },
-    "Unity로 가져오기 (Generic 리그, 클립 이름·반복 설정)",
-    "Animator Controller 생성 및 상태 전환 설정 (이동 속도, 바닥 여부 파라미터)",
-    "이동 스크립트와 Animator 파라미터 연결" ]},
-  { title: "마무리", tasks: [
-    "얼음 깨지는 소리, 점프, 게임 오버, 새 기록 효과음 (선택)",
-    "전체 플레이 테스트 (생존 시간 / 게임 오버 / 최고 기록 / 재시작), 블럭 수·깨짐 수치로 버티는 시간 조정",
-    "버그 수정",
-    "빌드 및 실행 확인" ]},
-  { title: "시련과 보상", tasks: [
-    { text: "적용할 시련 선택 → 눈덩이, 찬바람, 고드름, 펭귄 (랜덤 금 가기 제외)", done: true },
-    "시련 공통 (<code>TrialBase</code>: 버틴 시간 기준 시작·간격, 첫 등장 안내, 플레이어·봇 모두 대상)",
-    "기절 상태 (KnockDown + 머리 위 별)",
-    "눈덩이 낙하 (그림자 예고 → 낙하 → 기절 / 블럭 1단계, 시간이 지날수록 개수 증가)",
-    "찬바람 (화살표 안내 + 눈보라 줄기 → 3초 밀기)",
-    "고드름 (붉은 원 → 블럭 즉시 깨짐 + 짧은 기절)",
-    { text: "펭귄 슬라이딩", sub: [
-      { text: "펭귄 모델 (<code>Tools/blender/make_penguin.py</code>, 전용 뼈대, 키 약 1.4m)", done: true },
-      { text: "펭귄 클립: Ready(뒤뚱·파닥), Slide(배로 엎드려 날개 펴기), Exit(바다로 머리부터 뛰어들기)", done: true },
-      "Unity 가져오기 (<code>Assets/Models/Hazards/Penguin.fbx</code>, 애니메이터)",
-      "밀어내기 기능 (<code>PlayerController.Knockback</code>)",
-      "슬라이딩 로직 (줄 선택 → 등장·준비 1초 + 줄 표시 → 미끄러짐 → 바다로 퇴장)",
-      "등장 조건: 60초부터 7~10초마다" ]},
-    "보상: 파워업 아이템 4종 (얼음 복구·방패·슈퍼 점프·얼음 굳히기)",
-    "방패 (거품 표시, 맞기 직전 1번 막음)",
-    "슈퍼 점프 (6초 동안 점프 1.6배·속도 1.25배)",
-    "얼음 굳히기 (주변 5x5 금 간 칸을 멀쩡하게)",
-    "UI: 안내 문구 (시련 예고, 파워업 획득), 가진 파워업 표시",
-    "시련·보상 수치 조정 및 플레이 테스트" ]}
+    { text: "Dive 클립 제작 (10프레임, 마지막 자세 유지: 발끝 축으로 앞으로 몸 던지고 팔 앞으로 쭉)", done: true },
+    { text: "Unity로 가져오기 (Generic 리그, 클립 이름·반복 설정)", done: true },
+    { text: "Animator Controller (<code>Assets/Animations/Character.controller</code>: Idle ↔ Walk, Jump, Fall, Dive 전환) 동작 확인", done: false },
+    { text: "이동 스크립트와 Animator 파라미터 연결 (<code>CharacterAnimator</code>) 동작 확인", done: false }
+  ] },
+  { num: "10", title: "마무리", tasks: [
+    { text: "얼음 깨지는 소리, 점프, 게임 오버, 새 기록 효과음 (선택)", done: false },
+    { text: "전체 플레이 테스트 (생존 시간 / 게임 오버 / 최고 기록 / 재시작), 블럭 수·깨짐 수치로 버티는 시간 조정", done: false },
+    { text: "버그 수정", done: false },
+    { text: "빌드 및 실행 확인", done: false }
+  ] },
+  { num: "11", title: "시련과 보상", tasks: [
+    { note: "메뉴 <strong>LionIceRun &gt; 시련·보상 세팅</strong> → 그다음 <strong>Step 7 UI 세팅</strong> 다시 실행 (안내 문구·파워업 표시)" },
+    { text: "적용할 시련 선택 → 눈덩이, 찬바람, 고드름, 펭귄 (랜덤 금 가기는 이번엔 제외)", done: true },
+    { text: "시련 공통 (<code>TrialBase</code>: 버틴 시간 기준 시작·간격, 게임 중에만, 첫 등장 안내, 플레이어·봇 모두 대상)", done: false },
+    { text: "기절 상태 (<code>KnockDown</code> + 머리 위 별 <code>StunStars</code>, 오래 서 있기 타이머 정지)", done: false },
+    { text: "눈덩이 낙하 (그림자 예고 → 낙하 → 기절 / 블럭 1단계, 시간이 지날수록 개수 증가)", done: false },
+    { text: "찬바람 (화살표 안내 + 눈보라 줄기 → 3초 밀기, <code>PlayerController.AddPush</code>)", done: false },
+    { text: "고드름 (붉은 원 깜빡임 → 블럭 즉시 깨짐 + 짧은 기절)", done: false },
+    { text: "펭귄 슬라이딩", done: false, sub: [{ text: "펭귄 모델 (<code>Tools/blender/make_penguin.py</code>, 전용 뼈대, 키 약 1.4m)", done: true }, { text: "펭귄 클립: Ready(24f 반복, 뒤뚱·파닥), Slide(12f 반복, 배로 엎드려 날개 펴기), Exit(16f 유지, 바다로 머리부터 뛰어들기)", done: true }, { text: "Unity 가져오기 (<code>Assets/Models/Hazards/Penguin.fbx</code>, <code>build_all.ps1</code>에 포함, 애니메이터 <code>Assets/Animations/Penguin.controller</code>)", done: false }, { text: "밀어내기 기능 (<code>PlayerController.Knockback(속도, 넘어짐 시간)</code>)", done: false }, { text: "슬라이딩 로직 (줄 선택 → 바깥에 등장·준비 1초 + 줄 표시 → 끝까지 미끄러짐 → 바다로 퇴장)", done: false }, { text: "등장 조건: 60초 버틴 뒤부터 7~10초마다", done: false }] },
+    { text: "보상: 파워업 아이템 4종 (얼음 복구·방패·슈퍼 점프·얼음 굳히기, 종류마다 결정 색, 쓸모 없는 종류는 안 나옴)", done: false },
+    { text: "방패 (<code>PlayerPowerUps</code>: 거품 표시, 맞기 직전 1번 막고 터짐)", done: false },
+    { text: "슈퍼 점프 (<code>PlayerController.SetBoost</code>: 6초 동안 점프 1.6배·속도 1.25배)", done: false },
+    { text: "얼음 굳히기 (<code>IceBlock.Heal</code>: 주변 5x5 금 간 칸을 멀쩡하게)", done: false },
+    { text: "UI: 안내 문구 (시련 예고, 파워업 획득), 가진 파워업 표시 (방패 / 슈퍼 점프 남은 시간)", done: false },
+    { text: "시련·보상 수치 조정 및 플레이 테스트", done: false }
+  ] },
 ];
+// /GEN:STAGES
 
-const KEY = "lion-tile-runner-progress-v2";
+const KEY = "lion-tile-runner-progress-a64a9625";
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} };
@@ -403,6 +405,8 @@ function listHTML(tasks, prefix) {
   return `<ul class="tasks">` + tasks.map((t, i) => {
     const id = `${prefix}-${i + 1}`;
     if (typeof t === "string") return taskHTML(id, t) + `</li>`;
+    if (t.head) return `<li class="group">${t.head}</li>`;
+    if (t.note) return `<li class="note">${t.note}</li>`;
     return taskHTML(id, t.text, t.done) + (t.sub ? listHTML(t.sub, id) : "") + `</li>`;
   }).join("") + `</ul>`;
 }
@@ -413,7 +417,7 @@ list.style.gap = "14px";
 list.innerHTML = STAGES.map((s, i) => `
   <article class="stage${s.later ? " is-later" : ""}" data-stage="${i + 1}">
     <div class="stage-head">
-      <span class="num">STEP ${i + 1}</span>
+      <span class="num">STEP ${s.num || i + 1}</span>
       <h3>${s.title}${s.later ? ' <span class="later">후순위</span>' : ""}</h3>
       <span class="count"></span>
     </div>
