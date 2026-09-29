@@ -156,6 +156,7 @@ ul.tasks ul.tasks { padding-left: 28px; margin-top: 2px; }
         <tr><th>개발 환경</th><td>Unity 6000.6.3f1 · Universal 3D (URP) · 새 Input System · <code>D:\UnityClassGame\LionIceRun</code></td></tr>
         <tr><th>분위기</th><td>폴가이즈 느낌 · 밝은 파스텔 색, 통통하고 짧은 비율, 말랑하게 튀는 움직임</td></tr>
         <tr><th>캐릭터</th><td>인체형 복셀 사자, 두 발 보행 · 큰 머리와 몸통, 짧은 팔다리, 갈기와 꼬리</td></tr>
+        <tr><th>스킨</th><td>사자(기본), 북극곰(파란 목도리), 호랑이 · 능력은 같고 겉모습만 다름 · 같은 뼈대라 애니메이션 공유</td></tr>
         <tr><th>맵</th><td>펭귄 얼음깨기 · 기본 6x6 얼음 블럭 (에디터에서 가로·세로 설정 가능), 아래는 차가운 바다</td></tr>
         <tr><th>이동</th><td>자유 이동 · WASD / 방향키</td></tr>
         <tr><th>조작감</th><td>폴가이즈 느낌 · 살짝 묵직한 관성, 공중에서는 방향 전환이 둔함</td></tr>
@@ -280,18 +281,26 @@ const STAGES = [
     "재시작 버튼 구현",
     "R 키 재시작 구현 (<code>SceneManager.LoadScene</code>으로 현재 씬 다시 로드)" ]},
   { title: "인체형 복셀 사자 캐릭터 제작", tasks: [
-    "복셀 툴 결정 (예: MagicaVoxel)",
-    "폴가이즈 비율로 사자 디자인 (큰 머리, 통통한 몸통, 짧은 팔다리, 갈기, 꼬리 끝 털)",
-    { text: "애니메이션을 위해 부위별로 분리 제작", sub: [
-      "머리 (갈기 포함)", "몸통", "팔 2개", "다리 2개", "꼬리" ]},
-    "부위별 모델 내보내기 (.obj 등) 및 Unity로 가져오기",
+    { text: "복셀 툴 결정 → Blender 5.2 + 파이썬 스크립트 (<code>Tools/blender/make_lion.py</code>, 복셀 1칸 0.1m)", done: true },
+    { text: "폴가이즈 비율로 사자 디자인 (큰 머리, 통통한 몸통, 짧은 팔다리, 갈기, 꼬리 끝 털)", done: true },
+    { text: "애니메이션을 위해 부위별로 분리 제작 (원점 = 관절 위치)", done: true, sub: [
+      { text: "머리 (갈기 포함)", done: true }, { text: "몸통", done: true }, { text: "팔 2개", done: true },
+      { text: "다리 2개", done: true }, { text: "꼬리", done: true } ]},
+    { text: "부위별 모델 내보내기 (<code>Tools/blender/Lion.fbx</code>, 미리보기 <code>lion_preview.png</code>)", done: true },
+    { text: "스킨 추가: 북극곰, 호랑이 (같은 뼈대, <code>Tools/blender/build_all.ps1</code>로 한 번에 다시 생성)", done: true },
+    "Unity로 가져오기 (URP 머티리얼 연결)",
+    "스킨 교체 방법 정하기 (Inspector에서 선택 또는 시작 화면 선택)",
     "부모 오브젝트 아래로 조립 (팔·다리·꼬리의 회전 기준점을 관절 위치에 맞추기)",
     "임시 캡슐 캐릭터를 사자로 교체 (콜라이더 크기 조정)" ]},
   { title: "사자 애니메이션 (폴가이즈 느낌)", tasks: [
-    "Idle 클립 제작 (몸 살짝 출렁임, 꼬리 흔들기)",
-    "Walk 클립 제작 (두 발 교차 걸음 + 팔 반대로 흔들기 + 몸 좌우로 뒤뚱)",
-    "Jump 클립 제작 (점프 전 찌그러짐, 공중에서 늘어남, 착지 시 찌그러짐)",
-    "Fall 클립 제작 (떨어질 때 팔 허우적거리기, 선택)",
+    { text: "뼈대(Rig) 추가: 부위마다 뼈 하나, 이름을 <code>Rig</code>/<code>Mesh</code>로 통일해 세 스킨이 클립 공유", done: true },
+    { text: "Blender에서 클립 제작 (<code>Tools/blender/voxel_anim.py</code>, 24fps, FBX 안에 포함)", done: true },
+    { text: "Idle 클립 제작 (48프레임 반복: 몸 살짝 출렁임, 팔 살랑, 꼬리 흔들기)", done: true },
+    { text: "Walk 클립 제작 (16프레임 반복: 교차 걸음, 팔 흔들기, 좌우 뒤뚱, 위아래 통통)", done: true },
+    { text: "Jump 클립 제작 (12프레임, 마지막 자세 유지: 찌그러짐 → 쭉 늘어나며 팔 벌리기)", done: true },
+    { text: "Fall 클립 제작 (12프레임 반복: 팔 허우적, 다리 버둥)", done: true },
+    { text: "Dive 클립 제작 (10프레임, 마지막 자세 유지: 앞으로 몸 던지고 팔 앞으로 쭉)", done: true },
+    "Unity로 가져오기 (Generic 리그, 클립 이름·반복 설정)",
     "Animator Controller 생성 및 상태 전환 설정 (이동 속도, 바닥 여부 파라미터)",
     "이동 스크립트와 Animator 파라미터 연결" ]},
   { title: "마무리", tasks: [
