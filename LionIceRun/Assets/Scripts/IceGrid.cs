@@ -28,6 +28,14 @@ public class IceGrid : MonoBehaviour
     public IReadOnlyList<GameObject> Blocks => blocks;
     public float Spacing => blockSize + gap;
     public Vector2 Size => new Vector2(width * Spacing - gap, depth * Spacing - gap);
+    public Vector2Int StartCell => new Vector2Int(width / 2, depth / 2);
+
+    // 해당 칸 블럭 윗면 중앙의 월드 좌표
+    public Vector3 CellTop(Vector2Int cell)
+    {
+        Vector3 local = new Vector3((cell.x - (width - 1) / 2f) * Spacing, 0f, (cell.y - (depth - 1) / 2f) * Spacing);
+        return transform.TransformPoint(local);
+    }
 
     void Start() => Build();
 
