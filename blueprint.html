@@ -223,16 +223,17 @@ const STAGES = [
     { text: "메인 씬 생성 및 저장 (<code>Assets/Scenes/Main.unity</code>, 빌드 설정 등록 확인)", done: true },
     { text: "템플릿 안내 파일 정리 (TutorialInfo, Readme 삭제)", done: true } ]},
   { title: "펭귄 얼음깨기 맵 및 카메라", tasks: [
-    "얼음 블럭 프리팹 제작 (하늘색 재질, 캐릭터 그림자가 보이도록 불투명)",
-    { text: "IceGrid 스크립트 작성: Inspector에서 설정 가능한 값", sub: [
-      "가로 칸 수 (기본 6)", "세로 칸 수 (기본 6)", "블럭 크기와 블럭 사이 간격", "얼음 블럭 프리팹" ]},
-    "설정값으로 게임 시작 시 그리드 자동 생성 (맵 중앙이 원점에 오도록)",
-    "에디터에서 미리보기 버튼 추가 (<code>[ContextMenu]</code>로 그리드 생성·삭제)",
-    "맵 아래 바다(물) 평면 배치 (그리드 크기에 맞춰 크기 조정)",
+    { text: "얼음 블럭 프리팹 제작 (하늘색 재질, 캐릭터 그림자가 보이도록 불투명)", done: true },
+    { text: "IceGrid 스크립트 작성: Inspector에서 설정 가능한 값", done: true, sub: [
+      { text: "가로 칸 수 (기본 6)", done: true }, { text: "세로 칸 수 (기본 6)", done: true },
+      { text: "블럭 크기와 블럭 사이 간격", done: true }, { text: "얼음 블럭 프리팹", done: true } ]},
+    { text: "설정값으로 게임 시작 시 그리드 자동 생성 (맵 중앙이 원점에 오도록)", done: true },
+    { text: "에디터에서 미리보기 버튼 추가 (<code>[ContextMenu]</code>로 그리드 생성·삭제)", done: true },
+    { text: "맵 아래 바다(물) 평면 배치 (그리드 크기에 맞춰 크기 조정)", done: true },
     "펭귄 등 배경 장식 배치 (선택)",
-    "밝은 조명과 하늘 설정 (폴가이즈 톤)",
-    "고정 쿼터뷰 카메라가 그리드 크기에 맞춰 위치·거리 자동 조정",
-    "4x4, 6x6, 8x8로 바꿔 보며 맵 생성과 카메라 확인" ]},
+    { text: "밝은 조명과 하늘 설정 (폴가이즈 톤)", done: true },
+    { text: "고정 쿼터뷰 카메라가 그리드 크기에 맞춰 위치·거리 자동 조정", done: true },
+    { text: "여러 크기로 바꿔 보며 맵 생성과 카메라 확인", done: true } ]},
   { title: "캐릭터 이동 (임시 캐릭터)", tasks: [
     "캡슐로 임시 플레이어 오브젝트 생성",
     "이동 컴포넌트 결정 (Rigidbody 또는 CharacterController)",
