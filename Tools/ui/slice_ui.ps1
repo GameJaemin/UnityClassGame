@@ -62,3 +62,22 @@ $navy = [System.Drawing.Color]::FromArgb(255, 27, 42, 92)
 [PanelGen]::RoundedPanel((Join-Path $sprites "Gen_CardLight.png"), 256, 256, 44, 8,
     [System.Drawing.Color]::FromArgb(255, 240, 246, 255), $navy, [System.Drawing.Color]::FromArgb(255, 222, 232, 248), $false)
 Write-Host "Gen_BadgeWhite, Gen_PillNavy, Gen_PanelNavy, Gen_CardLight"
+
+# Fall Guys식 요소 (gameuidatabase.com의 Fall Guys UI 참고)
+$white = [System.Drawing.Color]::White
+$clear = [System.Drawing.Color]::FromArgb(0, 0, 0, 0)
+$innerWhite = [System.Drawing.Color]::FromArgb(210, 255, 255, 255)
+# 화면 끝에 붙는 평행사변형 띠: 목표(분홍), 숫자(짙은 남색), 스테이지 제목(초록), 새 기록(금색)
+[PanelGen]::Parallelogram((Join-Path $sprites "Gen_SkewPink.png"),  640, 112, 44, [System.Drawing.Color]::FromArgb(255, 245, 45, 140), $innerWhite, 4)
+[PanelGen]::Parallelogram((Join-Path $sprites "Gen_SkewNavy.png"),  520, 144, 44, [System.Drawing.Color]::FromArgb(240, 22, 26, 52), [System.Drawing.Color]::FromArgb(120, 255, 255, 255), 3)
+[PanelGen]::Parallelogram((Join-Path $sprites "Gen_SkewGreen.png"), 600, 128, 44, [System.Drawing.Color]::FromArgb(255, 42, 214, 120), $innerWhite, 4)
+[PanelGen]::Parallelogram((Join-Path $sprites "Gen_SkewGold.png"),  600, 120, 44, [System.Drawing.Color]::FromArgb(255, 255, 196, 40), $innerWhite, 4)
+# 사건 알림 띠 (흰 바탕 → Unity에서 하늘색·분홍·금색으로 입힘)
+[PanelGen]::Band((Join-Path $sprites "Gen_Band.png"), 2048, 200, $white, [System.Drawing.Color]::FromArgb(40, 30, 60, 120), [System.Drawing.Color]::FromArgb(70, 20, 40, 90))
+# 색을 입혀 쓰는 흰 알약 (띠 끝 장식), 반투명 칩(조작 안내·설명), 키 모양, 기울어진 배지, 자홍 제목 상자
+[PanelGen]::RoundedPanel((Join-Path $sprites "Gen_PillWhite.png"), 256, 96, 44, 0, $white, $clear, $clear, $false)
+[PanelGen]::RoundedPanel((Join-Path $sprites "Gen_ChipDark.png"), 160, 96, 34, 0, [System.Drawing.Color]::FromArgb(190, 18, 22, 44), $clear, $clear, $false)
+[PanelGen]::RoundedPanel((Join-Path $sprites "Gen_KeyCap.png"), 96, 96, 20, 4, $white, [System.Drawing.Color]::FromArgb(255, 40, 44, 70), [System.Drawing.Color]::FromArgb(255, 205, 212, 228), $false)
+[PanelGen]::RoundedPanel((Join-Path $sprites "Gen_BadgePink.png"), 256, 128, 44, 7, [System.Drawing.Color]::FromArgb(255, 245, 45, 140), $white, [System.Drawing.Color]::FromArgb(255, 215, 25, 115), $true)
+[PanelGen]::RoundedPanel((Join-Path $sprites "Gen_BoxMagenta.png"), 256, 160, 36, 8, [System.Drawing.Color]::FromArgb(255, 230, 40, 190), $white, [System.Drawing.Color]::FromArgb(255, 200, 25, 165), $true)
+Write-Host "Gen_SkewPink/Navy/Green/Gold, Gen_Band, Gen_PillWhite, Gen_ChipDark, Gen_KeyCap, Gen_BadgePink, Gen_BoxMagenta"

@@ -135,6 +135,7 @@ Material:
     - _SpecularStrength: 1.4
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _SunSharpness: 160
     - _Surface: 0
     - _WaveHeight: 0.35
     - _WaveLength: 9

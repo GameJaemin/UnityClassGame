@@ -62,7 +62,7 @@
 - 시트에는 예전 목표(아이템 수집) 요소("모든 아이템 획득!", "3/6")가 섞여 있으니 쓰지 않는다. 숫자·시간처럼 바뀌는 글자는 빈 패널 + 아이콘 + 실제 Text로 조합한다.
 - 글자는 **TextMeshPro**만 쓴다 (기본 Text + Outline 효과는 테두리가 깨져 보여서 쓰지 않음). 글꼴은 `Assets/UI/Fonts/MalgunGothicBold SDF.asset` (Windows 맑은 고딕 Bold를 OS에서 읽는 DynamicOS 방식), 재질은 같은 폴더의 Outlined(흰 글자 + 두꺼운 남색 테두리 + 아래 그림자) / OutlinedThin / Plain(밝은 바탕 위 남색 글자).
 - UI 스프라이트는 압축 끔 + 밉맵 켬 (큰 원본을 작게 줄여 그리면 깨지기 때문), 늘려 쓰는 배경은 9-slice. 시트에 빈 형태로 없는 배경(흰 배지, 반투명 남색 패널)은 `Tools/ui/PanelGen.cs`로 그린다.
-- 화면 배치는 UI 시트 2와 사용자가 준 시안(인게임: 왼쪽 위 정보 배지, 오른쪽 위 흰 타이머, 오른쪽 아래 조작 안내 / 실패 화면: 배너 + 기록 상자 + 버튼)을 따른다.
+- 화면 구성은 **Fall Guys UI**(https://www.gameuidatabase.com/gameData.php?id=1499)를 따른다: 화면 끝에 붙은 평행사변형 띠(목표 분홍, 숫자 남색, 스테이지 제목 초록, 새 기록 금색), 작은 제목 + 기울어진 분홍 배지, 화면을 가로지르는 사건 띠("시작!", "탈락!"), 반투명 키 칩, 자홍 제목 상자, 기울인 굵은 글자. 버튼·아이콘 그림은 사용자 UI 시트를 쓴다.
 - UI 입력은 새 Input System용 `InputSystemUIInputModule`을 쓴다.
 
 ## PowerShell 스크립트 주의

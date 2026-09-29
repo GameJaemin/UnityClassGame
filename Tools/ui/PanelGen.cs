@@ -46,6 +46,63 @@ public static class PanelGen
         }
     }
 
+    // Fall Guys식 평행사변형 띠 (윗변이 오른쪽으로 skew만큼 밀림). 안쪽에 얇은 흰 선
+    public static void Parallelogram(string output, int width, int height, int skew,
+        Color fill, Color innerLine, int innerWidth)
+    {
+        using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.Clear(Color.Transparent);
+            PointF[] outer = { new PointF(skew, 0), new PointF(width, 0), new PointF(width - skew, height), new PointF(0, height) };
+            using (var brush = new SolidBrush(fill)) g.FillPolygon(brush, outer);
+            if (innerWidth > 0)
+            {
+                float inset = innerWidth * 2.5f;
+                float s = skew * (1f - 2f * inset / height);
+                PointF[] inner = {
+                    new PointF(skew + inset * 0.6f, inset), new PointF(width - inset * 1.4f, inset),
+                    new PointF(width - skew - inset * 0.6f, height - inset), new PointF(inset * 1.4f, height - inset) };
+                using (var pen = new Pen(innerLine, innerWidth)) g.DrawPolygon(pen, inner);
+            }
+            bitmap.Save(output, ImageFormat.Png);
+        }
+    }
+
+    // 화면을 가로지르는 사건 알림 띠 (QUALIFIED! 같은). 옅은 무늬 + 위아래 진한 선. 흰 바탕이라 Unity에서 색을 입혀 쓴다
+    public static void Band(string output, int width, int height, Color fill, Color pattern, Color edge)
+    {
+        using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.Clear(Color.Transparent);
+            using (var brush = new SolidBrush(fill)) g.FillRectangle(brush, 0, 0, width, height);
+            // 비스듬한 알약 무늬를 엇갈려 깐다
+            using (var brush = new SolidBrush(pattern))
+            {
+                int stepX = 90, stepY = 56;
+                for (int row = 0; row * stepY < height + stepY; row++)
+                    for (int x = (row % 2) * stepX / 2 - stepX; x < width + stepX; x += stepX)
+                    {
+                        var state = g.Save();
+                        g.TranslateTransform(x, row * stepY - 10);
+                        g.RotateTransform(-30);
+                        using (GraphicsPath dash = Rounded(new RectangleF(0, 0, 38, 14), 7)) g.FillPath(brush, dash);
+                        g.Restore(state);
+                    }
+            }
+            using (var brush = new SolidBrush(edge))
+            {
+                g.FillRectangle(brush, 0, 0, width, 10);
+                g.FillRectangle(brush, 0, height - 10, width, 10);
+            }
+            bitmap.Save(output, ImageFormat.Png);
+        }
+    }
+
     static GraphicsPath Rounded(RectangleF r, int radius)
     {
         float d = radius * 2f;

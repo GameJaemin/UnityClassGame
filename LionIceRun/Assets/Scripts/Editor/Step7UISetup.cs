@@ -7,10 +7,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
-// Step 7: 게임 화면 UI. 배치는 UI 시트 시안(인게임 화면, 실패 화면)을 따른다.
+// Step 7: 게임 화면 UI. 구성은 Fall Guys UI(gameuidatabase.com/gameData.php?id=1499)를 따른다.
 //  1) TextMeshPro 기본 리소스가 없으면 가져온다 (처음 한 번, 그 뒤 메뉴를 한 번 더 실행)
 //  2) Windows 맑은 고딕 Bold로 TextMeshPro 글꼴(OS 글꼴을 실행 중에 읽는 방식)과 테두리·그림자 재질을 만든다
-//  3) Assets/UI/Sprites 이미지를 선명하게 보이도록 설정 (압축 끔, 밉맵 켬, 패널은 9-slice)
+//  3) Assets/UI/Sprites 이미지를 선명하게 보이도록 설정 (압축 끔, 밉맵 켬, 늘리는 배경은 9-slice)
 //     이미지는 Tools/ui/slice_ui.ps1이 UI 시트에서 잘라내거나 그려서 만든다.
 //  4) 씬에 GameUI 캔버스와 EventSystem을 새로 만든다 (다시 실행하면 새로 만듦, 직접 옮긴 위치는 초기화)
 // 메뉴: LionIceRun > Step 7 UI 세팅
@@ -23,8 +23,9 @@ public static class Step7UISetup
     static readonly Color Navy = new Color(0.106f, 0.165f, 0.361f);
     static readonly Color DeepNavy = new Color(0.055f, 0.10f, 0.24f);
     static readonly Color Brown = new Color(0.36f, 0.20f, 0.05f);
-    static readonly Color Pink = new Color(0.93f, 0.30f, 0.56f);
-    static readonly Color LightBlue = new Color(0.75f, 0.88f, 1f);
+    static readonly Color Pink = new Color(0.96f, 0.18f, 0.55f);
+    static readonly Color LightBlue = new Color(0.72f, 0.86f, 1f);
+    static readonly Color Yellow = new Color(1f, 0.86f, 0.25f);
 
     static TMP_FontAsset font;
     static Material outlined;      // 흰 글자 + 두꺼운 남색 테두리 + 아래 그림자
@@ -66,7 +67,7 @@ public static class Step7UISetup
         EditorSceneManager.MarkSceneDirty(hud.gameObject.scene);
         EditorSceneManager.SaveOpenScenes();
         Selection.activeGameObject = hud.gameObject;
-        Debug.Log("Step 7 UI 세팅 완료: 시안 배치대로 GameUI를 만들었습니다.");
+        Debug.Log("Step 7 UI 세팅 완료: Fall Guys식 구성으로 GameUI를 만들었습니다.");
     }
 
     // ---- 스프라이트 ----
@@ -99,6 +100,9 @@ public static class Step7UISetup
         if (path.Contains("/Gen_BadgeWhite")) return new Vector4(72, 72, 72, 72);
         if (path.Contains("/Gen_PillNavy")) return new Vector4(60, 60, 60, 60);
         if (path.Contains("/Gen_PanelNavy") || path.Contains("/Gen_CardLight")) return new Vector4(52, 52, 52, 52);
+        if (path.Contains("/Gen_PillWhite") || path.Contains("/Gen_BadgePink") || path.Contains("/Gen_BoxMagenta")) return new Vector4(48, 48, 48, 48);
+        if (path.Contains("/Gen_ChipDark")) return new Vector4(38, 38, 38, 38);
+        if (path.Contains("/Gen_KeyCap")) return new Vector4(26, 26, 26, 26);
         return Vector4.zero;
     }
 
@@ -185,6 +189,7 @@ public static class Step7UISetup
 
         BuildTop(root, hud);
         BuildBottom(root, hud);
+        BuildBanner(root, hud);
         BuildResult(root, hud);
         return hud;
     }
@@ -193,45 +198,90 @@ public static class Step7UISetup
     {
         RectTransform top = Group(root, "HUD");
 
-        // 왼쪽 위: 남은 얼음 (큐브 아이콘이 배지 왼쪽 밖으로 살짝 튀어나오게)
-        Image ice = Img(top, "IceBadge", Sprite("Gen_PillNavy"), new Vector2(0, 1), new Vector2(0, 1), new Vector2(70, -44), new Vector2(270, 92), true);
-        Img(ice.transform, "Icon", Sprite("Icon_IceCube"), new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(8, 4), new Vector2(104, 106));
-        hud.iceCountText = Label(ice.transform, "Count", "36 / 36", 46, Color.white, outlined,
-            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(76, 2), new Vector2(180, 80), TextAlignmentOptions.Left);
+        // 왼쪽 위: 화면 끝에 붙은 분홍 목표 띠 (왼쪽 끝은 화면 밖으로)
+        Image goal = Img(top, "Goal", Sprite("Gen_SkewPink"), new Vector2(0, 1), new Vector2(0, 1), new Vector2(-60, -34), new Vector2(620, 108));
+        Label(goal.transform, "Text", "최대한 오래 버티세요!", 40, Color.white, outlined,
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(104, 2), new Vector2(480, 80), TextAlignmentOptions.Left, true);
 
-        // 오른쪽 위: 흰 타이머 배지 + 아래 최고 기록
-        Image timer = Img(top, "TimerBadge", Sprite("Gen_BadgeWhite"), new Vector2(1, 1), new Vector2(1, 1), new Vector2(-44, -40), new Vector2(330, 104), true);
-        Img(timer.transform, "Icon", Sprite("Icon_Stopwatch"), new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(64, 4), new Vector2(72, 83));
-        hud.timerText = Label(timer.transform, "Time", "0:00.0", 58, Navy, plain,
-            new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-30, 0), new Vector2(210, 90), TextAlignmentOptions.Right);
+        // 위 가운데: 작은 제목 + 기울어진 분홍 배지 (Fall Guys의 LAP 1/2처럼)
+        Label(top, "IceLabel", "남은 얼음", 30, Color.white, outlinedThin,
+            new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -26), new Vector2(300, 44), TextAlignmentOptions.Center, true);
+        Image badge = Img(top, "IceBadge", Sprite("Gen_BadgePink"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), new Vector2(0, -122), new Vector2(236, 104), true);
+        badge.rectTransform.localRotation = Quaternion.Euler(0, 0, 3f);
+        Img(badge.transform, "Icon", Sprite("Icon_IceCube"), new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 6), new Vector2(80, 82));
+        hud.iceCountText = Label(badge.transform, "Count", "36 / 36", 50, Color.white, outlined,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(18, 4), new Vector2(190, 80), TextAlignmentOptions.Center, true);
+        hud.iceBadge = badge.rectTransform;
 
-        Image best = Img(top, "BestPill", Sprite("Gen_PillNavy"), new Vector2(1, 1), new Vector2(1, 1), new Vector2(-44, -156), new Vector2(250, 58), true);
+        // 오른쪽 위: 화면 끝에 붙은 남색 띠 (작은 제목 위, 큰 숫자 아래)
+        Image timer = Img(top, "Timer", Sprite("Gen_SkewNavy"), new Vector2(1, 1), new Vector2(1, 1), new Vector2(60, -34), new Vector2(500, 138));
+        Img(timer.transform, "Icon", Sprite("Icon_Stopwatch"), new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(110, 2), new Vector2(70, 80));
+        Label(timer.transform, "Label", "버틴 시간", 26, LightBlue, outlinedThin,
+            new Vector2(1, 1), new Vector2(1, 1), new Vector2(-104, -12), new Vector2(260, 38), TextAlignmentOptions.Right, true);
+        hud.timerText = Label(timer.transform, "Time", "0:00.0", 64, Color.white, outlined,
+            new Vector2(1, 0), new Vector2(1, 0), new Vector2(-100, 10), new Vector2(300, 84), TextAlignmentOptions.Right, true);
+
+        Image best = Img(top, "Best", Sprite("Gen_SkewNavy"), new Vector2(1, 1), new Vector2(1, 1), new Vector2(60, -178), new Vector2(330, 64));
         hud.bestText = Label(best.transform, "Text", "최고  0:00.0", 28, Color.white, outlinedThin,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 1), new Vector2(230, 50), TextAlignmentOptions.Center);
+            new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-96, 0), new Vector2(240, 44), TextAlignmentOptions.Right, true);
     }
 
     static void BuildBottom(Transform root, GameHUD hud)
     {
         RectTransform bottom = Group(root, "Bottom");
 
-        // 오른쪽 아래: 조작 안내 (시안처럼 반투명 남색 패널에 두 줄 표)
-        Image controls = Img(bottom, "Controls", Sprite("Gen_PanelNavy"), new Vector2(1, 0), new Vector2(1, 0), new Vector2(-44, 44), new Vector2(430, 176), true);
-        hud.controlsPanel = controls.gameObject;
-        string[,] rows = { { "이동", "WASD / 방향키" }, { "점프", "Space" }, { "다이브", "Ctrl  (게임패드 X)" } };
-        for (int i = 0; i < rows.GetLength(0); i++)
-        {
-            float y = 52 - i * 46;
-            Label(controls.transform, $"Key{i}", rows[i, 0], 28, LightBlue, outlinedThin,
-                new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(30, y), new Vector2(110, 40), TextAlignmentOptions.Left);
-            Label(controls.transform, $"Value{i}", rows[i, 1], 26, Color.white, outlinedThin,
-                new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(130, y), new Vector2(290, 40), TextAlignmentOptions.Left);
-        }
+        // 시작 전 왼쪽 아래: 초록 제목 띠 + 반투명 설명 (Fall Guys 스테이지 소개처럼)
+        var intro = new GameObject("Intro", typeof(RectTransform));
+        RectTransform introRect = Place(intro, bottom, new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 150), new Vector2(1400, 130));
+        hud.introGroup = introRect;
+        Image title = Img(introRect, "Title", Sprite("Gen_SkewGreen"), new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(-60, 0), new Vector2(560, 124));
+        Label(title.transform, "Text", "얼음 깨기", 60, Color.white, outlined,
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(110, 4), new Vector2(400, 90), TextAlignmentOptions.Left, true);
+        Image desc = Img(introRect, "Description", Sprite("Gen_ChipDark"), new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(470, 0), new Vector2(840, 110), true);
+        Label(desc.transform, "Line1", "밟은 얼음은 세 번이면 깨져요. 끝까지 버티세요!", 26, Color.white, outlinedThin,
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(40, 18), new Vector2(700, 40), TextAlignmentOptions.Left, false);
+        Label(desc.transform, "Line2", "움직이면 시작!", 30, Yellow, outlinedThin,
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(40, -22), new Vector2(700, 44), TextAlignmentOptions.Left, true);
+        Img(desc.transform, "Icon", Sprite("Icon_IceCube"), new Vector2(1, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-56, 2), new Vector2(76, 78));
 
-        // 아래 가운데: 시작 안내 (노란 버튼 모양, 통통 튐)
-        Image ready = Img(bottom, "ReadyPrompt", Sprite("Panel_Yellow"), new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 110), new Vector2(500, 112), true);
-        Label(ready.transform, "Text", "움직이면 시작!", 50, Brown, plain,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 6), new Vector2(460, 90), TextAlignmentOptions.Center);
-        hud.readyPrompt = ready.rectTransform;
+        // 오른쪽 아래: 키 칩 (오른쪽부터 채움)
+        var controls = new GameObject("Controls", typeof(RectTransform));
+        RectTransform controlsRect = Place(controls, bottom, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-40, 40), new Vector2(900, 64));
+        hud.controlsGroup = controls;
+        float x = 0f;
+        foreach (var (key, label) in new[] { ("Ctrl", "다이브"), ("Space", "점프"), ("WASD", "이동") })
+        {
+            RectTransform chip = Chip(controlsRect, key, label, new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-x, 0));
+            x += chip.sizeDelta.x + 14f;
+        }
+    }
+
+    // 화면을 가로지르는 사건 알림 띠 ("시작!", "탈락!"). 양 끝에 알약 장식
+    static void BuildBanner(Transform root, GameHUD hud)
+    {
+        var bannerObject = new GameObject("Banner", typeof(RectTransform));
+        RectTransform banner = Place(bannerObject, root, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 60), new Vector2(2600, 200));
+        banner.localRotation = Quaternion.Euler(0, 0, 4f);
+
+        (Vector2 pos, Vector2 size, Color color)[] pills =
+        {
+            (new Vector2(-760, 124), new Vector2(620, 56), Pink),
+            (new Vector2(-900, -120), new Vector2(520, 46), DeepNavy),
+            (new Vector2(760, -124), new Vector2(620, 56), Pink),
+            (new Vector2(900, 120), new Vector2(520, 46), DeepNavy),
+        };
+        foreach (var (pos, size, color) in pills)
+        {
+            Image pill = Img(banner, "Pill", Sprite("Gen_PillWhite"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), pos, size, true);
+            pill.color = color;
+        }
+        Image band = Img(banner, "Band", Sprite("Gen_Band"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(2600, 200));
+        band.preserveAspect = false;
+        hud.bannerBand = band;
+        hud.bannerText = Label(banner, "Text", "시작!", 150, Color.white, outlined,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 8), new Vector2(1200, 190), TextAlignmentOptions.Center, true);
+        hud.banner = banner;
+        bannerObject.SetActive(false);
     }
 
     static void BuildResult(Transform root, GameHUD hud)
@@ -239,53 +289,45 @@ public static class Step7UISetup
         RectTransform result = Group(root, "Result");
         hud.resultGroup = result.gameObject;
 
-        Image dim = Img(result, "Dim", null, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, false);
+        Image dim = Img(result, "Dim", null, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
         Stretch(dim.rectTransform);
-        dim.color = new Color(0.02f, 0.05f, 0.15f, 0.5f);
+        dim.color = new Color(0.02f, 0.05f, 0.15f, 0.45f);
         dim.raycastTarget = true;  // 뒤쪽 클릭 막기
 
-        Image card = Img(result, "Card", Sprite("Gen_PanelNavy"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -30), new Vector2(760, 520), true);
-        card.color = new Color(1f, 1f, 1f, 1f);
+        Image card = Img(result, "Card", Sprite("Gen_PanelNavy"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -40), new Vector2(720, 470), true);
         hud.resultCard = card.rectTransform;
         Transform c = card.transform;
 
-        // 카드 윗변에 걸친 배너 / 새 기록 배지
-        hud.gameOverBanner = Img(c, "GameOverBanner", Sprite("Banner_GameOver"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), new Vector2(0, 0), new Vector2(560, 178)).gameObject;
-        Image badge = Img(c, "NewRecordBadge", Sprite("Panel_Pink"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), new Vector2(0, 0), new Vector2(480, 118), true);
-        Img(badge.transform, "Check", Sprite("Icon_Check"), new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(70, 4), new Vector2(80, 82));
-        Label(badge.transform, "Text", "새 기록!", 62, Color.white, outlined,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(34, 6), new Vector2(320, 100), TextAlignmentOptions.Center);
-        hud.newRecordBadge = badge.gameObject;
+        // 카드 윗변에 걸친 자홍 제목 상자 (Fall Guys의 "57 REMAIN!"처럼)
+        Image header = Img(c, "Header", Sprite("Gen_BoxMagenta"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(660, 132), true);
+        header.rectTransform.localRotation = Quaternion.Euler(0, 0, -2f);
+        hud.resultTimeText = Label(header.transform, "Text", "0:00.0 버텼어요!", 60, Color.white, outlined,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 6), new Vector2(620, 100), TextAlignmentOptions.Center, true);
 
-        Label(c, "Subtitle", "바다로 떨어졌어요.", 32, Color.white, outlinedThin,
-            new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -104), new Vector2(600, 50), TextAlignmentOptions.Center);
+        // 새 기록이면 금색 띠
+        Image ribbon = Img(c, "NewRecord", Sprite("Gen_SkewGold"), new Vector2(0.5f, 1), new Vector2(0.5f, 0.5f), new Vector2(0, -122), new Vector2(430, 86));
+        Label(ribbon.transform, "Text", "새 기록!", 50, Color.white, outlined,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 4), new Vector2(380, 76), TextAlignmentOptions.Center, true);
+        hud.newRecordRibbon = ribbon.gameObject;
 
-        // 기록 상자 (시안의 흰 정보 상자)
-        Image stats = Img(c, "Stats", Sprite("Gen_CardLight"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 16), new Vector2(620, 180), true);
-        Label(stats.transform, "TimeLabel", "버틴 시간", 34, Navy, plain,
-            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(40, 38), new Vector2(240, 60), TextAlignmentOptions.Left);
-        hud.resultTimeText = Label(stats.transform, "TimeValue", "0:00.0", 60, Navy, plain,
-            new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-40, 38), new Vector2(300, 80), TextAlignmentOptions.Right);
-        Label(stats.transform, "BestLabel", "최고 기록", 30, Navy, plain,
-            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(40, -42), new Vector2(240, 56), TextAlignmentOptions.Left);
-        hud.resultBestText = Label(stats.transform, "BestValue", "0:00.0", 44, Pink, plain,
-            new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-40, -42), new Vector2(300, 64), TextAlignmentOptions.Right);
+        Label(c, "BestLabel", "최고 기록", 32, LightBlue, outlinedThin,
+            new Vector2(0.5f, 0.5f), new Vector2(1, 0.5f), new Vector2(-20, 6), new Vector2(260, 50), TextAlignmentOptions.Right, true);
+        hud.resultBestText = Label(c, "BestValue", "0:00.0", 52, Color.white, outlined,
+            new Vector2(0.5f, 0.5f), new Vector2(0, 0.5f), new Vector2(10, 6), new Vector2(280, 70), TextAlignmentOptions.Left, true);
 
-        // 다시 하기 버튼 (시트의 노란 버튼 + 실제 글자)
-        Image retry = Img(c, "RetryButton", Sprite("Btn_YellowRetry"), new Vector2(0.5f, 0), new Vector2(0.5f, 0.5f), new Vector2(0, 96), new Vector2(340, 133));
+        // 다시 하기 버튼 + R 키 칩
+        Image retry = Img(c, "RetryButton", Sprite("Btn_YellowRetry"), new Vector2(0.5f, 0), new Vector2(0.5f, 0.5f), new Vector2(0, 150), new Vector2(340, 133));
         retry.raycastTarget = true;
         Label(retry.transform, "Text", "다시 하기", 44, Brown, plain,
-            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(34, 4), new Vector2(230, 80), TextAlignmentOptions.Center);
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(34, 4), new Vector2(230, 80), TextAlignmentOptions.Center, false);
         var button = retry.gameObject.AddComponent<Button>();
         button.targetGraphic = retry;
         UnityEventTools.AddPersistentListener(button.onClick, hud.OnRetryClicked);
         retry.gameObject.AddComponent<UIButtonPop>();
-
-        Label(c, "RetryHint", "R 키로도 다시 할 수 있어요", 24, LightBlue, outlinedThin,
-            new Vector2(0.5f, 0), new Vector2(0.5f, 0.5f), new Vector2(0, 16), new Vector2(600, 36), TextAlignmentOptions.Center);
+        Chip(c, "R", "다시 하기", new Vector2(0.5f, 0), new Vector2(0.5f, 0.5f), new Vector2(0, 50));
 
         result.gameObject.SetActive(false);
-        badge.gameObject.SetActive(false);
+        ribbon.gameObject.SetActive(false);
     }
 
     static void EnsureEventSystem()
@@ -303,6 +345,33 @@ public static class Step7UISetup
     }
 
     // ---- 만들기 도우미 ----
+
+    // Fall Guys식 키 안내 칩: 반투명 알약 안에 [키 모양] + 설명. 글자 폭에 맞춰 너비를 정한다
+    static RectTransform Chip(Transform parent, string key, string label, Vector2 anchor, Vector2 pivot, Vector2 position)
+    {
+        const float height = 60f, pad = 14f, gap = 10f;
+        Image chip = Img(parent, $"Chip_{key}", Sprite("Gen_ChipDark"), anchor, pivot, position, new Vector2(100, height), true);
+
+        TMP_Text keyText = Label(chip.transform, "KeyText", key, 24, Navy, plain,
+            new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(100, 40), TextAlignmentOptions.Center, false);
+        // 글자 폭을 못 재면(글꼴이 아직 안 읽힘) 글자 수로 어림
+        float keyMeasured = keyText.GetPreferredValues(key).x;
+        if (keyMeasured < 1f) keyMeasured = key.Length * 15f;
+        float keyWidth = Mathf.Max(44f, keyMeasured + 24f);
+        Image cap = Img(chip.transform, "Key", Sprite("Gen_KeyCap"), new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(pad, 0), new Vector2(keyWidth, 44), true);
+        keyText.transform.SetParent(cap.transform, false);
+        Place(keyText.gameObject, cap.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 1), new Vector2(keyWidth, 40));
+
+        TMP_Text labelText = Label(chip.transform, "Label", label, 26, Color.white, outlinedThin,
+            new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(pad + keyWidth + gap, 0), new Vector2(200, 40), TextAlignmentOptions.Left, false);
+        float labelMeasured = labelText.GetPreferredValues(label).x;
+        if (labelMeasured < 1f) labelMeasured = label.Length * 27f;
+        float labelWidth = labelMeasured + 4f;
+        labelText.rectTransform.sizeDelta = new Vector2(labelWidth, 40);
+
+        chip.rectTransform.sizeDelta = new Vector2(pad + keyWidth + gap + labelWidth + pad + 6f, height);
+        return chip.rectTransform;
+    }
 
     static RectTransform Group(Transform parent, string name)
     {
@@ -345,8 +414,9 @@ public static class Step7UISetup
         return image;
     }
 
+    // italic: Fall Guys 글자처럼 살짝 기울임
     static TMP_Text Label(Transform parent, string name, string content, float size, Color color, Material material,
-        Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 box, TextAlignmentOptions alignment)
+        Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 box, TextAlignmentOptions alignment, bool italic)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
         Place(go, parent, anchor, pivot, position, box);
@@ -357,6 +427,7 @@ public static class Step7UISetup
         text.fontSize = size;
         text.color = color;
         text.alignment = alignment;
+        text.fontStyle = italic ? FontStyles.Italic : FontStyles.Normal;
         text.textWrappingMode = TextWrappingModes.NoWrap;
         text.overflowMode = TextOverflowModes.Overflow;
         text.raycastTarget = false;
