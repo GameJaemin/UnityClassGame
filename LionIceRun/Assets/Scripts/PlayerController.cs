@@ -65,6 +65,12 @@ public class PlayerController : MonoBehaviour
 
     public MoveState State { get; private set; }
     public bool IsGrounded { get; private set; }
+    // 발밑 충돌체 (땅에 있을 때만). 얼음 블럭 판정에 쓴다
+    public Collider GroundCollider { get; private set; }
+    // 게임 시작 후 한 번이라도 이동·점프·다이브 입력을 했는지 (시작 블럭 보호용)
+    public bool HasMoved { get; private set; }
+    // false면 입력을 무시한다 (게임 오버 등). 물리(중력)는 그대로
+    public bool InputEnabled { get; set; } = true;
     public float HorizontalSpeed => new Vector3(body.linearVelocity.x, 0f, body.linearVelocity.z).magnitude;
 
     // 점프 높이와 꼭대기까지 걸리는 시간으로 올라갈 때 중력과 점프 속도를 정한다
@@ -103,6 +109,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!InputEnabled)
+        {
+            moveDirection = Vector3.zero;
+            jumpHeld = false;
+            return;
+        }
+
         // 카메라가 보는 방향 기준으로 W가 화면 위쪽이 되게 한다
         Vector2 input = moveAction.ReadValue<Vector2>();
         Vector3 forward = Vector3.forward;
@@ -117,6 +130,7 @@ public class PlayerController : MonoBehaviour
         jumpHeld = jumpAction.IsPressed();
         if (jumpAction.WasPressedThisFrame()) lastJumpPressedTime = Time.time;
         if (diveAction.WasPressedThisFrame()) diveQueued = true;
+        if (moveDirection.sqrMagnitude > 0.01f || jumpHeld || diveQueued) HasMoved = true;
     }
 
     void FixedUpdate()
@@ -125,6 +139,7 @@ public class PlayerController : MonoBehaviour
 
         // 위로 올라가는 중에는 땅으로 보지 않는다 (점프 직후 다시 착지 판정되는 것 방지)
         IsGrounded = velocity.y <= 0.5f && CheckGround();
+        if (!IsGrounded) GroundCollider = null;
         if (IsGrounded)
         {
             lastGroundedTime = Time.time;
@@ -235,7 +250,9 @@ public class PlayerController : MonoBehaviour
         // 캡슐 아래쪽 반구 위치에서 조금 작은 구를 아래로 쏜다
         float radius = capsule.radius * 0.9f;
         Vector3 origin = body.position + body.rotation * capsule.center + Vector3.down * (capsule.height * 0.5f - capsule.radius);
-        return Physics.SphereCast(origin, radius, Vector3.down, out _, capsule.radius - radius + groundCheckDistance,
+        bool hit = Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit info, capsule.radius - radius + groundCheckDistance,
             ~0, QueryTriggerInteraction.Ignore);
+        GroundCollider = hit ? info.collider : null;
+        return hit;
     }
 }

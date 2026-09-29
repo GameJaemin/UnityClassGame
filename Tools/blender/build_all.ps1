@@ -1,4 +1,4 @@
-# 모든 복셀 캐릭터를 다시 만들고 미리보기 시트를 합친다.
+﻿# 모든 복셀 캐릭터를 다시 만들고 미리보기 시트를 합친다.
 # 실행: powershell -ExecutionPolicy Bypass -File Tools\blender\build_all.ps1
 param(
     [string]$Blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
