@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "name": "소용돌이 빙로",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "III............",
+    "III.IIIIIIIIIII",
+    "III.IIIIIIIIIII",
+    "III.IIIIIIIIIII",
+    "III.III.....III",
+    "III.IIIIIII.III",
+    "III.IIIIIII.III",
+    "III.IIIIIII.III",
+    "III.........III",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII"
+  ],
+  "playerStart": {
+    "y": 1,
+    "x": 7
+  },
+  "botStarts": [
+    {
+      "y": 13,
+      "x": 1
+    },
+    {
+      "y": 13,
+      "x": 13
+    },
+    {
+      "y": 5,
+      "x": 1
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+    "version": 1,
+    "name": "작은 환초",
+    "width": 8,
+    "depth": 8,
+    "rows": [
+        "..IIII..",
+        ".IIIIII.",
+        "IIIIIIII",
+        "III..III",
+        "III..III",
+        "IIIIIIII",
+        ".IIIIII.",
+        "..IIII.."
+    ],
+    "playerStart": {
+        "x": 3,
+        "y": 2
+    },
+    "botStarts": [
+        {
+            "x": 1,
+            "y": 3
+        },
+        {
+            "x": 6,
+            "y": 3
+        },
+        {
+            "x": 3,
+            "y": 6
+        }
+    ]
+}

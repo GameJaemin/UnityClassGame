@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "name": "아홉 바다 우물",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "..IIIIIIIIIII..",
+    ".IIIIIIIIIIIII.",
+    "III..II..II..II",
+    "III..II..II..II",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "III..II..II..II",
+    "III..II..II..II",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "III..II..II..II",
+    "III..II..II..II",
+    "IIIIIIIIIIIIIII",
+    ".IIIIIIIIIIIII.",
+    "..IIIIIIIIIII.."
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 6
+  },
+  "botStarts": [
+    {
+      "y": 13,
+      "x": 2
+    },
+    {
+      "y": 10,
+      "x": 13
+    },
+    {
+      "y": 2,
+      "x": 13
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "name": "십자 빙하",
+  "width": 12,
+  "depth": 12,
+  "rows": [
+    "...IIIIII...",
+    "...IIIIII...",
+    "...IIIIII...",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    "...IIIIII...",
+    "...IIIIII...",
+    "...IIIIII..."
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 5
+  },
+  "botStarts": [
+    {
+      "y": 10,
+      "x": 7
+    },
+    {
+      "y": 7,
+      "x": 1
+    },
+    {
+      "y": 5,
+      "x": 10
+    }
+  ]
+}

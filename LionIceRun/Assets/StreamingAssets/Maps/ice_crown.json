@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "name": "얼음 왕관",
+  "width": 14,
+  "depth": 12,
+  "rows": [
+    "III..IIII..III",
+    "III..IIII..III",
+    "III..IIII..III",
+    "III..IIII..III",
+    "IIIIIIIIIIIIII",
+    "IIIIIIIIIIIIII",
+    "IIIIIIIIIIIIII",
+    "IIIIIIIIIIIIII",
+    ".IIIIIIIIIIII.",
+    ".IIIIIIIIIIII.",
+    "..IIIIIIIIII..",
+    "...IIIIIIII..."
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 6
+  },
+  "botStarts": [
+    {
+      "y": 10,
+      "x": 12
+    },
+    {
+      "y": 10,
+      "x": 1
+    },
+    {
+      "y": 4,
+      "x": 12
+    }
+  ]
+}

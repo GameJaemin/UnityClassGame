@@ -1,0 +1,19 @@
+{
+    "version": 1,
+    "name": "작은 빙판",
+    "width": 6,
+    "depth": 6,
+    "rows": [
+        "IIIIII",
+        "IIIIII",
+        "IIIIII",
+        "IIIIII",
+        "IIIIII",
+        "IIIIII"
+    ],
+    "playerStart": {
+        "x": 3,
+        "y": 3
+    },
+    "botStarts": []
+}

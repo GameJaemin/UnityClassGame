@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "name": "모래시계 빙하",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    "..IIIIIIIIIII..",
+    "...IIIIIIIII...",
+    "....IIIIIII....",
+    ".....IIIII.....",
+    "......III......",
+    "......III......",
+    "......III......",
+    ".....IIIII.....",
+    "....IIIIIII....",
+    "...IIIIIIIII...",
+    "..IIIIIIIIIII..",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII."
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 7
+  },
+  "botStarts": [
+    {
+      "y": 13,
+      "x": 2
+    },
+    {
+      "y": 13,
+      "x": 12
+    },
+    {
+      "y": 9,
+      "x": 7
+    }
+  ]
+}

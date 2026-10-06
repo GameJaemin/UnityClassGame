@@ -1,0 +1,44 @@
+{
+    "version": 1,
+    "name": "세 바다 구멍",
+    "width": 10,
+    "depth": 10,
+    "rows": [
+        "IIIIIIIIII",
+        "IIIIIII..I",
+        "IIIIIII..I",
+        "IIIIIIIIII",
+        "II..IIIIII",
+        "II..IIIIII",
+        "IIIIIIIIII",
+        "IIIIII..II",
+        "IIIIII..II",
+        "IIIIIIIIII"
+    ],
+    "playerStart": {
+        "x": 5,
+        "y": 5
+    },
+    "botStarts": [
+        {
+            "x": 1,
+            "y": 8
+        },
+        {
+            "x": 9,
+            "y": 0
+        },
+        {
+            "x": 9,
+            "y": 9
+        },
+        {
+            "x": 1,
+            "y": 0
+        },
+        {
+            "x": 0,
+            "y": 2
+        }
+    ]
+}

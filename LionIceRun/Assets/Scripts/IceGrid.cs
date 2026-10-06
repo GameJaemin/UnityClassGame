@@ -6,9 +6,16 @@ using UnityEditor;
 
 // 가로 x 세로 얼음 블럭 그리드를 만든다.
 // 그리드 중앙이 이 오브젝트 위치에 오고, 블럭 윗면이 y = 0이 된다.
+// 맵 파일(StreamingAssets/Maps/*.json, 맵툴로 만듦)을 고르면 그 모양대로 만든다: 빈칸에는 블럭이 없고,
+// 가로·세로와 플레이어 시작 칸도 맵을 따른다. 맵 파일이 비어 있으면 가로 x 세로 꽉 찬 판.
 public class IceGrid : MonoBehaviour
 {
-    [Header("그리드 크기")]
+    [Header("맵")]
+    [Tooltip("StreamingAssets/Maps의 맵 파일. 고르면 가로·세로는 맵 크기로 바뀐다. 비우면 아래 가로 x 세로 꽉 찬 판")]
+    [MapFile] public string mapFile = "";
+    [System.NonSerialized] public bool networkReplica;
+
+    [Header("그리드 크기 (맵 파일이 없을 때)")]
     [Min(1)] public int width = 6;
     [Min(1)] public int depth = 6;
 
@@ -62,14 +69,27 @@ public class IceGrid : MonoBehaviour
 
     readonly List<GameObject> blocks = new List<GameObject>();
     readonly List<IceBlock> iceBlocks = new List<IceBlock>();
+    // 칸 번호로 블럭 찾기 (빈칸은 null). 게임 중에만 채워진다
+    IceBlock[,] cellBlocks;
     ParticleSystem iceBurst;
+    MapData map;
+    string loadedMapFile;
 
     public IReadOnlyList<GameObject> Blocks => blocks;
-    // 게임 중에만 채워진다 (에디터 미리보기에서는 비어 있음)
+    // 게임 중에만 채워진다 (에디터 미리보기에서는 비어 있음). 빈칸은 들어 있지 않다
     public IReadOnlyList<IceBlock> IceBlocks => iceBlocks;
     public float Spacing => blockSize + gap;
     public Vector2 Size => new Vector2(width * Spacing - gap, depth * Spacing - gap);
-    public Vector2Int StartCell => new Vector2Int(width / 2, depth / 2);
+    // 지금 쓰는 맵 (맵 파일이 없거나 못 읽었으면 null)
+    public MapData Map
+    {
+        get
+        {
+            EnsureMap();
+            return map;
+        }
+    }
+    public Vector2Int StartCell => Map != null ? map.StartCell : new Vector2Int(width / 2, depth / 2);
     // 바다 수면 높이 (여기보다 아래로 떨어지면 게임 오버)
     public float SeaLevel => transform.position.y - seaDepth;
 
@@ -82,12 +102,24 @@ public class IceGrid : MonoBehaviour
 
     public bool InBounds(Vector2Int cell) => cell.x >= 0 && cell.y >= 0 && cell.x < width && cell.y < depth;
 
-    // 게임 중에만 동작. Build에서 x 바깥, z 안쪽 순서로 만들어서 index = x * depth + z
+    // 게임 중에만 동작. 그리드 밖이나 맵의 빈칸이면 null
     public IceBlock GetBlock(Vector2Int cell)
     {
-        if (!InBounds(cell)) return null;
-        int index = cell.x * depth + cell.y;
-        return index < iceBlocks.Count ? iceBlocks[index] : null;
+        if (!InBounds(cell) || cellBlocks == null) return null;
+        if (cell.x >= cellBlocks.GetLength(0) || cell.y >= cellBlocks.GetLength(1)) return null;
+        return cellBlocks[cell.x, cell.y];
+    }
+
+    // 맵 파일이 바뀌었으면 다시 읽고 가로·세로를 맵 크기로 맞춘다
+    void EnsureMap()
+    {
+        string file = mapFile ?? "";
+        if (file == loadedMapFile) return;
+        loadedMapFile = file;
+        map = file.Length > 0 ? MapData.Load(file) : null;
+        if (map == null) return;
+        width = map.width;
+        depth = map.depth;
     }
 
     // 해당 칸 블럭 윗면 중앙의 월드 좌표
@@ -97,25 +129,40 @@ public class IceGrid : MonoBehaviour
         return transform.TransformPoint(local);
     }
 
+    // 다른 컴포넌트의 Start(플레이어 시작 위치 등)보다 먼저 맵 크기·시작 칸이 정해지도록 Awake에서 읽는다
+    void Awake()
+    {
+        loadedMapFile = null;
+        EnsureMap();
+    }
+
     void Start() => Build();
 
-    void OnValidate() => UpdateSea();
+    void OnValidate()
+    {
+        EnsureMap();
+        UpdateSea();
+    }
 
     [ContextMenu("그리드 생성")]
     public void Build()
     {
         Clear();
+        loadedMapFile = null;  // 파일 내용이 바뀌었을 수 있으니 다시 읽는다
+        EnsureMap();
         if (blockPrefab == null)
         {
             Debug.LogWarning("IceGrid: 블럭 프리팹이 비어 있습니다.", this);
             return;
         }
 
+        cellBlocks = new IceBlock[width, depth];
         Vector3 origin = new Vector3(-(width - 1) * Spacing / 2f, -blockHeight / 2f, -(depth - 1) * Spacing / 2f);
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < depth; z++)
             {
+                if (map != null && !map.IsIce(new Vector2Int(x, z))) continue;
                 GameObject block = CreateBlock();
                 block.name = $"Ice_{x}_{z}";
                 block.transform.localPosition = origin + new Vector3(x * Spacing, 0f, z * Spacing);
@@ -129,6 +176,7 @@ public class IceGrid : MonoBehaviour
                     if (ice == null) ice = block.AddComponent<IceBlock>();
                     ice.Init(this, new Vector2Int(x, z));
                     iceBlocks.Add(ice);
+                    cellBlocks[x, z] = ice;
                 }
             }
         }
@@ -140,6 +188,7 @@ public class IceGrid : MonoBehaviour
     {
         blocks.Clear();
         iceBlocks.Clear();
+        cellBlocks = null;
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             GameObject child = transform.GetChild(i).gameObject;

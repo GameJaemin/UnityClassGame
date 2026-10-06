@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "name": "네 섬 교차로",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "IIIII.III.IIIII",
+    "IIIII.III.IIIII",
+    "IIIII.III.IIIII",
+    "IIIII.III.IIIII",
+    "IIIIIIIIIIIIIII",
+    "....I.III.I....",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "IIIIIIIIIIIIIII",
+    "....I.III.I....",
+    "IIIIIIIIIIIIIII",
+    "IIIII.III.IIIII",
+    "IIIII.III.IIIII",
+    "IIIII.III.IIIII",
+    "IIIII.III.IIIII"
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 7
+  },
+  "botStarts": [
+    {
+      "y": 13,
+      "x": 1
+    },
+    {
+      "y": 13,
+      "x": 13
+    },
+    {
+      "y": 9,
+      "x": 7
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+    "version": 1,
+    "name": "넓은 빙판",
+    "width": 12,
+    "depth": 12,
+    "rows": [
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII",
+        "IIIIIIIIIIII"
+    ],
+    "playerStart": {
+        "x": 6,
+        "y": 6
+    },
+    "botStarts": []
+}

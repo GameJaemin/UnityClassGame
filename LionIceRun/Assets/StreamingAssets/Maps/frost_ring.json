@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "name": "서리 환초",
+  "width": 12,
+  "depth": 12,
+  "rows": [
+    "..IIIIIIII..",
+    ".IIIIIIIIII.",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    "IIII....IIII",
+    "IIII....IIII",
+    "IIII....IIII",
+    "IIII....IIII",
+    "IIIIIIIIIIII",
+    "IIIIIIIIIIII",
+    ".IIIIIIIIII.",
+    "..IIIIIIII.."
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 5
+  },
+  "botStarts": [
+    {
+      "y": 10,
+      "x": 9
+    },
+    {
+      "y": 9,
+      "x": 1
+    },
+    {
+      "y": 4,
+      "x": 10
+    }
+  ]
+}

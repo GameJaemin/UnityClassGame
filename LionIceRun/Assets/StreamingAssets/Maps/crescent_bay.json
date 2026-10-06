@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "name": "초승달 만",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    ".....IIIII.....",
+    "...IIIII.......",
+    "..IIIII........",
+    ".IIIIII........",
+    ".IIIII.........",
+    "IIIIII.........",
+    "IIIIII.........",
+    "IIIIIII........",
+    "IIIIIII........",
+    "IIIIIIII.......",
+    ".IIIIIIIII...I.",
+    ".IIIIIIIIIIIII.",
+    "..IIIIIIIIIII..",
+    "...IIIIIIIII...",
+    ".....IIIII....."
+  ],
+  "playerStart": {
+    "y": 2,
+    "x": 7
+  },
+  "botStarts": [
+    {
+      "y": 13,
+      "x": 5
+    },
+    {
+      "y": 6,
+      "x": 1
+    },
+    {
+      "y": 7,
+      "x": 5
+    }
+  ]
+}

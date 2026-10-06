@@ -1,0 +1,28 @@
+{
+    "version": 1,
+    "name": "대빙원",
+    "width": 15,
+    "depth": 15,
+    "rows": [
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII",
+        "IIIIIIIIIIIIIII"
+    ],
+    "playerStart": {
+        "x": 7,
+        "y": 7
+    },
+    "botStarts": []
+}
