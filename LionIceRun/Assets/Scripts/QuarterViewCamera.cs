@@ -4,6 +4,7 @@ using UnityEngine;
 //  - 에디터와 시작 전: IceGrid 전체가 화면에 들어오는 거리 (그리드 크기·화면 비율이 바뀌면 다시 맞춤)
 //  - 게임 시작 후: playDistance로 부드럽게 다가가며, 화면 중심이 맵 중앙에서 플레이어 쪽으로 옮겨간다
 //    (플레이어 높이는 따라가지 않아서 떨어질 때 바다로 빠지는 모습이 보인다)
+//  - 플레이어가 바다에 빠져 다시 들어오기를 기다리는 동안: 맵 전체가 보이는 거리로 물러난다
 [ExecuteAlways]
 [RequireComponent(typeof(Camera))]
 public class QuarterViewCamera : MonoBehaviour
@@ -32,6 +33,8 @@ public class QuarterViewCamera : MonoBehaviour
     [Min(0.1f)] public float followSharpness = 5f;
     [Tooltip("화면 중심이 맵 가장자리 밖으로 나가지 않게 (1 = 맵 끝까지)")]
     [Range(0f, 1f)] public float followLimit = 0.8f;
+    [Tooltip("플레이어가 바다에 빠져 다시 들어오기를 기다리는 동안 맵 전체를 보여 줌")]
+    public bool overviewWhileOut = true;
 
     Camera cam;
     float lastAspect;
@@ -39,6 +42,7 @@ public class QuarterViewCamera : MonoBehaviour
     float zoomStartTime = float.PositiveInfinity;
     Vector3 followPoint;
     bool followInitialized;
+    float outBlend;
 
     Camera Cam => cam != null ? cam : cam = GetComponent<Camera>();
 
@@ -100,6 +104,13 @@ public class QuarterViewCamera : MonoBehaviour
             followPoint = Vector3.Lerp(followPoint, target, 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
             center = Vector3.Lerp(center, followPoint, blend);
         }
+
+        // 플레이어가 바다에 빠져 꺼져 있는 동안은 맵 전체로 물러났다가, 다시 들어오면 돌아온다
+        bool watching = overviewWhileOut && player != null && !player.gameObject.activeInHierarchy;
+        outBlend = Mathf.MoveTowards(outBlend, watching ? 1f : 0f, Time.deltaTime / 0.8f);
+        float overview = Mathf.SmoothStep(0f, 1f, outBlend);
+        distance = Mathf.Lerp(distance, OverviewDistance(), overview);
+        center = Vector3.Lerp(center, grid.transform.position, overview);
         Place(center, distance);
     }
 

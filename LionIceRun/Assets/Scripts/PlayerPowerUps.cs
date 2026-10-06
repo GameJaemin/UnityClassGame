@@ -50,6 +50,18 @@ public class PlayerPowerUps : MonoBehaviour
 
     public void GiveSuperJump() => controller.SetBoost(superJumpHeight, superJumpSpeed, superJumpDuration);
 
+    public void ApplyOnlineShield(bool shield)
+    {
+        if (shield == HasShield) return;
+        if (shield) GiveShield();
+        else
+        {
+            HasShield = false;
+            if (bubble != null) Destroy(bubble);
+            bubble = null;
+        }
+    }
+
     // 시련이 맞히기 전에 부른다. 방패가 있으면 쓰고 true (맞지 않음)
     public bool TryBlock()
     {

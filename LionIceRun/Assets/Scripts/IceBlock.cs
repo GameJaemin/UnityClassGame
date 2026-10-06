@@ -33,6 +33,18 @@ public class IceBlock : MonoBehaviour
     public Vector2Int Cell { get; private set; }
     public bool IsBroken => CurrentStage == Stage.Broken;
 
+    // AI가 도착 전에 저절로 흔들리기 시작할 칸을 피할 수 있도록 남은 시간을 제공한다.
+    public float SecondsUntilShaking
+    {
+        get
+        {
+            if (CurrentStage >= Stage.Shaking) return 0f;
+            if (CurrentStage == Stage.Clean || grid == null || grid.decayInterval <= 0f) return float.PositiveInfinity;
+            int stages = (int)Stage.Shaking - (int)CurrentStage;
+            return Mathf.Max(0f, stages * grid.decayInterval - (Time.time - lastStageChangeTime));
+        }
+    }
+
     public event Action<IceBlock> Broken;
     public event Action<IceBlock> Restored;
 
@@ -60,6 +72,7 @@ public class IceBlock : MonoBehaviour
     // 이음새에서 같은 발걸음이 두 번 세어지는 것만 막는다 (touchDebounceTime).
     public void Step()
     {
+        if (grid.networkReplica) return;
         if (IsBroken || Time.time - lastStepTime < grid.touchDebounceTime) return;
         lastStepTime = Time.time;
 
@@ -76,6 +89,7 @@ public class IceBlock : MonoBehaviour
     // 시련(눈덩이): 밟힘 중복 방지 없이 한 단계. 흔들리는 중이면 바로 깨짐
     public void ForceAdvance()
     {
+        if (grid.networkReplica) return;
         if (IsBroken) return;
         if (CurrentStage == Stage.Shaking) ForceBreak();
         else Advance();
@@ -84,6 +98,7 @@ public class IceBlock : MonoBehaviour
     // 시련(고드름): 단계와 상관없이 바로 깨짐
     public void ForceBreak()
     {
+        if (grid.networkReplica) return;
         if (IsBroken) return;
         if (shaking != null) StopCoroutine(shaking);
         Break();
@@ -235,6 +250,24 @@ public class IceBlock : MonoBehaviour
         punching = StartCoroutine(Refreeze());
         grid.PlayIceBurst(TopCenter, 20, 0.5f);
         Restored?.Invoke(this);
+    }
+
+    // 확정된 상태만 반영하며 참가자 PC에서 파괴 타이머를 동작시키지 않는다.
+    public void ApplyNetworkStage(Stage stage)
+    {
+        if (!grid.networkReplica || stage == CurrentStage) return;
+        StopAllCoroutines();
+        shaking = growing = decaying = punching = null;
+        bool wasBroken = IsBroken;
+        CurrentStage = stage;
+        transform.localPosition = restPosition;
+        transform.localScale = restScale;
+        bool exists = stage != Stage.Broken;
+        gameObject.SetActive(exists);
+        blockCollider.enabled = blockRenderer.enabled = exists;
+        if (exists) UpdateLook();
+        else { SpawnShards(); grid.PlayIceBurst(TopCenter, 20, 0.8f); Broken?.Invoke(this); }
+        if (wasBroken && exists) { grid.PlayIceBurst(TopCenter, 12, 0.5f); Restored?.Invoke(this); }
     }
 
     // 작게 솟아올랐다가 살짝 커졌다 제 크기로 (톡 얼어붙는 느낌)

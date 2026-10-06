@@ -1,0 +1,1 @@
+﻿복사한 Unity 프로젝트에서만 사용하는 검사/빌드 스크립트입니다. 원본 Assets에 넣지 않습니다. 원본 Assets, Packages, ProjectSettings를 복사한 뒤 이 파일을 Assets/Editor에 넣고 BuildOutput.txt에 출력 EXE 절대 경로를 저장합니다. Unity 6000.6.3f1의 -batchmode -nographics -quit -executeMethod BatchEffectsBuild.Run으로 실행합니다. 기존 규칙 28개, 표현 저장 9개, 카운트다운/파티클 저장 7개를 검사합니다. 실제 화면/입자 시인성은 별도 확인합니다.

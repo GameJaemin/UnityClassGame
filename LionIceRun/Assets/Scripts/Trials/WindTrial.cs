@@ -10,7 +10,7 @@ public class WindTrial : TrialBase
     [Min(0.3f)] public float warnTime = 1.5f;
     [Min(0.5f)] public float duration = 3f;
     [Tooltip("미는 힘 (가속도). 땅에서 버티는 힘(가속 25)보다 작게")]
-    [Min(0f)] public float strength = 7f;
+    [Min(0f)] public float strength = 9f;
 
     ParticleSystem streaks;
 
@@ -58,10 +58,22 @@ public class WindTrial : TrialBase
     }
 
     // 맵을 덮는 하얀 눈보라 줄기 (한 번 만들어 재사용)
+    public void ApplyNetworkWind(bool active, Quaternion rotation)
+    {
+        if (!active && streaks == null) return;
+        ParticleSystem system = Streaks();
+        system.transform.rotation = rotation;
+        var main = system.main;
+        main.startSpeed = 14f;
+        if (active && !system.isPlaying) system.Play();
+        else if (!active && system.isPlaying) system.Stop();
+    }
+
     ParticleSystem Streaks()
     {
         if (streaks != null) return streaks;
         var go = new GameObject("WindStreaks");
+        OnlineWorldVisual.Track(go, 5);
         go.transform.position = grid.transform.position + Vector3.up * 1.2f;
         streaks = go.AddComponent<ParticleSystem>();
         streaks.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);

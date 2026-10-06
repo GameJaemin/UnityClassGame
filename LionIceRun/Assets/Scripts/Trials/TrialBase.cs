@@ -24,6 +24,7 @@ public abstract class TrialBase : MonoBehaviour
 
     void Update()
     {
+        if (OnlineGameSession.InRoom && !OnlineGameSession.Authority) return;
         GameManager manager = GameManager.Instance;
         SurvivalTimer timer = SurvivalTimer.Instance;
         if (manager == null || timer == null || manager.State != GameManager.GameState.Playing || grid == null) return;
@@ -45,6 +46,14 @@ public abstract class TrialBase : MonoBehaviour
     protected static void Toast(string text, Color color)
     {
         if (GameHUD.Instance != null) GameHUD.Instance.ShowToast(text, color);
+        OnlineGameSession.BroadcastToast(text, color);
+    }
+
+    public void ResetMatch()
+    {
+        StopAllCoroutines();
+        nextTime = startTime;
+        announced = false;
     }
 
     // 지금 켜져 있는 캐릭터 (플레이어 + 봇)
@@ -57,7 +66,7 @@ public abstract class TrialBase : MonoBehaviour
     }
 
     // 맞았는지: 플레이어는 방패가 있으면 막힌다
-    protected static bool Hit(PlayerController target) => target.useExternalInput || !PlayerPowerUps.Blocked(target);
+    protected static bool Hit(PlayerController target) => !PlayerPowerUps.Blocked(target);
 
     // 깨지지 않은 칸 하나. nearPlayerChance 확률로 플레이어 주변 nearRadius 안에서
     protected bool PickCell(float nearPlayerChance, int nearRadius, out Vector2Int cell)
@@ -80,6 +89,7 @@ public abstract class TrialBase : MonoBehaviour
     {
         GameObject disc = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         disc.name = "TrialMarker";
+        OnlineWorldVisual.Track(disc, material != null && material.name.Contains("Danger") ? 7 : 0);
         Destroy(disc.GetComponent<Collider>());
         disc.transform.position = center + Vector3.up * 0.02f;
         disc.transform.localScale = new Vector3(diameter, 0.01f, diameter);
@@ -94,6 +104,7 @@ public abstract class TrialBase : MonoBehaviour
     {
         GameObject prop = GameObject.CreatePrimitive(type);
         prop.name = "TrialProp";
+        OnlineWorldVisual.Track(prop, type == PrimitiveType.Sphere ? 1 : type == PrimitiveType.Cylinder ? 2 : 3);
         Destroy(prop.GetComponent<Collider>());
         prop.transform.position = position;
         prop.transform.localScale = scale;

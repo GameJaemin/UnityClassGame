@@ -53,6 +53,7 @@ public class RepairItem : MonoBehaviour
         renderers = GetComponentsInChildren<Renderer>();
         if (visual == null && transform.childCount > 0) visual = transform.GetChild(0);
         if (visual != null) visualBase = visual.localPosition;
+        if (visual != null) OnlineWorldVisual.Track(visual.gameObject, 10 + (int)kind);
 
         Color color = ColorOf(kind);
         var properties = new MaterialPropertyBlock();
@@ -89,6 +90,7 @@ public class RepairItem : MonoBehaviour
     {
         // 플레이어만 먹는다 (AI 봇은 지나가도 안 먹음)
         PlayerController controller = other.GetComponentInParent<PlayerController>();
-        if (controller != null && !controller.useExternalInput) spawner.OnItemCollected(this, controller);
+        if (controller != null && controller.GetComponent<BotBrain>() == null && spawner != null)
+            spawner.OnItemCollected(this, controller);
     }
 }

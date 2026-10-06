@@ -57,7 +57,7 @@ public class SurvivalTimer : MonoBehaviour
         IsRunning = false;
         IsFinished = true;
 
-        IsNewRecord = Elapsed > BestTime;
+        IsNewRecord = !OnlineGameSession.InRoom && Elapsed > BestTime;
         if (IsNewRecord)
         {
             BestTime = Elapsed;
@@ -69,6 +69,21 @@ public class SurvivalTimer : MonoBehaviour
     }
 
     // 개발용: 최고 기록 지우기 (Inspector 컴포넌트 메뉴)
+    public void ResetMatch()
+    {
+        IsRunning = IsFinished = IsNewRecord = false;
+        Elapsed = 0f;
+    }
+
+    public void ApplyOnlineTime(float elapsed, bool running)
+    {
+        Elapsed = elapsed;
+        startTime = Time.time - elapsed;
+        IsRunning = running;
+        IsFinished = !running && elapsed > 0f;
+        IsNewRecord = false;
+    }
+
     [ContextMenu("최고 기록 지우기")]
     void ResetBestTime()
     {

@@ -15,9 +15,9 @@ public class RepairItemSpawner : MonoBehaviour
 
     [Header("등장")]
     [Tooltip("생존 시간이 이만큼 지나면 첫 아이템")]
-    [Min(0f)] public float firstSpawnTime = 10f;
+    [Min(0f)] public float firstSpawnTime = 6f;
     [Tooltip("아이템이 사라지거나 먹힌 뒤 다음 아이템까지")]
-    [Min(0f)] public float interval = 12f;
+    [Min(0f)] public float interval = 7f;
     [Tooltip("아이템이 떠 있는 시간")]
     [Min(1f)] public float lifetime = 8f;
     [Min(0f)] public float floatHeight = 0.7f;
@@ -41,6 +41,7 @@ public class RepairItemSpawner : MonoBehaviour
 
     void Update()
     {
+        if (OnlineGameSession.InRoom && !OnlineGameSession.Authority) return;
         // 아이템이 놓인 블럭이 깨지면 아이템도 사라진다
         if (current != null)
         {
@@ -57,6 +58,14 @@ public class RepairItemSpawner : MonoBehaviour
 
     bool TrySpawn()
     {
+        if (OnlineGameSession.InRoom)
+        {
+            var humans = new List<PlayerController>();
+            foreach (var candidate in PlayerController.All)
+                if (candidate.GetComponent<BotBrain>() == null) humans.Add(candidate);
+            if (humans.Count == 0) return false;
+            player = humans[Random.Range(0, humans.Count)];
+        }
         IceBlock under = null;
         PlayerPowerUps powerUps = null;
         if (player != null)
@@ -169,6 +178,13 @@ public class RepairItemSpawner : MonoBehaviour
             IceBlock block = grid.GetBlock(cell);
             if (block != null) action(cell, block);
         }
+    }
+
+    public void ResetMatch()
+    {
+        if (current != null) Destroy(current.gameObject);
+        current = null;
+        nextSpawnTime = firstSpawnTime;
     }
 
     public void OnItemExpired(RepairItem item)

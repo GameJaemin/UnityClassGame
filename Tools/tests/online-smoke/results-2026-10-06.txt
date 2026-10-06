@@ -1,0 +1,17 @@
+2026-10-06 / Unity 6000.6.3f1 / Windows Mono 격리 검증
+규칙 검사: 28개 통과
+Unity 컴파일 및 Windows 검증 빌드: 성공
+실제 UGS 비공개 방 / Relay / 서로 다른 익명 프로필 / 동일 PC의 두 프로세스
+client-result.txt
+PASS: two rounds, code join, 4 actors, movement, ice, fall, respawn, results=True
+client-round0.txt
+PASS: moved=True, iceChanged=True, fall=True, respawn=True, count=4, map=crescent_bay.json
+client-round1.txt
+PASS: moved=True, iceChanged=True, fall=True, respawn=True, count=4, map=crescent_bay.json
+host-result.txt
+PASS: two rounds, code join, 4 actors, movement, ice, fall, respawn, results=True
+host-round0.txt
+PASS: moved=True, iceChanged=True, fall=True, respawn=True, count=4, map=crescent_bay.json
+host-round1.txt
+PASS: moved=True, iceChanged=True, fall=True, respawn=True, count=4, map=crescent_bay.json
+범위 밖: 원본 씬 화면, 다른 인터넷의 2~4인, 지연/손실, 점프/밀치기, 시련/아이템, 솔로 복귀

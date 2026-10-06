@@ -18,7 +18,13 @@ public class PlayerSkin : MonoBehaviour
 
     public GameObject CurrentModel { get; private set; }
 
-    void Awake() => Apply();
+    void Awake()
+    {
+        var player = GetComponent<PlayerController>();
+        if (player != null && !player.useExternalInput)
+            skin = (Skin)Mathf.Clamp(PlayerPrefs.GetInt("LionIceRun.Skin", (int)skin), 0, 2);
+        Apply();
+    }
 
     public void Apply()
     {

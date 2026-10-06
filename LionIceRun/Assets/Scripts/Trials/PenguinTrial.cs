@@ -55,6 +55,7 @@ public class PenguinTrial : TrialBase
 
         // 예고: 등장 + 지나갈 줄 표시
         GameObject penguin = Instantiate(penguinModel, start, Quaternion.LookRotation(direction));
+        OnlineWorldVisual.Track(penguin, 4);
         var animator = penguin.GetComponent<Animator>();
         if (animator == null) animator = penguin.AddComponent<Animator>();
         animator.runtimeAnimatorController = penguinAnimator;
