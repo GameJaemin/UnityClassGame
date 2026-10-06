@@ -1,6 +1,6 @@
 # LionIceRun
 
-폴가이즈 느낌의 솔로 3D 서바이벌 게임. 복셀 동물 캐릭터가 펭귄 얼음깨기(폴가이즈 Thin Ice 바탕) 맵 위에서 얼마나 오래 버티는지 겨룬다. 바다에 떨어지면 끝나고 버틴 시간이 기록(최고 기록은 PlayerPrefs)이 된다. 시련은 버틴 시간에 따라 늘어난다.
+폴가이즈 느낌의 3D 서바이벌 게임. 복셀 동물 캐릭터가 펭귄 얼음깨기(폴가이즈 Thin Ice 바탕) 맵 위에서 AI 봇들과 1등을 겨룬다. 서로 밀쳐 바다로 떨어뜨릴 수 있고, 떨어지면 10초 뒤 다시 들어오지만 맵 위에 한 명만 남으면 더 이상 못 들어오고 그 캐릭터가 1등(우승 횟수는 PlayerPrefs). 시련은 경기 시간에 따라 늘어난다.
 전체 계획과 진행 상황은 `blueprint.md`가 기준이다.
 
 ## 작업 규칙
@@ -30,14 +30,17 @@
 
 | 파일 | 역할 |
 |---|---|
-| `IceGrid.cs` | 가로x세로 얼음 그리드 생성(기본 6x6). 블럭 윗면 y=0. `CellTop(cell)`, `StartCell`, `Blocks`, 바다 위치(`seaDepth` 12m) |
+| `IceGrid.cs` | 얼음 그리드 생성. 맵 파일(`mapFile`)이 있으면 그 모양(빈칸 없음·가로세로·시작 칸)대로, 없으면 가로x세로 꽉 찬 판(기본 6x6). 블럭 윗면 y=0. `CellTop(cell)`, `StartCell`, `GetBlock(cell)`(2차원 배열, 빈칸·밖은 null), `IceBlocks`(빈칸 제외), 바다 위치(`seaDepth` 12m) |
+| `MapData.cs` | 맵 JSON (`Assets/StreamingAssets/Maps/*.json`, JsonUtility). `rows[0]`이 z가 가장 큰 행, 글자 `.`빈칸 `I`얼음 `C`금 간 `T`두꺼운, `playerStart`/`botStarts`. 맵툴 계획: `maptool_plan.html` |
+| `Editor/MapEditorWindow.cs` | 맵툴 창 (메뉴 **LionIceRun > 맵툴**). 칠하기·채우기·대칭·Undo·검사·저장, 씬에 미리보기 / 이 맵으로 플레이. 편집 중인 맵은 `MapEditState`(ScriptableObject)에 담아 Undo |
 | `QuarterViewCamera.cs` | 시작 전에는 그리드 전체가 보이는 거리, 게임 시작 시 `playDistance`로 부드럽게 줌인하며 플레이어를 따라감 (높이는 안 따라감) |
-| `PlayerController.cs` | Rigidbody 이동. 상태 `Normal / Diving / KnockedDown`, `KnockDown(초)`로 조작 불가 처리(시련 기절에도 사용), 가변 점프, 다이브(Ctrl) |
-| `BotManager.cs` / `BotBrain.cs` | AI 봇. 몸은 플레이어와 같은 부품을 코드로 조립하고 `PlayerController.SetExternalInput`으로 조종. 칸 단위 길 찾기(깨진 칸 1개는 점프). 바다에 빠지면 다시 떨어져 들어옴. **플레이어를 찾을 때는 `useExternalInput == false`인 쪽을 고른다** |
+| `GameManager.cs` | 경기 흐름(Ready / Playing / GameOver)과 1등 규칙. 참가자(플레이어 + `Register`된 봇)의 떨어짐 → 오브젝트 끄기 → 10초 뒤 다시 켜서 떨어뜨리기, 맵 위 1명이면 끝·순위·우승 횟수. 이벤트 `StateChanged`, `Fell`, `Respawned` |
+| `PlayerController.cs` | Rigidbody 이동. 상태 `Normal / Diving / KnockedDown`, `KnockDown(초)`로 조작 불가 처리(시련 기절에도 사용), 가변 점프, 다이브(Ctrl), 밀치기(좌클릭, `ReceivePush`: 넘어뜨리지 않고 서 있는 채로 약 1칸 밀어냄 / 시련의 `Knockback`은 넘어뜨림), 몸으로 밀기(`OnCollisionStay`). 켜진 캐릭터 목록 `PlayerController.All` |
+| `BotManager.cs` / `BotBrain.cs` | AI 봇. 몸은 플레이어와 같은 부품을 코드로 조립하고 `PlayerController.SetExternalInput`으로 조종. 안전한 칸 고르기, 칸 단위 길 찾기(깨진 칸 1개는 점프), 구멍 옆 상대 밀치기. 떨어짐·다시 들어오기는 GameManager가 처리. **플레이어를 찾을 때는 `useExternalInput == false`인 쪽을 고른다** |
 | `Trials/*.cs` | 시련. `TrialBase`(버틴 시간 기준 시작·간격, 첫 등장 안내, `Targets()`=플레이어+봇, `Hit()`=방패 판정) + `SnowballTrial`, `WindTrial`, `IcicleTrial`, `PenguinTrial`, 기절 별 `StunStars`. 새 시련은 `TrialBase`를 상속하고 `Reset()`에 기본 등장 시간을 넣는다 |
 | `RepairItem.cs` / `RepairItemSpawner.cs` | 파워업 아이템 4종 (이름은 처음 얼음 복구만 있던 흔적). `PlayerPowerUps`가 방패·슈퍼 점프 상태를 가짐 |
 | `PlayerSkin.cs` | 선택한 스킨 FBX를 Player 아래 `Model`로 붙이고 캡슐 렌더러 숨김 |
-| `CharacterAnimator.cs` | Animator 파라미터 `Speed`, `WalkAnimSpeed`, `Grounded`, `VerticalSpeed`, `Down` 전달 |
+| `CharacterAnimator.cs` | Animator 파라미터 `Speed`, `WalkAnimSpeed`, `Grounded`, `VerticalSpeed`, `Down` 전달. 밀치기 때 LateUpdate에서 `Arm_L/R` 뼈를 앞으로 뻗음 |
 
 거리 설계: 블럭 1.5m + 간격 0.1m. 깨진 블럭 1칸(약 1.7m)은 건널 수 있고 2칸(약 3.3m)은 어떤 동작으로도 못 건너야 한다. 점프·다이브 수치를 바꿀 때 이 조건을 지킨다.
 
