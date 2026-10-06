@@ -6,8 +6,8 @@ using UnityEngine.Rendering.Universal;
 // Step 2 폴리싱: 입체적인 바다.
 //  1) 바다를 약 200m로 키우고 잘게 나눈 파도용 메시(SeaSurface)로 바꾼다
 //  2) Sea 재질을 StylizedSea 셰이더(파도, 잔물결, 깊이 색, 하늘 반사, 햇빛 반짝임, 물거품, 그림자, 먼 곳 흐려짐)로 바꾼다
-//  3) 주변에 떠다니는 유빙(IceFloes)을 둔다
-//  4) 12m 아래 수면까지 얼음판 그림자가 닿도록 그림자 거리를 늘린다
+//  3) 주변에 떠다니는 유빙(IceFloes)을 씬에 미리 만들어 둔다 (이미 있으면 사용자 배치 유지)
+//  4) 12m 아래 수면까지 얼음판 그림자가 닿도록 그림자 거리를 늘리고, 반투명 바다용 깊이 텍스처를 켠다
 // 메뉴: LionIceRun > Step 2 바다 꾸미기
 public static class Step2SeaSetup
 {
@@ -66,11 +66,16 @@ public static class Step2SeaSetup
         if (floes == null) floes = new GameObject("IceFloes").AddComponent<IceFloes>();
         floes.grid = grid;
         floes.iceMaterial = AssetDatabase.LoadAssetAtPath<Material>(IceMaterialPath);
+        // 이미 씬에 유빙이 있으면 사용자가 옮긴 배치를 그대로 둔다
+        if (floes.transform.childCount == 0) floes.Generate();
+        EditorUtility.SetDirty(floes);
 
         // 그림자 거리: 카메라에서 수면까지 약 40~60m
-        if (UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urp && urp.shadowDistance < 90f)
+        if (UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset urp)
         {
-            urp.shadowDistance = 90f;
+            if (urp.shadowDistance < 90f) urp.shadowDistance = 90f;
+            // 반투명 바다가 물속 깊이를 재는 데 필요
+            urp.supportsCameraDepthTexture = true;
             EditorUtility.SetDirty(urp);
         }
 
@@ -79,5 +84,60 @@ public static class Step2SeaSetup
         EditorSceneManager.SaveOpenScenes();
         Selection.activeGameObject = seaObject;
         Debug.Log("Step 2 바다 꾸미기 완료: 바다 크기, 파도 메시, 바다 셰이더, 유빙, 그림자 거리를 설정했습니다. 색과 파도는 Sea 재질에서 조정합니다.");
+    }
+
+    // 유빙을 씬에 미리 만들어 둔다. 이미 있으면 그대로 두고 선택만 한다 (씬 뷰에서 직접 옮겨서 배치)
+    [MenuItem("LionIceRun/Step 2 유빙 씬에 만들기")]
+    static void CreateFloes()
+    {
+        IceFloes floes = PrepareFloes();
+        if (floes == null) return;
+        if (floes.transform.childCount == 0)
+        {
+            floes.Generate();
+            Debug.Log($"유빙 {floes.transform.childCount}개를 씬에 만들었습니다. IceFloes 아래 IceFloe를 씬 뷰에서 옮기거나 복제(Ctrl+D)·삭제하세요.");
+        }
+        else
+        {
+            Debug.Log($"유빙 {floes.transform.childCount}개가 이미 씬에 있어서 그대로 둡니다. 새로 흩뿌리려면 'Step 2 유빙 다시 흩뿌리기'를 쓰세요.");
+        }
+        SaveFloes(floes);
+    }
+
+    // 직접 옮긴 배치를 지우고 IceFloes 설정값(개수, 거리, 크기, seed)으로 새로 흩뿌린다
+    [MenuItem("LionIceRun/Step 2 유빙 다시 흩뿌리기")]
+    static void RegenerateFloes()
+    {
+        IceFloes floes = PrepareFloes();
+        if (floes == null) return;
+        if (floes.transform.childCount > 0 &&
+            !EditorUtility.DisplayDialog("유빙 다시 흩뿌리기", $"씬의 유빙 {floes.transform.childCount}개와 직접 옮긴 배치가 모두 지워집니다. 계속할까요?", "다시 흩뿌리기", "취소"))
+            return;
+        floes.Generate();
+        SaveFloes(floes);
+        Debug.Log($"유빙 {floes.transform.childCount}개를 새로 흩뿌렸습니다.");
+    }
+
+    static IceFloes PrepareFloes()
+    {
+        IceGrid grid = Object.FindAnyObjectByType<IceGrid>();
+        if (grid == null)
+        {
+            Debug.LogError("유빙: IceGrid가 씬에 없습니다. 먼저 LionIceRun > Step 2 맵 세팅을 실행하세요.");
+            return null;
+        }
+        IceFloes floes = Object.FindAnyObjectByType<IceFloes>();
+        if (floes == null) floes = new GameObject("IceFloes").AddComponent<IceFloes>();
+        floes.grid = grid;
+        if (floes.iceMaterial == null) floes.iceMaterial = AssetDatabase.LoadAssetAtPath<Material>(IceMaterialPath);
+        return floes;
+    }
+
+    static void SaveFloes(IceFloes floes)
+    {
+        EditorUtility.SetDirty(floes);
+        EditorSceneManager.MarkSceneDirty(floes.gameObject.scene);
+        EditorSceneManager.SaveOpenScenes();
+        Selection.activeGameObject = floes.gameObject;
     }
 }

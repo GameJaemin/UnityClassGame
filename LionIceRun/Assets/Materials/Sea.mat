@@ -101,6 +101,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _Clarity: 1.6
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -108,11 +109,15 @@ Material:
     - _DeepRadius: 60
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
+    - _DetailScale: 1.6
+    - _DetailStrength: 0.6
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _FadeEnd: 150
     - _FadeStart: 55
+    - _FloeFoamStrength: 0.9
+    - _FloeFoamWidth: 0.9
     - _FoamThreshold: 0.74
     - _GlossMapScale: 0
     - _Glossiness: 0
@@ -135,8 +140,11 @@ Material:
     - _SpecularStrength: 1.4
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _StreakStrength: 0.35
     - _SunSharpness: 160
     - _Surface: 0
+    - _SurfaceAlpha: 0.4
+    - _ToneVariation: 0.12
     - _WaveHeight: 0.35
     - _WaveLength: 9
     - _WaveSpeed: 1.2

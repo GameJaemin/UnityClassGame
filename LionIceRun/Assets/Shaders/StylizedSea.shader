@@ -1,8 +1,10 @@
 // 폴가이즈풍 바다 (URP).
 //  - 방향이 다른 사인파 3개로 수면이 오르내림 (정점 이동, 월드 좌표 기준이라 바다 크기를 바꿔도 파도 크기는 그대로)
-//  - 두 방향으로 흘러가는 노이즈 잔물결로 법선을 흔듦
+//  - 두 방향으로 흘러가는 노이즈 잔물결 + 더 잘게 일렁이는 작은 물결로 법선을 흔듦, 색 얼룩과 밝은 물결 줄무늬
+//  - 반투명: 물속에 잠긴 물체(유빙 아랫부분 등)가 비침. 깊이 텍스처로 잰 물 깊이만큼 진해져서 물체가 없는 곳은 불투명하게 보임
 //  - 얼음판 아래(바다 중심)는 얕은 청록, 멀어질수록 깊은 남색 / 파도 마루는 밝게, 골은 어둡게
 //  - 비스듬히 볼수록 하늘이 비치고(프레넬), 햇빛 하이라이트와 반짝이 알갱이, 파도 마루의 물거품
+//  - 유빙(IceFloes가 넘겨주는 위치·크기) 둘레에 물에 닿은 곳만 출렁이는 물거품
 //  - 얼음판·캐릭터 그림자를 받음 / 멀어질수록 배경색으로 녹아듦
 Shader "LionIceRun/StylizedSea"
 {
@@ -31,16 +33,33 @@ Shader "LionIceRun/StylizedSea"
         _SparkleThreshold ("Sparkle threshold", Range(0, 1)) = 0.9
         _FoamThreshold ("Foam threshold", Range(0, 1)) = 0.74
         _ShadowStrength ("Shadow strength", Range(0, 1)) = 0.55
+
+        [Header(Detail)]
+        _DetailScale ("Detail ripple scale", Float) = 1.6
+        _DetailStrength ("Detail ripple strength", Range(0, 1)) = 0.6
+        _ToneVariation ("Color patch variation", Range(0, 0.5)) = 0.12
+        _StreakStrength ("Light streaks", Range(0, 1)) = 0.35
+
+        [Header(Transparency)]
+        _SurfaceAlpha ("Alpha at surface", Range(0, 1)) = 0.4
+        _Clarity ("Clarity depth (m)", Float) = 1.6
+
+        [Header(Floe Foam)]
+        _FloeFoamWidth ("Floe foam width", Float) = 0.9
+        _FloeFoamStrength ("Floe foam strength", Range(0, 1)) = 0.9
     }
 
     SubShader
     {
-        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "Queue" = "Geometry" }
+        // 불투명 물체를 모두 그린 뒤(깊이 텍스처가 만들어진 뒤) 그린다
+        Tags { "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" "Queue" = "Transparent-10" }
 
         Pass
         {
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForward" }
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -51,6 +70,7 @@ Shader "LionIceRun/StylizedSea"
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _ShallowColor;
@@ -71,7 +91,21 @@ Shader "LionIceRun/StylizedSea"
                 float _SparkleThreshold;
                 float _FoamThreshold;
                 float _ShadowStrength;
+                float _FloeFoamWidth;
+                float _FloeFoamStrength;
+                float _DetailScale;
+                float _DetailStrength;
+                float _ToneVariation;
+                float _StreakStrength;
+                float _SurfaceAlpha;
+                float _Clarity;
             CBUFFER_END
+
+            // IceFloes.cs가 넘겨주는 전역 값 (배열 크기 = IceFloes.MaxFloes)
+            // _FloeBoxes: 중심 x, z, 반너비 x, z / _FloeExtras: 가로축 방향 x, z, 바닥 높이, 윗면 높이
+            float4 _FloeBoxes[64];
+            float4 _FloeExtras[64];
+            float _FloeCount;
 
             struct Attributes
             {
@@ -85,6 +119,7 @@ Shader "LionIceRun/StylizedSea"
                 float3 normalWS : TEXCOORD1;
                 float crest : TEXCOORD2;   // 파도 높이 0(골) ~ 1(마루)
                 float fogFactor : TEXCOORD3;
+                float4 screenPos : TEXCOORD4;
             };
 
             // 파도 5개: 길이 비율이 서로 딱 떨어지지 않게 골라 같은 모양이 금방 되풀이되지 않게 한다
@@ -158,6 +193,58 @@ Shader "LionIceRun/StylizedSea"
                 return float2(Fbm(p + float2(e, 0)) - n, Fbm(p + float2(0, e)) - n) / e;
             }
 
+            // 작은 물결용 가벼운 노이즈 2겹 (Fbm보다 싸다)
+            float DetailNoise(float2 p)
+            {
+                return ValueNoise(p) * 0.65 + ValueNoise(mul(float2x2(0.80, -0.60, 0.60, 0.80), p) * 2.13 + 3.7) * 0.35;
+            }
+
+            float2 DetailSlope(float2 p)
+            {
+                const float e = 0.04;
+                float n = DetailNoise(p);
+                return float2(DetailNoise(p + float2(e, 0)) - n, DetailNoise(p + float2(0, e)) - n) / e;
+            }
+
+            // 유빙 둘레 물거품 세기 0~1. 수면 높이가 유빙의 바닥~윗면 사이일 때만(물에 닿을 때만) 생긴다
+            float FloeFoam(float3 positionWS, float t)
+            {
+                int count = min((int)_FloeCount, 64);
+                if (count <= 0) return 0;
+
+                float field = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    float4 box = _FloeBoxes[i];
+                    float4 extra = _FloeExtras[i];
+                    float2 rel = positionWS.xz - box.xy;
+                    float width = _FloeFoamWidth * (0.7 + 0.25 * min(box.z, box.w));
+                    // 먼 유빙은 건너뜀
+                    float reach = length(box.zw) + width * 2.0;
+                    if (dot(rel, rel) > reach * reach) continue;
+
+                    // 회전된 직사각형까지의 거리 (안쪽은 음수)
+                    float2 local = float2(dot(rel, extra.xy), dot(rel, float2(-extra.y, extra.x)));
+                    float2 q = abs(local) - box.zw;
+                    float d = length(max(q, 0)) + min(max(q.x, q.y), 0);
+
+                    // 물이 유빙 옆면에 닿아 있을 때만
+                    float contact = smoothstep(extra.z - 0.4, extra.z, positionWS.y) * (1.0 - smoothstep(extra.w, extra.w + 0.4, positionWS.y));
+                    // 밀려왔다 빠지는 듯 폭이 출렁임
+                    float lap = 0.8 + 0.2 * sin(t * 1.8 + i * 2.3);
+                    field = max(field, saturate(1.0 - d / (width * lap)) * contact);
+                }
+                if (field <= 0) return 0;
+
+                // 가장자리를 들쭉날쭉하게 만드는 노이즈 (유빙 근처에서만 계산)
+                float edgeNoise = Fbm(positionWS.xz * 1.4 + t * float2(0.15, -0.1));
+                float bubbles = ValueNoise(positionWS.xz * 5.0 - t * float2(0.3, 0.2));
+                // 유빙에 붙은 진한 테두리 + 바깥쪽으로 흩어지는 거품 알갱이
+                float rim = smoothstep(0.62, 0.72, field + (edgeNoise - 0.5) * 0.25);
+                float scatter = smoothstep(0.55, 0.75, field * 0.8 + bubbles * 0.45 + (edgeNoise - 0.5) * 0.3);
+                return saturate(max(rim, scatter * 0.8));
+            }
+
             Varyings vert(Attributes input)
             {
                 Varyings output;
@@ -171,6 +258,7 @@ Shader "LionIceRun/StylizedSea"
                 output.crest = saturate(h / max(_WaveHeight * WaveSum, 0.001) * 0.5 + 0.5);
                 output.positionCS = TransformWorldToHClip(positionWS);
                 output.fogFactor = ComputeFogFactor(output.positionCS.z);
+                output.screenPos = ComputeScreenPos(output.positionCS);
                 return output;
             }
 
@@ -184,7 +272,15 @@ Shader "LionIceRun/StylizedSea"
                 float2 p1 = p + t * float2(0.12, 0.05);
                 float2 p2 = p * 1.7 - t * float2(0.07, 0.11);
                 float2 ripple = (NoiseSlope(p1) + NoiseSlope(p2) * 0.6) * 0.6;
-                float3 normalWS = normalize(input.normalWS + float3(-ripple.x, 0, -ripple.y) * _RippleStrength * 0.3);
+                float fromCamera = length(positionWS - _WorldSpaceCameraPos);
+
+                // 더 잘게 일렁이는 작은 물결 두 겹 (서로 다른 방향으로 흐름). 멀면 자글거리므로 흐리게
+                float2 d = positionWS.xz * _DetailScale;
+                float2 detail = DetailSlope(d + t * float2(0.35, 0.2)) - DetailSlope(d * 1.9 - t * float2(0.25, 0.4)) * 0.5;
+                float detailFade = 1.0 - smoothstep(20.0, 60.0, fromCamera);
+                ripple = ripple * _RippleStrength * 0.3 + detail * _DetailStrength * 0.18 * detailFade;
+
+                float3 normalWS = normalize(input.normalWS + float3(-ripple.x, 0, -ripple.y));
                 float3 viewWS = GetWorldSpaceNormalizeViewDir(positionWS);
 
                 // 바다 중심(얼음판 아래)은 얕은 물, 멀어질수록 깊은 물
@@ -193,6 +289,9 @@ Shader "LionIceRun/StylizedSea"
                 half3 water = lerp(_ShallowColor.rgb, _DeepColor.rgb, smoothstep(_ShallowRadius, _DeepRadius, fromCenter));
                 // 파도 마루는 밝게, 골은 어둡게
                 water *= lerp(0.82, 1.12, input.crest);
+                // 넓게 번지는 색 얼룩 (한 가지 색으로 밋밋하지 않게)
+                float tone = Fbm(positionWS.xz * 0.06 + t * float2(0.01, 0.006));
+                water *= 1.0 + (tone - 0.5) * 2.0 * _ToneVariation;
 
                 // 비스듬히 볼수록 하늘이 비침
                 float fresnel = pow(1.0 - saturate(dot(normalWS, viewWS)), 4.0);
@@ -204,7 +303,6 @@ Shader "LionIceRun/StylizedSea"
                 float diffuse = saturate(dot(normalWS, light.direction)) * 0.35 + 0.65;
                 water *= diffuse * shadow;
 
-                float fromCamera = length(positionWS - _WorldSpaceCameraPos);
                 // 멀리 있는 작은 무늬는 뭉쳐서 규칙적으로 보이므로 거품·반짝이는 가까운 곳에만
                 float nearFade = 1.0 - smoothstep(25.0, 70.0, fromCamera);
 
@@ -216,6 +314,12 @@ Shader "LionIceRun/StylizedSea"
                 float sparkle = smoothstep(_SparkleThreshold * 0.85, 1.0, glint * 1.15) * smoothstep(0.55, 1.0, highlight) * nearFade;
                 half3 color = water + (specular + sparkle * 1.2) * light.color * shadow;
 
+                // 밝은 물결 줄무늬: 노이즈의 가운데 값(능선)만 가는 선으로, 작은 물결을 따라 흔들림
+                float2 streakUV = positionWS.xz * 0.45 + detail * 0.08 + t * float2(0.05, 0.03);
+                float ridge = 1.0 - abs(Fbm(streakUV) * 2.0 - 1.0);
+                float streak = smoothstep(0.9, 0.98, ridge) * _StreakStrength * (1.0 - smoothstep(30.0, 80.0, fromCamera));
+                color += streak * 0.35 * light.color * shadow;
+
                 // 물거품: 아주 큰 노이즈로 "거품이 생기는 구역"을 정하고, 그 안의 파도 마루에만 휘어진 노이즈로 불규칙하게
                 float2 foamUV = positionWS.xz * 0.35;
                 float patch = smoothstep(0.45, 0.75, Fbm(positionWS.xz * 0.035 + t * float2(0.004, -0.003)));
@@ -223,11 +327,30 @@ Shader "LionIceRun/StylizedSea"
                 float foam = smoothstep(_FoamThreshold, _FoamThreshold + 0.12, input.crest * 0.55 + foamNoise * 0.6) * patch * nearFade;
                 color = lerp(color, _FoamColor.rgb * (0.85 + 0.15 * shadow), foam * 0.75);
 
+                // 유빙 둘레 물거품 (멀리서도 보이게 nearFade보다 먼 곳에서 흐려짐)
+                float floeFoam = FloeFoam(positionWS, t) * _FloeFoamStrength * (1.0 - smoothstep(70.0, 130.0, fromCamera));
+                color = lerp(color, _FoamColor.rgb * (0.88 + 0.12 * shadow), floeFoam);
+
                 // 멀어질수록 배경색으로 녹아들어 지평선이 하늘과 이어지게
-                color = lerp(color, _HorizonColor.rgb, smoothstep(_FadeStart, _FadeEnd, fromCamera));
+                float distanceFade = smoothstep(_FadeStart, _FadeEnd, fromCamera);
+                color = lerp(color, _HorizonColor.rgb, distanceFade);
+
+                // 투명도: 수면 바로 아래에 물체가 있으면 비치고, 깊을수록 진해짐 (아래에 아무것도 없으면 깊이가 매우 커서 불투명)
+                float2 screenUV = input.screenPos.xy / input.screenPos.w;
+                #if UNITY_REVERSED_Z
+                    float rawDepth = SampleSceneDepth(screenUV);
+                #else
+                    float rawDepth = lerp(UNITY_NEAR_CLIP_VALUE, 1, SampleSceneDepth(screenUV));
+                #endif
+                float3 sceneWS = ComputeWorldSpacePosition(screenUV, rawDepth, UNITY_MATRIX_I_VP);
+                float depthBelow = max(positionWS.y - sceneWS.y, 0.0);  // 수면에서 물체까지 수직 깊이
+                float alpha = lerp(_SurfaceAlpha, 1.0, 1.0 - exp(-depthBelow / max(_Clarity, 0.01)));
+                // 거품·햇빛·반짝이·먼 곳은 불투명하게
+                alpha = max(alpha, saturate(foam * 0.75 + floeFoam + specular * 0.5 + sparkle + streak * 0.5));
+                alpha = max(alpha, distanceFade);
 
                 color = MixFog(color, input.fogFactor);
-                return half4(color, 1);
+                return half4(color, saturate(alpha));
             }
             ENDHLSL
         }
