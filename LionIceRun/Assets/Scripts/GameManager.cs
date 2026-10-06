@@ -200,12 +200,6 @@ public class GameManager : MonoBehaviour
         if (State == GameState.GameOver) return;
         Winner = winner;
         PlayerPlace = place;
-        if (PlayerWon)
-        {
-            Wins++;
-            PlayerPrefs.SetInt("LionIceRun.OnlineWins", Wins);
-            PlayerPrefs.Save();
-        }
         if (player != null) player.InputEnabled = false;
         SetState(GameState.GameOver);
     }
@@ -294,7 +288,7 @@ public class GameManager : MonoBehaviour
         Winner = competitors.Count >= 2 || !order[0].outOfMap ? order[0].body : null;
         PlayerPlace = order.FindIndex(c => c.body == player) + 1;
 
-        if (PlayerWon)
+        if (PlayerWon && !OnlineGameSession.InRoom)
         {
             Wins++;
             PlayerPrefs.SetInt(OnlineGameSession.InRoom ? "LionIceRun.OnlineWins" : WinsKey, Wins);
@@ -311,6 +305,11 @@ public class GameManager : MonoBehaviour
         if (body == null) return null;
         foreach (Competitor c in competitors) if (c.body == body) return c;
         return null;
+    }
+
+    public void RecordOnlineSeriesWin()
+    {
+        Wins++; PlayerPrefs.SetInt("LionIceRun.OnlineWins", Wins); PlayerPrefs.Save();
     }
 
     // 개발용: 우승 횟수 지우기 (Inspector 컴포넌트 메뉴)

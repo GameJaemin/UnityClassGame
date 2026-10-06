@@ -50,12 +50,15 @@ using UnityEngine;
     public OnlineMapStamp[] maps;
     public string[] files;
     public ulong[] ranking;
+    public int seriesRound, completedRounds;
+    public double nextRoundAt;
+    public OnlineScore[] scores;
     public OnlineVisualState[] visuals;
 }
 
 public static class OnlineRules
 {
-    public const int Protocol = 1;
+    public const int Protocol = 2;
     public const int MaxHumans = 4;
     public const int MaxPacketBytes = 32768;
 

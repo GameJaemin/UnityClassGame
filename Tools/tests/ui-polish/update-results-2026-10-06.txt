@@ -1,0 +1,17 @@
+Unity 6000.6.3f1 / 복사 프로젝트 에디터 메뉴 검사 / 종료 코드 0
+게임 플레이어 빌드 없음. 원본 Main 씬은 변경하지 않음.
+
+UI_UPDATE_VALIDATION_PASSED
+- 비활성 OnlineUI에서도 전체 업데이트 실행, 모드 선택 미리보기 표시
+- 모델 선택·입력창 richText 설정·5판 표시 연결 동시 적용
+- 반복 적용 시 사용자 변경 위치 및 기존 GameUI 위치 유지
+- 시리즈 전용 메뉴 실행 후 중간 결과 미리보기 표시
+- 저장 후 씬 재열기에서 모델 선택 연결과 결과 미리보기 유지
+- OnlineFrontend.Start 초기화 시 미리보기 닫기
+- 기존 온라인 시리즈 규칙 검사 통과
+
+재현: Assets/Packages/ProjectSettings를 임시 프로젝트에 복사하고
+UIUpdateValidation.cs를 복사본 Assets/Scripts/Editor에 넣는다.
+Unity -batchmode -quit -projectPath <복사본> -executeMethod UIUpdateValidation.Run
+그래픽 장치를 사용하므로 -nographics는 지정하지 않는다.
+UI 전체 업데이트와 UI 폴리싱은 같은 메뉴 구현이다.

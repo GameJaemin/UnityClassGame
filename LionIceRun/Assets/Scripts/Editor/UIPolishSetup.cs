@@ -16,14 +16,16 @@ public static class UIPolishSetup
     static readonly Color Gold = new Color(1f, 0.85f, 0.23f);
     static Sprite Sprite(string name) => AssetDatabase.LoadAssetAtPath<Sprite>("Assets/UI/Sprites/" + name + ".png");
 
+    [MenuItem("LionIceRun/UI 전체 업데이트")]
     [MenuItem("LionIceRun/UI 폴리싱")]
     public static void Run()
     {
-        var front = Object.FindAnyObjectByType<OnlineFrontend>();
+        var front = Object.FindAnyObjectByType<OnlineFrontend>(FindObjectsInactive.Include);
         if (front == null) { Debug.LogError("친구 멀티 세팅을 먼저 실행하세요."); return; }
         foreach (string rootName in new[] { "OnlineUI", "MapSelectionUI", "GameUI" })
         {
-            var root = GameObject.Find(rootName); if (root == null) continue;
+            var root = System.Array.Find(front.gameObject.scene.GetRootGameObjects(), go => go.name == rootName);
+            if (root == null) continue;
             foreach (var text in root.GetComponentsInChildren<TMP_Text>(true))
             {
                 if (text.GetComponentInParent<TMP_InputField>() != null) continue;
@@ -42,12 +44,18 @@ public static class UIPolishSetup
         var botCheck = front.fillBots.graphic as TMP_Text;
         if (botCheck != null) { botCheck.text = "●"; botCheck.color = Gold; botCheck.fontSize = 24f; }
         BuildPortraits(front);
-        front.HidePanels();
+        OnlineSeriesSetup.Apply(front);
+        front.gameObject.SetActive(true);
+        front.GetComponent<Canvas>().enabled = true;
+        front.OpenModes();
+        Selection.activeGameObject = front.modesPanel;
+        SceneView.RepaintAll();
         EditorUtility.SetDirty(front); EditorSceneManager.MarkSceneDirty(front.gameObject.scene);
-        EditorSceneManager.SaveOpenScenes(); AssetDatabase.SaveAssets();
-        Debug.Log("UI 폴리싱 저장 완료. 밝은 입력창·태그 출력 수정·모델/화살표 선택·로비 초상화. 최초 적용 시 모드 선택 화면만 새 2열 배치로 전환하며 기존 HUD 배치는 유지합니다. 빌드는 수행하지 않았습니다.");
+        EditorSceneManager.SaveScene(front.gameObject.scene); AssetDatabase.SaveAssets();
+        Debug.Log("전체 UI 업데이트 저장 완료: 입력창·모델/화살표 선택·로비 초상화·5판 결과/점수 표시. Scene 뷰에는 모드 선택 화면을 표시하며 Play는 타이틀부터 시작합니다. 기존 HUD 배치는 유지합니다. 빌드는 수행하지 않았습니다.");
     }
     [MenuItem("LionIceRun/UI 폴리싱", true)]
+    [MenuItem("LionIceRun/UI 전체 업데이트", true)]
     static bool CanRun() => !EditorApplication.isPlayingOrWillChangePlaymode;
 
     public static void StyleInput(TMP_InputField input)

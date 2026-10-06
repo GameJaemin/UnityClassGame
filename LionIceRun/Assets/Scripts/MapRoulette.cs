@@ -191,6 +191,7 @@ public class MapRoulette : MonoBehaviour
         titleGroup.SetActive(false);
         if (titleDecorations != null) titleDecorations.SetActive(false);
         rouletteGroup.SetActive(true);
+        stopButton.gameObject.SetActive(files.Count > 0);
         choosing = true;
     }
 
@@ -246,6 +247,7 @@ public class MapRoulette : MonoBehaviour
         position = atPosition;
         status.text = caption;
         stopButton.interactable = canStop;
+        stopButton.gameObject.SetActive(false);
         buttonText.text = canStop ? "멈추기" : "방장이 선택 중";
         RenderCards();
     }
@@ -255,6 +257,7 @@ public class MapRoulette : MonoBehaviour
         position = atPosition;
         status.text = caption;
         stopButton.interactable = canStop;
+        stopButton.gameObject.SetActive(false);
         buttonText.text = canStop ? "멈추기" : "선택 중…";
         if (files.Count > 0) RenderCards();
     }

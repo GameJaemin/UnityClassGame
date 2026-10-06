@@ -112,6 +112,7 @@ public static class OnlineMultiplayerSetup
         var leave = Group(ui.transform, "MatchLeave", new Vector2(260, 80), new Vector2(-785, -460)); frontend.leavePanel = leave.gameObject;
         frontend.matchLeaveButton = Button(leave, "Leave", "로비 나가기", Vector2.zero, new Vector2(260, 75), false);
 
+        OnlineSeriesSetup.Apply(frontend);
         frontend.HidePanels();
         EditorUtility.SetDirty(service); EditorUtility.SetDirty(frontend); EditorUtility.SetDirty(network);
         EditorSceneManager.MarkSceneDirty(manager.gameObject.scene); EditorSceneManager.SaveOpenScenes(); AssetDatabase.SaveAssets();

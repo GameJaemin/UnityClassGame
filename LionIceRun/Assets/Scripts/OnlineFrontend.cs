@@ -18,11 +18,16 @@ public class OnlineFrontend : MonoBehaviour
     public CharacterSelection characterSelection;
     public Image[] slotPortraits;
     public Sprite[] characterPortraits;
+    public TMP_Text resultsTitle, resultsHint, seriesStatus;
     int SelectedSkin => characterSelection != null ? characterSelection.Index : skin.value;
     bool ignoreOptions;
 
     void Start()
     {
+        // 에디터에서 저장한 UI 미리보기를 닫고 정상 타이틀 흐름으로 시작한다.
+        HidePanels();
+        if (resultsTitle == null) resultsTitle = resultsPanel.transform.Find("Title")?.GetComponent<TMP_Text>();
+        if (resultsHint == null) resultsHint = resultsPanel.transform.Find("Hint")?.GetComponent<TMP_Text>();
         nickname.text = PlayerPrefs.GetString("LionIceRun.Nickname", "얼음 친구");
         soloButton.onClick.AddListener(() => { SaveName(); session.StartSolo(); });
         createButton.onClick.AddListener(() => { SaveName(); session.CreateRoom(nickname.text, SelectedSkin, capacity.value + 2); });
@@ -56,6 +61,7 @@ public class OnlineFrontend : MonoBehaviour
         MatchCountdown.Instance?.Hide();
         modesPanel.SetActive(false); lobbyPanel.SetActive(false); loadingPanel.SetActive(false);
         resultsPanel.SetActive(false); leavePanel.SetActive(false);
+        if (seriesStatus != null) seriesStatus.gameObject.SetActive(false);
     }
     public void OpenModes()
     {
@@ -81,6 +87,11 @@ public class OnlineFrontend : MonoBehaviour
         if (characterSelection != null) characterSelection.SetInteractable(!busy);
         notice.text = session.Notice;
         var phase = session.CurrentPhase;
+        if (seriesStatus != null)
+        {
+            seriesStatus.gameObject.SetActive(phase == OnlineGameSession.Phase.Playing || phase == OnlineGameSession.Phase.Countdown);
+            seriesStatus.text = $"{session.SeriesRound} / 5 라운드 · 총 {session.LocalTotal}점";
+        }
         leavePanel.SetActive(phase == OnlineGameSession.Phase.Playing || phase == OnlineGameSession.Phase.Countdown);
         if (phase == OnlineGameSession.Phase.Lobby && !lobbyPanel.activeSelf) ShowLobby();
         if (phase == OnlineGameSession.Phase.Lobby)
@@ -122,6 +133,9 @@ public class OnlineFrontend : MonoBehaviour
             if (!resultsPanel.activeSelf) { HidePanels(); resultsPanel.SetActive(true); }
             if (GameHUD.Instance != null && GameHUD.Instance.resultGroup != null) GameHUD.Instance.resultGroup.SetActive(false);
             resultText.text = session.ResultLines;
+            if (resultsTitle != null) resultsTitle.text = session.ResultsTitle;
+            if (resultsHint != null) resultsHint.text = session.ResultsHint;
+            returnButton.gameObject.SetActive(session.SeriesComplete && session.IsHost);
             returnButton.interactable = session.IsHost && !busy;
             resultLeaveButton.interactable = !busy;
         }
