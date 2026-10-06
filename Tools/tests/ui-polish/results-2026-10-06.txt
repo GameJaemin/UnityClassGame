@@ -1,0 +1,17 @@
+Unity 6000.6.3f1 / Direct3D 11 / NVIDIA GeForce RTX 3060
+별도 복사 프로젝트에서 컴파일·씬 저장·그래픽 렌더 검사 완료. 종료 코드 0.
+
+ONLINE_CHECKS_PASSED: 28개
+UI_POLISH_VALIDATION_PASSED: 입력창·3D 선택·초상화·재적용·HUD 보존, 플레이어 빌드 없음
+
+입력 richText와 글자 richText 모두 false, 밝은 배경/남색 글자/재질 연결 확인.
+실제 FBX 3개와 좌우 버튼/카메라/RenderTexture 연결, 양방향 순환, 연결 중 잠금 확인.
+3종 정면 초상화 PNG 렌더·알파·sRGB 색공간·Sprite 저장 확인.
+메뉴 재실행 시 사용자 닉네임 배치·기존 전체 HUD anchoredPosition 보존 확인.
+Unity 렌더를 직접 확인하며 첫 프레임 자세/셰이더 준비와 체크 글자 지원 문제 수정.
+
+화면: docs/screenshots/ui-polish.png, docs/screenshots/ui-polish-lobby.png
+로비 화면의 참가자 명단은 배치 검사용 예시다.
+실제 한글 IME 입력·모델 버튼 조작·친구 PC 화면은 사용자 플레이 확인 필요.
+원본 Main 씬은 변경하지 않음. LionIceRun > UI 폴리싱을 실행해 씬에 저장.
+BuildPipeline 호출 없음. EXE/ZIP 생성 없음.

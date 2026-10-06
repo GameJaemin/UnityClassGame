@@ -14,6 +14,33 @@ public static class StepTrialSetup
     const string HazardFolder = "Assets/Models/Hazards";
     const string PenguinControllerPath = "Assets/Animations/Penguin.controller";
 
+    [MenuItem("LionIceRun/바람·아이템 밸런스 적용")]
+    static void ApplyBalance()
+    {
+        var wind = Object.FindAnyObjectByType<WindTrial>(FindObjectsInactive.Include);
+        var spawner = Object.FindAnyObjectByType<RepairItemSpawner>(FindObjectsInactive.Include);
+        if (wind == null || spawner == null)
+        {
+            Debug.LogError("바람·아이템: WindTrial 또는 RepairItemSpawner가 없습니다. 시련·보상 세팅과 Step 5 생존 시간 세팅을 먼저 실행하세요.");
+            return;
+        }
+
+        Undo.RecordObjects(new Object[] { wind, spawner }, "바람·아이템 밸런스 적용");
+        wind.strength = 9f;
+        spawner.firstSpawnTime = 6f;
+        spawner.interval = 7f;
+        EditorUtility.SetDirty(wind);
+        EditorUtility.SetDirty(spawner);
+        EditorSceneManager.MarkSceneDirty(wind.gameObject.scene);
+        EditorSceneManager.MarkSceneDirty(spawner.gameObject.scene);
+        EditorSceneManager.SaveOpenScenes();
+        Selection.activeGameObject = wind.gameObject;
+        Debug.Log("바람·아이템 밸런스 적용 완료: 바람 힘 9, 아이템 첫 등장 6초, 획득·소멸 후 다음 등장 7초.");
+    }
+
+    [MenuItem("LionIceRun/바람·아이템 밸런스 적용", true)]
+    static bool CanApplyBalance() => !EditorApplication.isPlayingOrWillChangePlaymode;
+
     [MenuItem("LionIceRun/시련·보상 세팅")]
     static void Run()
     {

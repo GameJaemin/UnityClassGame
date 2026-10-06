@@ -93,3 +93,6 @@ $innerWhite = [System.Drawing.Color]::FromArgb(210, 255, 255, 255)
 [PanelGen]::RoundedPanel((Join-Path $sprites "Gen_BadgePink.png"), 256, 128, 44, 7, [System.Drawing.Color]::FromArgb(255, 245, 45, 140), $white, [System.Drawing.Color]::FromArgb(255, 215, 25, 115), $true)
 [PanelGen]::RoundedPanel((Join-Path $sprites "Gen_BoxMagenta.png"), 256, 160, 36, 8, [System.Drawing.Color]::FromArgb(255, 230, 40, 190), $white, [System.Drawing.Color]::FromArgb(255, 200, 25, 165), $true)
 Write-Host "Gen_SkewPink/Navy/Green/Gold, Gen_Band, Gen_PillWhite, Gen_ChipDark, Gen_KeyCap, Gen_BadgePink, Gen_BoxMagenta"
+# 흰 원판 (다시 들어가기 카운트다운의 둥근 진행 막대·원판)
+[PanelGen]::Circle((Join-Path $sprites "Gen_Circle.png"), 256)
+Write-Host "Gen_Circle"

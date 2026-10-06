@@ -46,6 +46,20 @@ public static class PanelGen
         }
     }
 
+    // 흰 원판 (Unity에서 색을 입히고, 둥근 진행 막대는 Filled Radial로 씀)
+    public static void Circle(string output, int size)
+    {
+        using (var bitmap = new Bitmap(size, size, PixelFormat.Format32bppArgb))
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.Clear(Color.Transparent);
+            using (var brush = new SolidBrush(Color.White)) g.FillEllipse(brush, 1, 1, size - 2, size - 2);
+            bitmap.Save(output, ImageFormat.Png);
+        }
+    }
+
     // Fall Guys식 평행사변형 띠 (윗변이 오른쪽으로 skew만큼 밀림). 안쪽에 얇은 흰 선
     public static void Parallelogram(string output, int width, int height, int skew,
         Color fill, Color innerLine, int innerWidth)

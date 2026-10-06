@@ -1,0 +1,575 @@
+VBCSCompilerPreWarmer: watching VBCSCompiler (PID 71512)
+VBCSCompilerPreWarmer: pre-warm launched (dotnet PID 62776)
+VBCSCompiler prewarm took 16.71 ms
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.6/staging' branch; Version is '6000.6.3f1 (45d8eee7de74) revision 4577518'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-User" at "2026-10-06T07:33:51.0810354Z"
+OS: 'Windows 11  (10.0.26200) Core' Language: 'ko' Physical Memory: 130909 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-10-06T07:33:51Z
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe
+-batchmode
+-quit
+-projectPath
+D:\UnityClassGame\.tmp-ui-polish-validation
+-executeMethod
+BatchUIPolishValidation.Run
+-logFile
+D:\UnityClassGame\Tools\tests\ui-polish\validation-final.log
+Successfully changed project path to: D:\UnityClassGame\.tmp-ui-polish-validation
+D:/UnityClassGame/.tmp-ui-polish-validation
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-main-allocator-mimalloc-enabled=1"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Logging is directed to a specific file, skipping project log.
+Player connection [68580]  Target information:
+
+Player connection [68580]  * "[IP] 172.24.1.8 [Port] 55506 [Flags] 2 [Guid] 3298076839 [EditorId] 3298076839 [Version] 1048832 [Id] WindowsEditor(7,K-2301160013) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [68580] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [68580] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 26684, path: "C:/Program Files/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              aa0927e8aaed488b87147c059ad8d029
+  Correlation Id:          6dd0cdaa3c8e2405267e1927f69711a9
+  External correlation Id: 938929740588709269
+  Machine Id:              mEzSiPh2U7P2SMTGrXeRZuEPdes=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-User" (connect: 0.00s, validation: 0.00s, handshake: 0.03s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-User-notifications" at "2026-10-06T07:33:51.1111748Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 14568628278049-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.03s
+[Package Manager] Connected to IPC stream "Upm-19724" after 0.2 seconds.
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+Launching Unity Data Store - C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/Tools/Unity.DataStore.exe 
+Unity Data Store artifact dir = Library/DataStore, working dir = D:/UnityClassGame/.tmp-ui-polish-validationUnity Data Store running and initialised
+[Physics::Module] Selected backend (deferred post-plugins).
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Initialize engine version: 6000.6.3f1 (45d8eee7de74)
+[EntityIdStore] init: VM path (explicit commit), pageSize=4096, blockCount=1048576, entitiesPerBlock=256, slots reserved=4294967296 bytes
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path D:/UnityClassGame/.tmp-ui-polish-validation/Assets
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 3060 (ID=0x2504)
+    Vendor:   NVIDIA
+    VRAM:     12115 MB
+    Driver:   32.0.15.9186
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/BCLExtensions/runtime/netstandard2.1'
+Mono path[2] = 'C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56724
+CodeReloadManager initialized
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: C:/Program Files/Unity/Hub/Editor/6000.6.3f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001102 seconds.
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.545 seconds
+Domain Reload Profiling: 934ms
+	BeginReloadAssembly (95ms)
+		CreateAndSetChildDomain (5ms)
+	RebuildCommonClasses (4ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (45ms)
+	LoadAllAssembliesAndSetupDomain (232ms)
+		LoadAssemblies (88ms)
+		TypeCache.Refresh (157ms)
+			TypeCache.ScanAssembly (146ms)
+		AnalyzeDomain (0ms)
+	FinalizeReload (546ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (76ms)
+			ProcessInitializeOnLoadAttributes (122ms)
+			ProcessInitializeOnLoadMethodAttributes (163ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 70 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.netcode.gameobjects@2.13.3 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.netcode.gameobjects@277a288a1cea)
+    com.unity.services.multiplayer@2.3.3 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.multiplayer@3bd2e24872f4)
+    com.unity.services.authentication@3.7.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.authentication@ea91a087a2b7)
+    com.unity.ai.navigation@2.0.14 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.ai.navigation@134dd6a3b97b)
+    com.unity.collab-proxy@2.13.6 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.collab-proxy@4628d2ba6ea4)
+    com.unity.ide.rider@3.0.38 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.ide.rider@1f60b3138684)
+    com.unity.ide.visualstudio@2.0.26 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.ide.visualstudio@a99d56dec63f)
+    com.unity.inputsystem@1.20.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.inputsystem@7a4e1a2a8194)
+    com.unity.visualscripting@1.9.12 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.visualscripting@4edfcc09512f)
+    com.unity.services.core@1.18.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.core@3464cb68d709)
+    com.unity.nuget.newtonsoft-json@3.2.2 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64)
+    com.unity.services.qos@1.4.1 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.qos@03d4b52d4980)
+    com.unity.services.wire@1.5.1 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.wire@af86088a4eac)
+    com.unity.services.deployment@1.7.2 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.deployment@c07c64f9804b)
+    com.unity.nuget.mono-cecil@1.11.6 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.searcher@4.9.5 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.searcher@a463122f2c00)
+    com.unity.profiling.core@1.0.3 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.profiling.core@8a49f7027d06)
+    com.unity.services.deployment.api@1.1.3 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.services.deployment.api@9becf6da0f1a)
+  Built-in packages:
+    com.unity.render-pipelines.universal@17.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.render-pipelines.universal@327d93d1cbc8)
+    com.unity.test-framework@1.8.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.test-framework@80f691d4262b)
+    com.unity.timeline@6.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.timeline@c56d56b0070b)
+    com.unity.ugui@2.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.ugui@0727b404f3a0)
+    com.unity.modules.accessibility@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.physicscore2d@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.physicscore2d)
+    com.unity.modules.screencapture@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tetgen@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.tetgen)
+    com.unity.modules.tilemap@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.timelinefoundation@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.timelinefoundation)
+    com.unity.modules.ui@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.wind@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.1.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.ext.nunit@0198eae3b53e)
+    com.unity.render-pipelines.core@17.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.render-pipelines.core@02d75770e4b3)
+    com.unity.shadergraph@17.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.shadergraph@1dd0fd24b57e)
+    com.unity.render-pipelines.universal-config@17.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.render-pipelines.universal-config@561422b74439)
+    com.unity.transport@6.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.transport@1839533e4eb3)
+    com.unity.collections@6.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.collections@10fff0607388)
+    com.unity.graph-authoring@1.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.graph-authoring@cfd2588851ee)
+    com.unity.burst@2.0.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.burst@626e66ab421b)
+    com.unity.test-framework.performance@6.6.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.test-framework.performance@b6023decb532)
+    com.unity.mathematics@1.4.0 (location: D:\UnityClassGame\.tmp-ui-polish-validation\Library\PackageCache\com.unity.mathematics@8306a64d0cd6)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.02 seconds
+A meta data file (.meta) exists but its asset 'Assets/UI/CharacterPreviews/Lion.png' can't be found. When moving or deleting files outside of Unity, please ensure that the corresponding .meta file is moved or deleted along with it.
+A meta data file (.meta) exists but its asset 'Assets/UI/CharacterPreviews/PolarBear.png' can't be found. When moving or deleting files outside of Unity, please ensure that the corresponding .meta file is moved or deleted along with it.
+A meta data file (.meta) exists but its asset 'Assets/UI/CharacterPreviews/Tiger.png' can't be found. When moving or deleting files outside of Unity, please ensure that the corresponding .meta file is moved or deleted along with it.
+[ScriptCompilation] Requested script compilation because: AssetDatabase observed changes in script compilation related files
+Starting: C:\Program Files\Unity\Hub\Editor\6000.6.3f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: D:/UnityClassGame/.tmp-ui-polish-validation
+DisplayProgressbar: Compiling Scripts
+ExitCode: 0 Duration: 1s402ms
+[1069/1402  0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[1394/1402  0s] Csc Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll (+2 others)
+Assets\Scripts\QuarterViewCamera.cs(57,84): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\QuarterViewCamera.cs(57,48): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\Trials\TrialBase.cs(63,85): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Trials\TrialBase.cs(63,49): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\OnlineGameSession.cs(211,88): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\OnlineGameSession.cs(211,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+[1395/1402  0s] Csc Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp-Editor.dll (+2 others)
+Assets\Scripts\Editor\StepBotSetup.cs(13,91): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Editor\StepBotSetup.cs(13,48): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\Editor\CharacterPreviewSetup.cs(72,98): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Editor\CharacterPreviewSetup.cs(72,36): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\Editor\Step2MapSetup.cs(90,65): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Editor\Step2MapSetup.cs(90,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\Editor\StepTrialSetup.cs(48,91): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Editor\StepTrialSetup.cs(48,48): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\Editor\BatchUIPolishValidation.cs(47,106): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Editor\BatchUIPolishValidation.cs(47,32): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+
+Assets\Scripts\Editor\MapEditorWindow.cs(567,81): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Scripts\Editor\MapEditorWindow.cs(567,45): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+[1396/1402  0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Assembly-CSharp.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll, with 149 defines and 370 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, Unity.Netcode.Editor.CodeGen.INetworkMessageILPP, Unity.Netcode.Editor.CodeGen.INetworkSerializableILPP, Unity.Netcode.Editor.CodeGen.NetworkBehaviourILPP, Unity.Netcode.Editor.CodeGen.RuntimeAccessModifiersILPP, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running Unity.Netcode.Editor.CodeGen.INetworkMessageILPP
+
+running Unity.Netcode.Editor.CodeGen.INetworkSerializableILPP
+
+running Unity.Netcode.Editor.CodeGen.NetworkBehaviourILPP
+
+running Unity.Netcode.Editor.CodeGen.RuntimeAccessModifiersILPP
+[1397/1402  0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp.pdb
+[1398/1402  0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp.dll
+[1399/1402  0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Assembly-CSharp-Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp-Editor.dll, with 147 defines and 393 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, Unity.Netcode.Editor.CodeGen.INetworkMessageILPP, Unity.Netcode.Editor.CodeGen.INetworkSerializableILPP, Unity.Netcode.Editor.CodeGen.NetworkBehaviourILPP, Unity.Netcode.Editor.CodeGen.RuntimeAccessModifiersILPP, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running Unity.Netcode.Editor.CodeGen.INetworkMessageILPP
+
+running Unity.Netcode.Editor.CodeGen.INetworkSerializableILPP
+
+running Unity.Netcode.Editor.CodeGen.NetworkBehaviourILPP
+
+running Unity.Netcode.Editor.CodeGen.RuntimeAccessModifiersILPP
+[1400/1402  0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.pdb
+[1401/1402  0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.dll
+*** Tundra build success (1.37 seconds), 9 items updated, 1402 evaluated
+Assets\Scripts\QuarterViewCamera.cs(57,84): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\QuarterViewCamera.cs(57,48): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Trials\TrialBase.cs(63,85): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Trials\TrialBase.cs(63,49): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\OnlineGameSession.cs(211,88): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\OnlineGameSession.cs(211,31): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Editor\StepBotSetup.cs(13,91): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Editor\StepBotSetup.cs(13,48): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Editor\CharacterPreviewSetup.cs(72,98): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Editor\CharacterPreviewSetup.cs(72,36): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Editor\Step2MapSetup.cs(90,65): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Editor\Step2MapSetup.cs(90,33): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Editor\StepTrialSetup.cs(48,91): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Editor\StepTrialSetup.cs(48,48): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Editor\BatchUIPolishValidation.cs(47,106): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Editor\BatchUIPolishValidation.cs(47,32): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Scripts\Editor\MapEditorWindow.cs(567,81): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Scripts\Editor\MapEditorWindow.cs(567,45): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Total cache size 267962568
+Total cache size after purge 267962568, took 00:00:00.1982715
+AssetDatabase: script compilation time: 2.079679s
+Begin MonoManager ReloadAssembly
+'Packages/com.unity.render-pipelines.core/Editor/Deprecated.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+'Packages/com.unity.render-pipelines.core/Editor/Deprecated.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.834 seconds
+Domain Reload Profiling: 1590ms
+	BeginReloadAssembly (180ms)
+		DisableScriptedObjects (30ms)
+		CreateAndSetChildDomain (33ms)
+	RebuildCommonClasses (7ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (55ms)
+	LoadAllAssembliesAndSetupDomain (503ms)
+		LoadAssemblies (246ms)
+		TypeCache.Refresh (146ms)
+			TypeCache.ScanAssembly (132ms)
+		AnalyzeDomain (75ms)
+			BuildScriptInfoCaches (68ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (835ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (77ms)
+			ProcessInitializeOnLoadAttributes (206ms)
+			ProcessInitializeOnLoadMethodAttributes (233ms)
+			AfterProcessingInitializeOnLoad (4ms)
+		AwakeInstancesAfterBackupRestoration (24ms)
+Starting new worker id: 0 with log in D:/UnityClassGame/.tmp-ui-polish-validation/Logs/AssetImportWorkerHW0.log
+
+Asset Pipeline Refresh (id=08922aa688bc4334a979a3d26d06ec16): Total: 4.412 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	(Values over 0.05ms)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=1316 ms
+		Asset DB Callback time: managed=149 ms, native=21 ms
+		Scripting: domain reloads=1, domain reload time=794 ms, compile time=2082 ms, other=47 ms
+		Project Asset Count: scripts=1895, non-scripts=2712
+		Asset File Changes: new=0, changed=2, moved=0, deleted=3
+		Scan Filter Count: 0
+	InvokePackagesCallback: 18.587ms
+	ApplyChangesToAssetFolders: 0.468ms
+	Scan: 164.907ms
+	Collect global state as custom dependencies: 14.877ms
+	OnSourceAssetsModified: 1.123ms
+	CategorizeScriptCompilationAssets: 39.164ms
+	ProcessAssetsWithTransientArtifactChanges: 65.364ms
+	CategorizeAssets: 44.887ms
+	CompileScripts: 2081.876ms
+	ImportOutOfDateAssets: 854.756ms (840.838ms without children)
+		UnloadImportedAssets: 2.650ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.628ms
+		ImportSchedulerStart: 10.602ms
+	PostProcessAllAssets: 148.783ms
+		XRBuildSystem.XRAssetImported 0.471ms
+		PostProcessCallbackCreateDeferredMaterials 0.247ms
+		MonoPostProcessAllAssets: 147.455ms
+			AssetPostprocessor.OnPostprocessAllAssets 21.372ms
+			AssetPostprocessorProxy.OnPostprocessAllAssets 18.686ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 12.327ms
+			UniversalRenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 11.882ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 4.749ms
+			SyncVS.PostprocessSyncProject 2.871ms
+			NetworkPrefabProcessor.OnPostprocessAllAssets 2.184ms
+			AssetChangedListener.OnPostprocessAllAssets 1.379ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 1.323ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 1.256ms
+			ShaderGraphAssetPostProcessor.OnPostprocessAllAssets 1.227ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 1.033ms
+			EditModeScopePostprocessor.OnPostprocessAllAssets 0.915ms
+			UVCSAssetPostprocessor.OnPostprocessAllAssets 0.696ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.672ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.631ms
+			MaterialPostprocessor.OnPostprocessAllAssets 0.517ms
+			ShaderReflectionAssetPostProcessor.OnPostprocessAllAssets 0.459ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 0.263ms
+			PostProcessor.OnPostprocessAllAssets 0.256ms
+			InputActionAssetPostprocessor.OnPostprocessAllAssets 0.248ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.247ms
+			TMPro_TexturePostProcessor.OnPostprocessAllAssets 0.243ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.231ms
+			InputActionJsonNameModifierAssetProcessor.OnPostprocessAllAssets 0.207ms
+			AssetEvents.OnPostprocessAllAssets 0.198ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.157ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.120ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.118ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.110ms
+			ProjectSettingsPostprocessor.OnPostprocessAllAssets 0.100ms
+			SamplePostprocessor.OnPostprocessAllAssets 0.095ms
+			AssetReloadNotifier.OnPostprocessAllAssets 0.086ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.085ms
+			ThemePostprocessor.OnPostprocessAllAssets 0.084ms
+			AudioContainerPostProcessor.OnPostprocessAllAssets 0.068ms
+	PostAssetChangesProfiler: 3.788ms
+	UnloadStreamsBegin: 1.184ms
+	PersistCurrentRevisions: 0.160ms
+	GenerateScriptTypeHashes: 1.407ms
+	GenerateScriptTypeSerializationHashes: 2.894ms
+	Untracked: 951.140ms
+
+Application.AssetDatabase Initial Refresh End
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Scanning for USB devices : 3.336ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-LionIceRun
+Unloading 86 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 8832 unused Assets / (14.8 MB). Loaded Objects now: 9727.
+Memory consumption went from 448.6 MB to 433.8 MB.
+Total: 11.581100 ms (FindLiveObjects: 0.893200 ms CreateObjectMapping: 0.458500 ms MarkObjects: 6.296800 ms  DeleteObjects: 3.553000 ms)
+
+Opening scene 'Assets/Scenes/Main.unity'
+Unloading 102 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Assets/Scenes/Main.unity'
+	Deserialize:            82.843 ms
+	Integration:            104.650 ms
+	Integration of assets:  9.859 ms
+	Thread Wait Time:       -0.553 ms
+	Total Operation Time:   196.799 ms
+Unloading 31 unused Assets / (19.3 KB). Loaded Objects now: 12196.
+Memory consumption went from 458.0 MB to 458.0 MB.
+Total: 8.506000 ms (FindLiveObjects: 0.903600 ms CreateObjectMapping: 0.359800 ms MarkObjects: 6.891100 ms  DeleteObjects: 0.072100 ms)
+
+ONLINE_CHECKS_PASSED: 28개
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+OnlineMultiplayerTests:Run () (at Assets/Scripts/Editor/OnlineMultiplayerTests.cs:60)
+BatchUIPolishValidation:Run () (at Assets/Scripts/Editor/BatchUIPolishValidation.cs:16)
+
+(Filename: Assets/Scripts/Editor/OnlineMultiplayerTests.cs Line: 60)
+
+Asset Pipeline Refresh (id=d3b52b86383eb9a4a80bf6d282adbac7): Total: 0.066 seconds - Initiated by RefreshV2(NoUpdateAssetOptions)
+GPU Resident Drawer created.
+Importing 'GUID: 7e98496f92fc682488ad67f116c7b889 - Path: Assets/UI/CharacterPreviews/Lion.png' with importer (TextureImporter)
+Imported 'GUID: 7e98496f92fc682488ad67f116c7b889' -> (Import Result ID: '7fd5ebee5b0d6823aa307659c9f90515') in 0.022 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=f1d8f6b8cfbe33c63266e2ecf9acee02 DependenciesID=656542806c9c3d217782573e90eef0c9 StaticDependenciesID=2a24b3137a038840e846b26bf943734a 
+Asset Pipeline Refresh (id=864777dfe7e547a4cb432d3d2efbf284): Total: 0.068 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: 7e98496f92fc682488ad67f116c7b889 - Path: Assets/UI/CharacterPreviews/Lion.png' with importer (TextureImporter)
+Imported 'GUID: 7e98496f92fc682488ad67f116c7b889' -> (Import Result ID: '2f5e3fafb8c14096ce9de0fc611630d1') in 0.023 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=c20194bd14b5b688fc04d700612cac87 DependenciesID=42221d7ed24e361451b747d0e4b69fa2 StaticDependenciesID=f4922aea8e990ac87896fc5cad835f36 
+Asset Pipeline Refresh (id=5c58a655c08193e47ab247ec0c043f87): Total: 0.057 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: d076b8c0db97c1142a9a61eca3244651 - Path: Assets/UI/CharacterPreviews/PolarBear.png' with importer (TextureImporter)
+Imported 'GUID: d076b8c0db97c1142a9a61eca3244651' -> (Import Result ID: 'b3df2168e06a7a82e4adeda02ddb4c7d') in 0.010 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=53571f5efcaa38bee46618e5905d19f7 DependenciesID=ec6e4cdcce4def2f50bf1a345c608c7d StaticDependenciesID=d5a401bdf41b60943277f723728bb26b 
+Asset Pipeline Refresh (id=c3bf9b802f8d74f408cf03947c566039): Total: 0.041 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: d076b8c0db97c1142a9a61eca3244651 - Path: Assets/UI/CharacterPreviews/PolarBear.png' with importer (TextureImporter)
+Imported 'GUID: d076b8c0db97c1142a9a61eca3244651' -> (Import Result ID: '41c4e62646fa1a1d8ae889aa2334efaf') in 0.016 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=70efca100b785a52df393018fb6acb02 DependenciesID=bade64840726b0a2d102b5e90f680e80 StaticDependenciesID=c90d75b2955ea769949c93b029281aa1 
+Asset Pipeline Refresh (id=a520cd2ef57e5c74bb0bd48a849150c1): Total: 0.047 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: ccfd6d28490215f4795a4e1a275acf73 - Path: Assets/UI/CharacterPreviews/Tiger.png' with importer (TextureImporter)
+Imported 'GUID: ccfd6d28490215f4795a4e1a275acf73' -> (Import Result ID: '2ef443542aac66b4b7c29520eeafffe7') in 0.011 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=e2cafbcd2ae9d9fb058250979762543a DependenciesID=aff205a83f24e83b3ea9daac9933deef StaticDependenciesID=89b0f4e658557548654cd71c71224a25 
+Asset Pipeline Refresh (id=7a63e2108509b014fa1e3c611b093a91): Total: 0.043 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Worker ready: AssetImportWorkerHW0 0
+Importing 'GUID: ccfd6d28490215f4795a4e1a275acf73 - Path: Assets/UI/CharacterPreviews/Tiger.png' with importer (TextureImporter)
+Imported 'GUID: ccfd6d28490215f4795a4e1a275acf73' -> (Import Result ID: 'c55fb8301dcebefd8fcdfe9222dfd070') in 0.017 seconds [static and dynamic dependencies]. Details - ImportResultOutputID=21c87fb1223434f17810c4c0e6e19209 DependenciesID=4c54990f492dc197ac9ed58256e509e0 StaticDependenciesID=befe4236824d2480c6c54be57f211b74 
+Asset Pipeline Refresh (id=f9c9b493232e43249a881c37ca8a271c): Total: 0.052 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: 00000000000000009000000000000000 - Path: ProjectSettings/QualitySettings.asset' with importer (LibraryAssetImporter)
+Imported 'GUID: 00000000000000009000000000000000' -> (Import Result ID: '8151b601d05d3e12de314c2aa1f82962') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=2a108b3da874f726c62fbe5f12be4a8a DependenciesID=6180c49ef29638684367d2893c04e070 StaticDependenciesID=5b19720d9149525484b40148944c8e26 
+Importing 'GUID: 6b45d3c68344cca44ab66e98faa98801 - Path: Assets/UI/CharacterPreviews/Character.renderTexture' with importer (NativeFormatImporter)
+Imported 'GUID: 6b45d3c68344cca44ab66e98faa98801' -> (Import Result ID: 'b36b7608e3307a880295311919fe0329') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=bbd24306dd3519269906d64ab9f2eaaa DependenciesID=86059f4dfa079a8387e7c0c6d149cdb6 StaticDependenciesID=ee953c409e8084720dd205363b50b143 
+Importing 'GUID: 6762c18efb349d74aa953a719adce066 - Path: Assets/UI/Fonts/MalgunGothicBold SDF.asset' with importer (NativeFormatImporter)
+Imported 'GUID: 6762c18efb349d74aa953a719adce066' -> (Import Result ID: '0ce27c884c3565893b0eaa31184035fe') in 0.003 seconds [static dependencies only]. Details - ImportResultOutputID=f8c7b379a64b7c4e767935bbc10b813e DependenciesID=1474b8c42bf5af1c35a1a8939cf5760e StaticDependenciesID=e8aa4bc2be0034c167b86e0a255291b8 
+Asset Pipeline Refresh (id=5ecfee612554ace4fac298b5796db370): Total: 0.037 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: 99c9720ab356a0642a771bea13969a05 - Path: Assets/Scenes/Main.unity' with importer (DefaultImporter)
+Imported 'GUID: 99c9720ab356a0642a771bea13969a05' -> (Import Result ID: '2980279c8016bb1af114d1831b796a25') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=f0ab003acd2598d96c932a2df4053f44 DependenciesID=00a98c83fd7cf6e41e8716a6b8541eb6 StaticDependenciesID=93da8fcc2b68d7618d01ddd94f782b59 
+Asset Pipeline Refresh (id=83e3082c5eb223645a49246668f6d1bf): Total: 0.013 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+UI 폴리싱 저장 완료. 밝은 입력창·태그 출력 수정·모델/화살표 선택·로비 초상화. 최초 적용 시 모드 선택 화면만 새 2열 배치로 전환하며 기존 HUD 배치는 유지합니다. 빌드는 수행하지 않았습니다.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UIPolishSetup:Run () (at Assets/Scripts/Editor/UIPolishSetup.cs:48)
+BatchUIPolishValidation:Run () (at Assets/Scripts/Editor/BatchUIPolishValidation.cs:20)
+
+(Filename: Assets/Scripts/Editor/UIPolishSetup.cs Line: 48)
+
+Asset Pipeline Refresh (id=8776c107fc8d4934ea4a049ecd5cdf1f): Total: 0.005 seconds - Initiated by RefreshV2(NoUpdateAssetOptions)
+Importing 'GUID: 6b45d3c68344cca44ab66e98faa98801 - Path: Assets/UI/CharacterPreviews/Character.renderTexture' with importer (NativeFormatImporter)
+Imported 'GUID: 6b45d3c68344cca44ab66e98faa98801' -> (Import Result ID: 'b36b7608e3307a880295311919fe0329') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=bbd24306dd3519269906d64ab9f2eaaa DependenciesID=86059f4dfa079a8387e7c0c6d149cdb6 StaticDependenciesID=ee953c409e8084720dd205363b50b143 
+Asset Pipeline Refresh (id=edd3cc9dcb5fadd4f960ed791f074bd6): Total: 0.012 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Importing 'GUID: 99c9720ab356a0642a771bea13969a05 - Path: Assets/Scenes/Main.unity' with importer (DefaultImporter)
+Imported 'GUID: 99c9720ab356a0642a771bea13969a05' -> (Import Result ID: 'ad5ab875ff417b31abadaf73fadf6a67') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=f0ab003acd2598d96c932a2df4053f44 DependenciesID=96ed2f8c2fc1d7dba4188f833f1c662d StaticDependenciesID=02fff2d81a3b84ef2831cad9fa11b8cd 
+Asset Pipeline Refresh (id=5971898fba0513742b8f422387077d54): Total: 0.025 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+UI 폴리싱 저장 완료. 밝은 입력창·태그 출력 수정·모델/화살표 선택·로비 초상화. 최초 적용 시 모드 선택 화면만 새 2열 배치로 전환하며 기존 HUD 배치는 유지합니다. 빌드는 수행하지 않았습니다.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UIPolishSetup:Run () (at Assets/Scripts/Editor/UIPolishSetup.cs:48)
+BatchUIPolishValidation:Run () (at Assets/Scripts/Editor/BatchUIPolishValidation.cs:35)
+
+(Filename: Assets/Scripts/Editor/UIPolishSetup.cs Line: 48)
+
+UI_POLISH_VALIDATION_PASSED: 입력창·3D 선택·초상화·재적용·HUD 보존, 플레이어 빌드 없음
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+BatchUIPolishValidation:Run () (at Assets/Scripts/Editor/BatchUIPolishValidation.cs:42)
+
+(Filename: Assets/Scripts/Editor/BatchUIPolishValidation.cs Line: 42)
+
+Batchmode quit successfully invoked - shutting down!
+Clearing [MalgunGothicBold SDF] dynamic font asset data.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+TMPro.EditorEventCallbacks/<>c:<InitializeFontAssetResourceChangeCallBacks>b__0_0 () (at ./Library/PackageCache/com.unity.ugui@0727b404f3a0/Editor/TMP/TMP_EditorResourceManager.cs:36)
+UnityEditor.EditorApplication:Internal_EditorApplicationQuit ()
+
+(Filename: ./Library/PackageCache/com.unity.ugui@0727b404f3a0/Editor/TMP/TMP_EditorResourceManager.cs Line: 36)
+
+Importing 'GUID: 6b45d3c68344cca44ab66e98faa98801 - Path: Assets/UI/CharacterPreviews/Character.renderTexture' with importer (NativeFormatImporter)
+Imported 'GUID: 6b45d3c68344cca44ab66e98faa98801' -> (Import Result ID: 'b36b7608e3307a880295311919fe0329') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=bbd24306dd3519269906d64ab9f2eaaa DependenciesID=86059f4dfa079a8387e7c0c6d149cdb6 StaticDependenciesID=ee953c409e8084720dd205363b50b143 
+Importing 'GUID: 6762c18efb349d74aa953a719adce066 - Path: Assets/UI/Fonts/MalgunGothicBold SDF.asset' with importer (NativeFormatImporter)
+Imported 'GUID: 6762c18efb349d74aa953a719adce066' -> (Import Result ID: '6bacd63bafe8eba854fd4522222a884a') in 0.001 seconds [static dependencies only]. Details - ImportResultOutputID=f8c7b379a64b7c4e767935bbc10b813e DependenciesID=ddd5d2a45c17ca66b370c0f35947d87a StaticDependenciesID=7d1b02737ef738decb1c64196e4170a5 
+Asset Pipeline Refresh (id=d4b923cbb0ebe394086502c971528440): Total: 0.028 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+GPU Resident Drawer disposed.
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-User-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-User channel disconnected successfully.
+Lingering sessions upon destruction of worker manager
+Unity Data Store service was successfully shut down
+UDS shutting down local client system
+AcceleratorClientConnectionCallback - disconnected - :0
+Cleanup mono
+CodeReloadManager destroyed
+Exiting batchmode successfully now!
+[ExitDontLaunchBugReporter] Exiting without the bug reporter. Application will exit with return code 0

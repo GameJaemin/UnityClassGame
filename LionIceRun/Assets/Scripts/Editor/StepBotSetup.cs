@@ -30,6 +30,6 @@ public static class StepBotSetup
         EditorSceneManager.MarkSceneDirty(manager.gameObject.scene);
         EditorSceneManager.SaveOpenScenes();
         Selection.activeGameObject = manager.gameObject;
-        Debug.Log($"AI 봇 세팅 완료: GameSystems에 BotManager를 붙였습니다 (봇 {bots.botCount}마리, Inspector에서 조정).");
+        Debug.Log($"AI 봇 세팅 완료: 봇 {bots.botCount}마리 (신중형 {bots.CautiousCount}, 공격형 {bots.AggressiveCount}). Bot Count는 전체 수, Aggressive Bot Count는 공격형 수입니다. 지정 시작 위치 순서로 신중형부터 배치합니다.");
     }
 }
