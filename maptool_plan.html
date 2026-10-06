@@ -1,0 +1,443 @@
+<title>LionIceRun 맵툴 계획</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column like blueprint.html; a live mock of the editor grid + JSON sits mid-page as the centerpiece. */
+:root {
+  --bg: #f1f5f8;
+  --surface: #ffffff;
+  --fg: #1f2733;
+  --muted: #5f6b7a;
+  --line: #d6dee7;
+  --ice: #bfe6f7;
+  --ice-edge: #8ccbe8;
+  --crack: #7fb3dc;
+  --thick: #eef8fd;
+  --sea: #2f6f9f;
+  --mane: #d98a0b;
+  --mane-soft: #fbe8c6;
+  --pink: #e0548f;
+  --grass: #1f8f7a;
+  --code-bg: #e5ebf1;
+  --font-display: "Do Hyeon", "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121820; --surface: #1b2330; --fg: #e6edf5; --muted: #95a3b4; --line: #2e3a4a;
+    --ice: #7fc4e4; --ice-edge: #a9dcf2; --crack: #5b93bd; --thick: #d8f0fb; --sea: #0d2b45;
+    --mane: #f0ad3c; --mane-soft: #3a2f1c; --pink: #f58bb8; --grass: #4fc7ae; --code-bg: #243040;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121820; --surface: #1b2330; --fg: #e6edf5; --muted: #95a3b4; --line: #2e3a4a;
+  --ice: #7fc4e4; --ice-edge: #a9dcf2; --crack: #5b93bd; --thick: #d8f0fb; --sea: #0d2b45;
+  --mane: #f0ad3c; --mane-soft: #3a2f1c; --pink: #f58bb8; --grass: #4fc7ae; --code-bg: #243040;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 820px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: 2.4rem; }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; }
+section { display: grid; gap: 14px; min-width: 0; }
+code { font-family: var(--font-mono); font-size: .86em; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+.eyebrow { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lead { color: var(--muted); max-width: 62ch; }
+.hint { font-size: .85rem; color: var(--muted); }
+ul, ol { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+
+/* flow */
+.flow { display: grid; grid-template-columns: repeat(5, auto); align-items: center; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.flow .node { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; min-width: 150px; }
+.flow .node b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 1.05rem; }
+.flow .node span { font-size: .8rem; color: var(--muted); }
+.flow .arrow { color: var(--muted); font-family: var(--font-mono); }
+.flow .node.file { border-style: dashed; border-color: var(--mane); background: var(--mane-soft); }
+
+/* tables */
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+tr:last-child th, tr:last-child td { border-bottom: 0; }
+thead th { color: var(--muted); font-weight: 600; font-size: .82rem; }
+td.sym { font-family: var(--font-mono); font-weight: 500; white-space: nowrap; }
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--line); }
+
+/* mock editor */
+.mock { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.mock-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.mock-bar strong { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; }
+.mock-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.mock-left { padding: 14px; display: grid; gap: 12px; align-content: start; border-right: 1px solid var(--line); min-width: 0; }
+.mock-right { padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.palette { display: flex; flex-wrap: wrap; gap: 6px; }
+.palette button { font: inherit; font-size: .82rem; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.palette button[aria-pressed="true"] { border-color: var(--mane); background: var(--mane-soft); }
+.palette button:focus-visible, .grid button:focus-visible, .tool:focus-visible { outline: 2px solid var(--mane); outline-offset: 2px; }
+.palette i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.grid-frame { background: var(--sea); border-radius: 6px; padding: 8px; justify-self: start; max-width: 100%; }
+.grid { display: grid; grid-template-columns: repeat(8, 30px); gap: 3px; user-select: none; touch-action: none; }
+.grid button { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 3px; cursor: crosshair; position: relative; font-family: var(--font-mono); font-size: .7rem; font-weight: 600; color: #14324a; }
+.grid button.I { background: var(--ice); box-shadow: inset 0 -3px 0 var(--ice-edge); }
+.grid button.C { background: linear-gradient(135deg, var(--ice) 42%, var(--crack) 42%, var(--crack) 58%, var(--ice) 58%); box-shadow: inset 0 -3px 0 var(--ice-edge); }
+.grid button.T { background: var(--thick); box-shadow: inset 0 -5px 0 var(--ice-edge), inset 0 0 0 2px var(--ice-edge); }
+.grid button.E { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.grid button .mark { position: absolute; inset: 6px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: .62rem; }
+.grid button .mark.p { background: var(--mane); }
+.grid button .mark.b { background: var(--pink); }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.tool { font: inherit; font-size: .8rem; padding: 3px 10px; border-radius: 4px; border: 1px solid var(--line); background: none; color: var(--fg); cursor: pointer; }
+.checks { display: grid; gap: 4px; font-size: .84rem; list-style: none; padding: 0; }
+.checks li::before { content: "●"; margin-right: 6px; }
+.checks li.ok::before { color: var(--grass); }
+.checks li.warn::before { color: var(--mane); }
+.checks li.bad::before { color: var(--pink); }
+pre { margin: 0; font-family: var(--font-mono); font-size: .76rem; line-height: 1.5; background: var(--code-bg); border-radius: 6px; padding: 12px; overflow: auto; max-height: 420px; }
+
+/* phases */
+.phases { display: grid; gap: 12px; }
+.phase { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; display: grid; gap: 8px; }
+.phase-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.phase-head .num { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); }
+.phase-head h3 { flex: 1; min-width: 0; }
+.phase-head .check { font-size: .8rem; color: var(--grass); }
+.phase ul { font-size: .92rem; }
+
+/* decisions */
+.decide { display: grid; gap: 10px; }
+.q { border-left: 3px solid var(--mane); padding: 4px 0 4px 14px; display: grid; gap: 3px; }
+.q b { font-weight: 600; }
+.q .rec { font-size: .88rem; }
+.q .rec em { font-style: normal; color: var(--grass); font-weight: 600; }
+
+@media (max-width: 640px) {
+  h1 { font-size: 1.9rem; }
+  .mock-body { grid-template-columns: 1fr; }
+  .mock-left { border-right: 0; border-bottom: 1px solid var(--line); }
+  .grid { grid-template-columns: repeat(8, 26px); }
+  .grid button { width: 26px; height: 26px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header style="display:grid; gap:10px">
+    <span class="eyebrow">LionIceRun · 새 기능 계획</span>
+    <h1>얼음판 맵툴</h1>
+    <p class="lead">Unity 에디터 안의 맵툴 창에서 얼음판 모양을 칠해 JSON 파일로 저장하면, 게임이 그 파일을 읽어 얼음 타일맵으로 만든다. 지금은 가로×세로 직사각형만 만들 수 있지만, 맵툴로 구멍·섬·금 간 칸이 있는 판을 미리 디자인할 수 있게 된다.</p>
+  </header>
+
+  <section>
+    <h2>전체 흐름</h2>
+    <div class="flow" role="list">
+      <div class="node" role="listitem"><b>맵툴 창</b><span>LionIceRun &gt; 맵툴</span></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node file" role="listitem"><b>맵 JSON</b><span>StreamingAssets/Maps/*.json</span></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node" role="listitem"><b>IceGrid</b><span>게임 시작 때 읽어 블럭 생성</span></div>
+    </div>
+    <p class="hint">JSON은 사람이 읽고 git으로 비교하기 쉽게 한 줄에 한 행씩 글자로 저장한다. 맵 파일이 없거나 고르지 않으면 지금처럼 가로×세로 꽉 찬 판을 만든다.</p>
+  </section>
+
+  <section>
+    <h2>칸 종류</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>글자</th><th>칸</th><th>게임에서</th><th>단계</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">.</td><td><span class="swatch" style="background:var(--sea)"></span>빈칸 (바다)</td><td>처음부터 블럭이 없음. 서면 떨어짐. 얼음 복구 아이템으로도 안 생김</td><td>1단계</td></tr>
+        <tr><td class="sym">I</td><td><span class="swatch" style="background:var(--ice)"></span>얼음</td><td>지금 블럭과 같음 (3번 밟으면 흔들림 → 깨짐)</td><td>1단계</td></tr>
+        <tr><td class="sym">C</td><td><span class="swatch" style="background:var(--crack)"></span>금 간 얼음</td><td>"살짝 금" 단계로 시작 → 2번 만에 흔들림. 천천히 부서짐도 바로 시작</td><td>3단계</td></tr>
+        <tr><td class="sym">T</td><td><span class="swatch" style="background:var(--thick)"></span>두꺼운 얼음</td><td>멀쩡함 앞에 단계가 2개 더 있음 (5번 밟아야 흔들림). 하얀 서리 무늬로 구분</td><td>3단계</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">깨지지 않는 칸은 넣지 않는다. 블럭이 모두 결국 깨져야 "맵 위에 한 명만 남는" 순간이 반드시 오기 때문이다.</p>
+    <h3>표시 (칸 위에 얹는 것)</h3>
+    <ul>
+      <li><b>플레이어 시작 칸</b> 1개 (필수). 지금의 <code>StartCell</code>(가운데 칸)을 대신한다. 첫 이동 전까지 깨지지 않는 규칙은 그대로.</li>
+      <li><b>봇 시작 칸</b> 0개 이상. 봇 수보다 적으면 남은 봇은 지금처럼 무작위 칸에 선다.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="mock-title">
+    <h2 id="mock-title">맵툴 창 미리보기</h2>
+    <p class="hint">실제 창의 구성을 흉내 낸 예시다. 칸을 클릭하거나 드래그해서 칠하면 오른쪽에 저장될 JSON과 검사 결과가 바로 바뀐다.</p>
+    <div class="mock">
+      <div class="mock-bar">
+        <strong>맵툴 · <span id="map-name">구멍 뚫린 섬</span></strong>
+        <span class="hint">8 × 8 · 얼음 <span id="ice-count">0</span>칸</span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-left">
+          <div class="palette" role="group" aria-label="브러시">
+            <button type="button" id="brush-I" data-brush="I" aria-pressed="true"><i style="background:var(--ice)"></i>얼음</button>
+            <button type="button" id="brush-C" data-brush="C" aria-pressed="false"><i style="background:var(--crack)"></i>금 간</button>
+            <button type="button" id="brush-T" data-brush="T" aria-pressed="false"><i style="background:var(--thick); border:1px solid var(--ice-edge)"></i>두꺼운</button>
+            <button type="button" id="brush-E" data-brush="." aria-pressed="false"><i style="background:var(--sea)"></i>빈칸</button>
+            <button type="button" id="brush-P" data-brush="P" aria-pressed="false"><i style="background:var(--mane); border-radius:50%"></i>플레이어 시작</button>
+            <button type="button" id="brush-B" data-brush="B" aria-pressed="false"><i style="background:var(--pink); border-radius:50%"></i>봇 시작</button>
+          </div>
+          <div class="grid-frame"><div class="grid" id="grid" aria-label="맵 격자 (위가 +z)"></div></div>
+          <div class="tools">
+            <button type="button" class="tool" id="tool-mirror" aria-pressed="false">좌우 대칭 그리기: 끔</button>
+            <button type="button" class="tool" id="tool-fill">모두 얼음</button>
+            <button type="button" class="tool" id="tool-reset">예시로 되돌리기</button>
+          </div>
+          <ul class="checks" id="checks" aria-live="polite"></ul>
+        </div>
+        <div class="mock-right">
+          <span class="eyebrow">저장될 JSON</span>
+          <pre id="json"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>JSON 형식</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>키</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">version</td><td>형식 번호 (지금 1). 나중에 형식이 바뀌어도 예전 파일을 읽을 수 있게</td></tr>
+        <tr><td class="sym">name</td><td>맵 이름 (화면·목록 표시용). 파일 이름은 영어로 따로 (<code>holey_island.json</code>)</td></tr>
+        <tr><td class="sym">width / depth</td><td>가로(x) / 세로(z) 칸 수. 1~16</td></tr>
+        <tr><td class="sym">rows</td><td>한 행에 한 글자열. <code>rows[0]</code>이 맵툴 화면의 맨 위 행 (= z가 가장 큰 행), 글자 순서는 x 0부터</td></tr>
+        <tr><td class="sym">playerStart</td><td><code>{"x":3,"y":3}</code> (y가 z 칸 번호. Unity <code>Vector2Int</code> 그대로)</td></tr>
+        <tr><td class="sym">botStarts</td><td>같은 형식의 목록</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">Unity 기본 <code>JsonUtility</code>로 읽고 쓴다 (추가 패키지 없음). 칸 크기·간격·얼음 깨짐 수치는 맵에 넣지 않고 지금처럼 IceGrid Inspector 값을 쓴다.</p>
+  </section>
+
+  <section>
+    <h2>코드 변경</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>파일</th><th>할 일</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">MapData.cs <span class="hint">(새)</span></td><td>JSON과 같은 모양의 클래스. 읽기·쓰기, 칸 종류 확인, 기본 맵(꽉 찬 직사각형) 만들기</td></tr>
+        <tr><td class="sym">IceGrid.cs</td><td>Inspector에 <b>Map File</b>(맵 목록 드롭다운). 비어 있으면 지금처럼. 빈칸은 블럭을 안 만듦. <code>GetBlock</code>을 2차원 배열로 바꿈 (지금은 꽉 찬 판을 가정해 <code>x * depth + z</code> 순번으로 찾음 → 빈칸이 있으면 어긋남). <code>StartCell</code>은 맵의 플레이어 시작 칸</td></tr>
+        <tr><td class="sym">IceBlock.cs</td><td><code>Init</code>에 시작 단계(금 간 얼음)와 추가 단계 수(두꺼운 얼음). 두꺼운 얼음의 서리 표시</td></tr>
+        <tr><td class="sym">BotManager.cs</td><td>봇 첫 위치에 맵의 봇 시작 칸 먼저 사용</td></tr>
+        <tr><td class="sym">Editor/MapEditorWindow.cs <span class="hint">(새)</span></td><td>맵툴 창 (메뉴 <b>LionIceRun &gt; 맵툴</b>)</td></tr>
+        <tr><td class="sym">그대로 동작</td><td>카메라·바다 크기(가로×세로 기준), 다시 들어오기·아이템·시련(멀쩡한 블럭 목록 기준), 봇 길 찾기(<code>GetBlock</code>이 빈칸에 null), 남은 얼음 수 표시</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>맵툴 창 기능</h2>
+    <ul>
+      <li><b>파일</b>: 새로 만들기, 불러오기(맵 목록), 저장, 다른 이름으로 저장, 삭제. 저장 안 한 변경이 있으면 제목에 * 표시</li>
+      <li><b>크기</b>: 가로·세로 1~16. 바꿔도 이미 칠한 칸은 가운데 기준으로 유지</li>
+      <li><b>칠하기</b>: 브러시 고르고 왼쪽 클릭·드래그, 오른쪽 클릭은 빈칸으로. 채우기(이어진 같은 칸 한 번에), 모두 얼음 / 모두 비우기</li>
+      <li><b>대칭 그리기</b>: 좌우 / 상하 / 4방향. 공정한 맵을 빨리 만들기 위해</li>
+      <li><b>되돌리기</b>: Ctrl+Z / Ctrl+Y (Unity Undo 사용)</li>
+      <li><b>검사</b>: 저장 전에 자동으로. 문제가 있어도 저장은 되지만 빨간 줄로 알림 (아래 표)</li>
+      <li><b>씬에 미리보기</b>: 지금 씬의 IceGrid에 이 맵을 지정하고 블럭을 미리 만들어 보여 줌</li>
+      <li><b>이 맵으로 플레이</b>: 지정한 뒤 바로 Play 모드 시작</li>
+    </ul>
+    <div class="table-scroll"><table>
+      <thead><tr><th>검사</th><th>등급</th></tr></thead>
+      <tbody>
+        <tr><td>플레이어 시작 칸이 없거나 빈칸 위에 있음</td><td>오류</td></tr>
+        <tr><td>얼음 칸이 (봇 수 + 1) × 3칸보다 적음</td><td>오류</td></tr>
+        <tr><td>점프(빈칸 1개)로도 갈 수 없는 떨어진 섬이 있음</td><td>경고</td></tr>
+        <tr><td>봇 시작 칸이 겹치거나 플레이어 시작 칸 바로 옆</td><td>경고</td></tr>
+        <tr><td>봇 시작 칸이 봇 수보다 적음 (남은 봇은 무작위)</td><td>알림</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>단계</h2>
+    <p class="hint">CLAUDE.md 규칙대로 단계마다 사용자가 직접 확인한 뒤 다음으로 넘어간다.</p>
+    <div class="phases">
+      <article class="phase">
+        <div class="phase-head"><span class="num">1단계</span><h3>맵 데이터와 불러오기</h3></div>
+        <ul>
+          <li><code>MapData</code> + JSON 읽기·쓰기, <code>StreamingAssets/Maps/</code> 폴더</li>
+          <li>IceGrid가 맵을 읽어 판 만들기 (빈칸 지원), <code>GetBlock</code> 2차원 배열로</li>
+          <li>기본 맵 2개를 코드로 만들어 둠: <code>default_6x6.json</code>(지금과 같은 판), <code>holey_island.json</code>(구멍 있는 예시)</li>
+        </ul>
+        <p class="hint">확인: 기본 맵이 지금과 똑같이 플레이되는지, 예시 맵에서 구멍·봇·다시 들어오기가 맞는지</p>
+      </article>
+      <article class="phase">
+        <div class="phase-head"><span class="num">2단계</span><h3>맵툴 창</h3></div>
+        <ul>
+          <li>파일·크기·칠하기·채우기·대칭·되돌리기</li>
+          <li>검사, 씬에 미리보기, 이 맵으로 플레이</li>
+        </ul>
+        <p class="hint">확인: 새 맵을 그려 저장하고 게임에서 그 모양대로 나오는지</p>
+      </article>
+      <article class="phase">
+        <div class="phase-head"><span class="num">3단계</span><h3>칸 종류 늘리기</h3></div>
+        <ul>
+          <li>금 간 얼음, 두꺼운 얼음 (게임 동작 + 겉모습 + 맵툴 브러시)</li>
+          <li>봇 시작 칸을 BotManager에 연결</li>
+        </ul>
+      </article>
+      <article class="phase">
+        <div class="phase-head"><span class="num">4단계</span><h3>게임에서 맵 고르기</h3></div>
+        <ul>
+          <li>지금은 IceGrid Inspector의 Map File로 고름</li>
+          <li>나중에 "추가 UI"의 타이틀 화면에 맵 선택을 붙임 (고른 맵은 PlayerPrefs에 기억)</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>정해 주세요</h2>
+    <div class="decide">
+      <div class="q"><b>1. 칸 종류</b><span class="rec">추천: <em>빈칸 · 얼음 · 금 간 얼음 · 두꺼운 얼음</em>. 높낮이가 다른 블럭이나 깨지지 않는 칸은 이번엔 빼기</span></div>
+      <div class="q"><b>2. 저장 위치</b><span class="rec">추천: <em>Assets/StreamingAssets/Maps</em>. 빌드한 게임 폴더에도 JSON 그대로 들어가서, 빌드 뒤에 맵 파일만 추가하거나 고칠 수 있음 (대신 Resources 폴더는 빌드 안에 묶여서 못 바꿈)</span></div>
+      <div class="q"><b>3. 편집 화면</b><span class="rec">추천: <em>별도 맵툴 창</em>에서 위에서 본 격자로 칠하기. 씬 뷰에서 블럭을 직접 클릭해 칠하는 방식은 나중에 필요하면</span></div>
+      <div class="q"><b>4. 최대 크기</b><span class="rec">추천: <em>16 × 16</em>. 카메라가 전체를 보여 줄 때 블럭이 너무 작아지지 않는 정도</span></div>
+      <div class="q"><b>5. 맵 고르는 방법</b><span class="rec">추천: <em>지금은 Inspector</em>, 맵 선택 화면은 타이틀 화면을 만들 때 같이</span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const W = 8, D = 8;
+  // 예시 맵: rows[0]이 맨 위(z = D-1)
+  const sample = {
+    rows: ["..IIII..", ".IITTII.", "IICIICII", "IIT..TII", "IIT..TII", "IICIICII", ".IITTII.", "..IIII.."],
+    player: { x: 3, y: 2 },
+    bots: [{ x: 1, y: 3 }, { x: 6, y: 3 }, { x: 3, y: 6 }]
+  };
+  let cells, player, bots, brush = "I", mirror = false, painting = false;
+
+  function load(src) {
+    cells = src.rows.map(r => r.split(""));
+    player = src.player ? { ...src.player } : null;
+    bots = src.bots.map(b => ({ ...b }));
+  }
+  // 화면 행 r → z = D-1-r
+  const at = (x, z) => cells[D - 1 - z][x];
+  const set = (x, z, v) => { cells[D - 1 - z][x] = v; };
+  const same = (a, b) => a && b && a.x === b.x && a.y === b.y;
+
+  const grid = document.getElementById("grid");
+  const btns = [];
+  for (let r = 0; r < D; r++) for (let x = 0; x < W; x++) {
+    const z = D - 1 - r;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.x = x; b.dataset.z = z;
+    b.setAttribute("aria-label", `칸 x${x} z${z}`);
+    grid.appendChild(b);
+    btns.push(b);
+  }
+
+  function paintCell(x, z) {
+    const targets = [[x, z]];
+    if (mirror) targets.push([W - 1 - x, z]);
+    for (const [cx, cz] of targets) {
+      if (brush === "P") { player = { x: cx, y: cz }; if (at(cx, cz) === ".") set(cx, cz, "I"); }
+      else if (brush === "B") {
+        const i = bots.findIndex(b => b.x === cx && b.y === cz);
+        if (i >= 0) bots.splice(i, 1); else { bots.push({ x: cx, y: cz }); if (at(cx, cz) === ".") set(cx, cz, "I"); }
+      } else {
+        set(cx, cz, brush);
+        if (brush === ".") { if (same(player, { x: cx, y: cz })) player = null; bots = bots.filter(b => !(b.x === cx && b.y === cz)); }
+      }
+      if (brush === "P" || brush === "B") break; // 표시는 대칭으로 복사하지 않음
+    }
+    render();
+  }
+
+  grid.addEventListener("pointerdown", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    painting = brush !== "P" && brush !== "B";
+    paintCell(+b.dataset.x, +b.dataset.z);
+  });
+  grid.addEventListener("pointerover", e => {
+    if (!painting) return;
+    const b = e.target.closest("button"); if (b) paintCell(+b.dataset.x, +b.dataset.z);
+  });
+  window.addEventListener("pointerup", () => { painting = false; });
+  grid.addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.closest("button")) { e.preventDefault(); const b = e.target; paintCell(+b.dataset.x, +b.dataset.z); }
+  });
+
+  document.querySelectorAll(".palette button").forEach(p => p.addEventListener("click", () => {
+    brush = p.dataset.brush;
+    document.querySelectorAll(".palette button").forEach(o => o.setAttribute("aria-pressed", o === p ? "true" : "false"));
+  }));
+  const mirrorBtn = document.getElementById("tool-mirror");
+  mirrorBtn.addEventListener("click", () => {
+    mirror = !mirror;
+    mirrorBtn.setAttribute("aria-pressed", mirror);
+    mirrorBtn.textContent = "좌우 대칭 그리기: " + (mirror ? "켬" : "끔");
+  });
+  document.getElementById("tool-fill").addEventListener("click", () => { cells = cells.map(r => r.map(() => "I")); render(); });
+  document.getElementById("tool-reset").addEventListener("click", () => { load(sample); render(); });
+
+  const walkable = (x, z) => x >= 0 && z >= 0 && x < W && z < D && at(x, z) !== ".";
+
+  function checks() {
+    const out = [];
+    let ice = 0;
+    for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) if (walkable(x, z)) ice++;
+    const botCount = 3;
+    if (!player) out.push(["bad", "플레이어 시작 칸이 없어요"]);
+    else out.push(["ok", `플레이어 시작 칸 (${player.x}, ${player.y})`]);
+    if (ice < (botCount + 1) * 3) out.push(["bad", `얼음이 ${ice}칸뿐이에요 (봇 ${botCount}마리 기준 최소 ${(botCount + 1) * 3}칸)`]);
+    // 걷기 + 빈칸 1개 점프로 닿는 칸 (봇 길 찾기와 같은 규칙)
+    if (player && ice > 0) {
+      const seen = new Set([player.x + "," + player.y]), q = [[player.x, player.y]];
+      while (q.length) {
+        const [x, z] = q.shift();
+        for (const [dx, dz] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          for (const k of [1, 2]) {
+            const nx = x + dx * k, nz = z + dz * k;
+            if (k === 2 && walkable(x + dx, z + dz)) continue;
+            if (!walkable(nx, nz) || seen.has(nx + "," + nz)) continue;
+            seen.add(nx + "," + nz); q.push([nx, nz]);
+          }
+        }
+      }
+      if (seen.size < ice) out.push(["warn", `점프로도 못 가는 떨어진 칸이 ${ice - seen.size}개 있어요`]);
+      else out.push(["ok", "모든 얼음 칸이 이어져 있어요"]);
+    }
+    const near = bots.filter(b => player && Math.abs(b.x - player.x) <= 1 && Math.abs(b.y - player.y) <= 1);
+    if (near.length) out.push(["warn", "봇 시작 칸이 플레이어 바로 옆에 있어요"]);
+    if (bots.length < botCount) out.push(["warn", `봇 시작 칸 ${bots.length}개 (봇 ${botCount}마리 중 나머지는 무작위)`]);
+    else out.push(["ok", `봇 시작 칸 ${bots.length}개`]);
+    return { out, ice };
+  }
+
+  function render() {
+    btns.forEach(b => {
+      const x = +b.dataset.x, z = +b.dataset.z, c = at(x, z);
+      b.className = c === "." ? "E" : c;
+      b.innerHTML = same(player, { x, y: z }) ? '<span class="mark p">P</span>'
+        : bots.some(o => o.x === x && o.y === z) ? '<span class="mark b">B</span>' : "";
+    });
+    const { out, ice } = checks();
+    document.getElementById("ice-count").textContent = ice;
+    document.getElementById("checks").innerHTML = out.map(([k, t]) => `<li class="${k}">${t}</li>`).join("");
+    const data = {
+      version: 1,
+      name: document.getElementById("map-name").textContent,
+      width: W, depth: D,
+      rows: cells.map(r => r.join("")),
+      playerStart: player || { x: -1, y: -1 },
+      botStarts: bots
+    };
+    document.getElementById("json").textContent = JSON.stringify(data, null, 2)
+      .replace(/\{\n\s+"x": (-?\d+),\n\s+"y": (-?\d+)\n\s+\}/g, '{ "x": $1, "y": $2 }');
+  }
+
+  load(sample);
+  render();
+})();
+</script>
