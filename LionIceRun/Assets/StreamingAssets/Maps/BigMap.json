@@ -1,6 +1,10 @@
 {
     "version": 1,
-    "name": "대빙원",
+    "name": "새 맵",
+    "archived": false,
+    "theme": "",
+    "description": "",
+    "gimmicks": [],
     "width": 15,
     "depth": 15,
     "rows": [

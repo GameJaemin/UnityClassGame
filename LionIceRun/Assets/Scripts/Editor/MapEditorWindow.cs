@@ -8,7 +8,7 @@ using UnityEngine;
 //  - 파일: 새로 만들기, 불러오기, 저장, 다른 이름으로 저장, 휴지통으로 삭제. 저장 안 한 변경이 있으면 제목에 *
 //  - 크기: 가로·세로 1~16 (바꿔도 칠한 칸은 가운데 기준으로 유지)
 //  - 칠하기: 브러시를 고르고 왼쪽 클릭·드래그, 오른쪽 클릭·드래그는 빈칸. 채우기 도구는 이어진 같은 칸을 한 번에
-//    브러시 단축키 1~6, 칠하기 P / 채우기 F
+//    브러시 단축키 1~7 (7은 안전지대), 칠하기 P / 채우기 F
 //  - 대칭 그리기: 좌우 / 상하 / 4방향 (칸 종류만, 시작 칸 표시는 대칭 안 함)
 //  - 되돌리기: Ctrl+Z / Ctrl+Y (Unity Undo)
 //  - 검사: 시작 칸, 얼음 칸 수, 점프로도 못 가는 떨어진 섬, 봇 시작 칸
@@ -16,7 +16,7 @@ using UnityEngine;
 // 화면 방향: 위가 +z, 오른쪽이 +x (게임 카메라는 45도 돌아가 있음)
 public class MapEditorWindow : EditorWindow
 {
-    enum Brush { Ice, Cracked, Thick, Empty, PlayerStart, BotStart }
+    enum Brush { Ice, Cracked, Thick, Empty, PlayerStart, BotStart, Safe }
     enum Tool { Paint, Fill }
     enum Mirror { None, LeftRight, TopBottom, FourWay }
 
@@ -28,6 +28,7 @@ public class MapEditorWindow : EditorWindow
         (Brush.Empty, "빈칸 (바다)", MapData.Empty, new Color(0.13f, 0.30f, 0.46f)),
         (Brush.PlayerStart, "플레이어 시작", '\0', new Color(0.85f, 0.54f, 0.04f)),
         (Brush.BotStart, "봇 시작", '\0', new Color(0.88f, 0.33f, 0.56f)),
+        (Brush.Safe, "이동 안전지대 시작", MapData.Safe, new Color(0.25f, 0.95f, 0.6f)),
     };
 
     static readonly Color GridBack = new Color(0.08f, 0.20f, 0.32f);
@@ -106,6 +107,7 @@ public class MapEditorWindow : EditorWindow
         sideScroll = EditorGUILayout.BeginScrollView(sideScroll, GUILayout.Width(260));
         DrawFilePanel();
         DrawSizePanel();
+        DrawGimmickPanel();
         DrawBrushPanel();
         DrawChecksPanel();
         DrawScenePanel();
@@ -115,6 +117,20 @@ public class MapEditorWindow : EditorWindow
         DrawGrid(area);
         EditorGUILayout.EndHorizontal();
         UpdateTitle();
+    }
+
+    void DrawGimmickPanel()
+    {
+        EditorGUILayout.LabelField("레벨 기믹", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("move 왕복 / rotate 회전 / piston 밀침 / sweeper 막대 / conveyor 흐름. 좌표와 크기는 칸 단위입니다. 플레이에서 생성됩니다.", MessageType.Info);
+        var serialized = new SerializedObject(state);
+        serialized.Update();
+        var map = serialized.FindProperty("map");
+        EditorGUILayout.PropertyField(map.FindPropertyRelative("archived"), new GUIContent("선택 목록에서 보관"));
+        EditorGUILayout.PropertyField(map.FindPropertyRelative("theme"), new GUIContent("테마"));
+        EditorGUILayout.PropertyField(map.FindPropertyRelative("description"), new GUIContent("플레이 안내"));
+        EditorGUILayout.PropertyField(map.FindPropertyRelative("gimmicks"), new GUIContent("기믹 목록"), true);
+        serialized.ApplyModifiedProperties();
     }
 
     void DrawFilePanel()
@@ -279,7 +295,7 @@ public class MapEditorWindow : EditorWindow
     {
         Event e = Event.current;
         if (e.type != EventType.KeyDown || EditorGUIUtility.editingTextField) return;
-        if (e.keyCode >= KeyCode.Alpha1 && e.keyCode <= KeyCode.Alpha6) brush = (Brush)(e.keyCode - KeyCode.Alpha1);
+        if (e.keyCode >= KeyCode.Alpha1 && e.keyCode <= KeyCode.Alpha7) brush = (Brush)(e.keyCode - KeyCode.Alpha1);
         else if (e.keyCode == KeyCode.P) tool = Tool.Paint;
         else if (e.keyCode == KeyCode.F) tool = Tool.Fill;
         else return;
@@ -432,6 +448,9 @@ public class MapEditorWindow : EditorWindow
         MapData old = MapData.FromJson(Map.ToJson());
         Vector2Int offset = new Vector2Int((width - old.width) / 2, (depth - old.depth) / 2);
         MapData resized = MapData.Filled(old.name, width, depth);
+        resized.theme = old.theme; resized.description = old.description;
+        resized.archived = old.archived; resized.gimmicks = old.gimmicks;
+        foreach (var gimmick in resized.gimmicks) { gimmick.x += offset.x; gimmick.z += offset.y; }
         for (int x = 0; x < width; x++)
             for (int z = 0; z < depth; z++)
             {

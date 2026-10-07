@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "name": "해머 교차로",
+  "theme": "factory",
+  "description": "네 방향에서 흔들리는 큰 해머. 해머가 멀어지는 순간 교차로를 건너고 대피 칸으로 빠져요.",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III..III..III.",
+    ".III..III..ISI.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".ISI..III..III.",
+    ".III..III..III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    "..............."
+  ],
+  "playerStart": {
+    "x": 2,
+    "y": 2
+  },
+  "botStarts": [
+    {
+      "x": 12,
+      "y": 2
+    },
+    {
+      "x": 2,
+      "y": 12
+    },
+    {
+      "x": 12,
+      "y": 12
+    }
+  ],
+  "gimmicks": [
+    {
+      "kind": "pendulum",
+      "x": 5,
+      "z": 7,
+      "width": 1.2,
+      "depth": 1,
+      "period": 5,
+      "tiltAngle": 60,
+      "angle": 0,
+      "hitSpeed": 10
+    },
+    {
+      "kind": "pendulum",
+      "x": 9,
+      "z": 7,
+      "width": 1.2,
+      "depth": 1,
+      "period": 5,
+      "phase": 2.5,
+      "tiltAngle": 60,
+      "angle": 0,
+      "hitSpeed": 10
+    },
+    {
+      "kind": "pendulum",
+      "x": 7,
+      "z": 5,
+      "width": 1.2,
+      "depth": 1,
+      "period": 6,
+      "tiltAngle": 55,
+      "angle": 90,
+      "hitSpeed": 9
+    },
+    {
+      "kind": "pendulum",
+      "x": 7,
+      "z": 9,
+      "width": 1.2,
+      "depth": 1,
+      "period": 6,
+      "phase": 3,
+      "tiltAngle": 55,
+      "angle": 90,
+      "hitSpeed": 9
+    }
+  ]
+}

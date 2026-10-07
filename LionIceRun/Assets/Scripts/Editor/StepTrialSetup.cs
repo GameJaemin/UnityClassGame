@@ -26,7 +26,7 @@ public static class StepTrialSetup
         }
 
         Undo.RecordObjects(new Object[] { wind, spawner }, "바람·아이템 밸런스 적용");
-        wind.strength = 9f;
+        wind.strength = 22f;
         spawner.firstSpawnTime = 6f;
         spawner.interval = 7f;
         EditorUtility.SetDirty(wind);
@@ -35,7 +35,7 @@ public static class StepTrialSetup
         EditorSceneManager.MarkSceneDirty(spawner.gameObject.scene);
         EditorSceneManager.SaveOpenScenes();
         Selection.activeGameObject = wind.gameObject;
-        Debug.Log("바람·아이템 밸런스 적용 완료: 바람 힘 9, 아이템 첫 등장 6초, 획득·소멸 후 다음 등장 7초.");
+        Debug.Log("바람·아이템 밸런스 적용 완료: 바람 힘 22, 아이템 첫 등장 6초, 획득·소멸 후 다음 등장 7초.");
     }
 
     [MenuItem("LionIceRun/바람·아이템 밸런스 적용", true)]

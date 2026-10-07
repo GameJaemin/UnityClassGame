@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "name": "장난감 균형 정원",
+  "theme": "garden",
+  "description": "시소 지름길과 반짝 다리, 중앙 해머를 함께 피하는 생존 정원. 길 끝의 작은 섬에서 쉬어 가요.",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "...............",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".III.......III.",
+    ".III...I...III.",
+    ".III...IIIIISI.",
+    ".III...IIIIIII.",
+    ".III..III..III.",
+    ".IIIIIII...III.",
+    ".ISIIIII...III.",
+    ".III...I...III.",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".III.......III.",
+    "..............."
+  ],
+  "playerStart": {
+    "x": 2,
+    "y": 2
+  },
+  "botStarts": [
+    {
+      "x": 12,
+      "y": 2
+    },
+    {
+      "x": 2,
+      "y": 12
+    },
+    {
+      "x": 12,
+      "y": 12
+    }
+  ],
+  "gimmicks": [
+    {
+      "kind": "seesaw",
+      "x": 5,
+      "z": 5.5,
+      "width": 3,
+      "depth": 2,
+      "period": 6,
+      "tiltAngle": 22
+    },
+    {
+      "kind": "blink",
+      "x": 9,
+      "z": 8.5,
+      "width": 3,
+      "depth": 2,
+      "period": 7,
+      "activeDuration": 4.5
+    },
+    {
+      "kind": "pendulum",
+      "x": 7,
+      "z": 7,
+      "width": 1,
+      "depth": 1,
+      "period": 5.5,
+      "tiltAngle": 50,
+      "angle": 90
+    }
+  ]
+}

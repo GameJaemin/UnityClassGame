@@ -68,6 +68,14 @@ public class CharacterAnimator : MonoBehaviour
         // 모델의 추가 동작을 기준 자세로 되돌려, 동작 종료나 부활 뒤에 기울기가 남지 않게 한다.
         animator.transform.localPosition = modelRestPosition;
         animator.transform.localRotation = modelRestRotation;
+        if (player.State == PlayerController.MoveState.KnockedDown && player.HorizontalSpeed > 1f)
+        {
+            Vector3 sliding = transform.InverseTransformDirection(player.Velocity);
+            float impactLean = Mathf.Clamp(player.HorizontalSpeed * 3f, 8f, 30f);
+            animator.transform.localRotation = modelRestRotation * Quaternion.Euler(
+                -Mathf.Sign(sliding.z) * impactLean, 0, Mathf.Sign(sliding.x) * impactLean);
+            return;
+        }
         float t = Time.time - player.LastPushTime;
         if (player.State != PlayerController.MoveState.Normal || t < 0f || t > pushPoseTime) return;
 

@@ -1,0 +1,233 @@
+PASS 10초 유지·2초 보간
+PASS 이동 전·후 안전 색 보간
+PASS BigMap.json 안전 시작 칸 없는 사용자 맵 유지
+PASS candy_carousel.json 안전 경로 두 개
+PASS candy_carousel.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS candy_carousel.json 안전 경로 겹침 없음
+PASS candy_carousel.json 다음 위치 파괴 준비
+PASS candy_carousel.json 10초 직전까지 보호
+PASS candy_carousel.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS candy_carousel.json 떠난 칸 다시 금감
+PASS candy_carousel.json 새 위치 보호
+PASS candy_carousel.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS candy_carousel.json 안전 경로 겹침 없음
+PASS candy_carousel.json 다음 위치 파괴 준비
+PASS candy_carousel.json 10초 직전까지 보호
+PASS candy_carousel.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS candy_carousel.json 떠난 칸 다시 금감
+PASS candy_carousel.json 새 위치 보호
+PASS candy_carousel.json 경로 반복
+PASS candy_carousel.json 클라이언트 보호 예측 금지
+PASS candy_carousel.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS candy_carousel.json 이전 안전 칸 원격 파괴 적용
+PASS clockwork_floe.json 안전 경로 두 개
+PASS clockwork_floe.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS clockwork_floe.json 안전 경로 겹침 없음
+PASS clockwork_floe.json 다음 위치 파괴 준비
+PASS clockwork_floe.json 10초 직전까지 보호
+PASS clockwork_floe.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS clockwork_floe.json 떠난 칸 다시 금감
+PASS clockwork_floe.json 새 위치 보호
+PASS clockwork_floe.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS clockwork_floe.json 안전 경로 겹침 없음
+PASS clockwork_floe.json 다음 위치 파괴 준비
+PASS clockwork_floe.json 10초 직전까지 보호
+PASS clockwork_floe.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS clockwork_floe.json 떠난 칸 다시 금감
+PASS clockwork_floe.json 새 위치 보호
+PASS clockwork_floe.json 경로 반복
+PASS clockwork_floe.json 클라이언트 보호 예측 금지
+PASS clockwork_floe.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS clockwork_floe.json 이전 안전 칸 원격 파괴 적용
+PASS conveyor_docks.json 안전 경로 두 개
+PASS conveyor_docks.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS conveyor_docks.json 안전 경로 겹침 없음
+PASS conveyor_docks.json 다음 위치 파괴 준비
+PASS conveyor_docks.json 10초 직전까지 보호
+PASS conveyor_docks.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS conveyor_docks.json 떠난 칸 다시 금감
+PASS conveyor_docks.json 새 위치 보호
+PASS conveyor_docks.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS conveyor_docks.json 안전 경로 겹침 없음
+PASS conveyor_docks.json 다음 위치 파괴 준비
+PASS conveyor_docks.json 10초 직전까지 보호
+PASS conveyor_docks.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS conveyor_docks.json 떠난 칸 다시 금감
+PASS conveyor_docks.json 새 위치 보호
+PASS conveyor_docks.json 경로 반복
+PASS conveyor_docks.json 클라이언트 보호 예측 금지
+PASS conveyor_docks.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS conveyor_docks.json 이전 안전 칸 원격 파괴 적용
+PASS default_6x6.json 안전 경로 두 개
+PASS default_6x6.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS default_6x6.json 안전 경로 겹침 없음
+PASS default_6x6.json 다음 위치 파괴 준비
+PASS default_6x6.json 10초 직전까지 보호
+PASS default_6x6.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS default_6x6.json 떠난 칸 다시 금감
+PASS default_6x6.json 새 위치 보호
+PASS default_6x6.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS default_6x6.json 안전 경로 겹침 없음
+PASS default_6x6.json 다음 위치 파괴 준비
+PASS default_6x6.json 10초 직전까지 보호
+PASS default_6x6.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS default_6x6.json 떠난 칸 다시 금감
+PASS default_6x6.json 새 위치 보호
+PASS default_6x6.json 경로 반복
+PASS default_6x6.json 클라이언트 보호 예측 금지
+PASS default_6x6.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS default_6x6.json 이전 안전 칸 원격 파괴 적용
+PASS four_outposts.json 안전 경로 두 개
+PASS four_outposts.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS four_outposts.json 안전 경로 겹침 없음
+PASS four_outposts.json 다음 위치 파괴 준비
+PASS four_outposts.json 10초 직전까지 보호
+PASS four_outposts.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS four_outposts.json 떠난 칸 다시 금감
+PASS four_outposts.json 새 위치 보호
+PASS four_outposts.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS four_outposts.json 안전 경로 겹침 없음
+PASS four_outposts.json 다음 위치 파괴 준비
+PASS four_outposts.json 10초 직전까지 보호
+PASS four_outposts.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS four_outposts.json 떠난 칸 다시 금감
+PASS four_outposts.json 새 위치 보호
+PASS four_outposts.json 경로 반복
+PASS four_outposts.json 클라이언트 보호 예측 금지
+PASS four_outposts.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS four_outposts.json 이전 안전 칸 원격 파괴 적용
+PASS frost_ring.json 안전 경로 두 개
+PASS frost_ring.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS frost_ring.json 안전 경로 겹침 없음
+PASS frost_ring.json 다음 위치 파괴 준비
+PASS frost_ring.json 10초 직전까지 보호
+PASS frost_ring.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS frost_ring.json 떠난 칸 다시 금감
+PASS frost_ring.json 새 위치 보호
+PASS frost_ring.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS frost_ring.json 안전 경로 겹침 없음
+PASS frost_ring.json 다음 위치 파괴 준비
+PASS frost_ring.json 10초 직전까지 보호
+PASS frost_ring.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS frost_ring.json 떠난 칸 다시 금감
+PASS frost_ring.json 새 위치 보호
+PASS frost_ring.json 경로 반복
+PASS frost_ring.json 클라이언트 보호 예측 금지
+PASS frost_ring.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS frost_ring.json 이전 안전 칸 원격 파괴 적용
+PASS harbor_ferries.json 안전 경로 두 개
+PASS harbor_ferries.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS harbor_ferries.json 안전 경로 겹침 없음
+PASS harbor_ferries.json 다음 위치 파괴 준비
+PASS harbor_ferries.json 10초 직전까지 보호
+PASS harbor_ferries.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS harbor_ferries.json 떠난 칸 다시 금감
+PASS harbor_ferries.json 새 위치 보호
+PASS harbor_ferries.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS harbor_ferries.json 안전 경로 겹침 없음
+PASS harbor_ferries.json 다음 위치 파괴 준비
+PASS harbor_ferries.json 10초 직전까지 보호
+PASS harbor_ferries.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS harbor_ferries.json 떠난 칸 다시 금감
+PASS harbor_ferries.json 새 위치 보호
+PASS harbor_ferries.json 경로 반복
+PASS harbor_ferries.json 클라이언트 보호 예측 금지
+PASS harbor_ferries.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS harbor_ferries.json 이전 안전 칸 원격 파괴 적용
+PASS hourglass_glacier.json 안전 경로 두 개
+PASS hourglass_glacier.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS hourglass_glacier.json 안전 경로 겹침 없음
+PASS hourglass_glacier.json 다음 위치 파괴 준비
+PASS hourglass_glacier.json 10초 직전까지 보호
+PASS hourglass_glacier.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS hourglass_glacier.json 떠난 칸 다시 금감
+PASS hourglass_glacier.json 새 위치 보호
+PASS hourglass_glacier.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS hourglass_glacier.json 안전 경로 겹침 없음
+PASS hourglass_glacier.json 다음 위치 파괴 준비
+PASS hourglass_glacier.json 10초 직전까지 보호
+PASS hourglass_glacier.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS hourglass_glacier.json 떠난 칸 다시 금감
+PASS hourglass_glacier.json 새 위치 보호
+PASS hourglass_glacier.json 경로 반복
+PASS hourglass_glacier.json 클라이언트 보호 예측 금지
+PASS hourglass_glacier.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS hourglass_glacier.json 이전 안전 칸 원격 파괴 적용
+PASS piston_pass.json 안전 경로 두 개
+PASS piston_pass.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS piston_pass.json 안전 경로 겹침 없음
+PASS piston_pass.json 다음 위치 파괴 준비
+PASS piston_pass.json 10초 직전까지 보호
+PASS piston_pass.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS piston_pass.json 떠난 칸 다시 금감
+PASS piston_pass.json 새 위치 보호
+PASS piston_pass.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS piston_pass.json 안전 경로 겹침 없음
+PASS piston_pass.json 다음 위치 파괴 준비
+PASS piston_pass.json 10초 직전까지 보호
+PASS piston_pass.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS piston_pass.json 떠난 칸 다시 금감
+PASS piston_pass.json 새 위치 보호
+PASS piston_pass.json 경로 반복
+PASS piston_pass.json 클라이언트 보호 예측 금지
+PASS piston_pass.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS piston_pass.json 이전 안전 칸 원격 파괴 적용
+PASS polar_foundry.json 안전 경로 두 개
+PASS polar_foundry.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS polar_foundry.json 안전 경로 겹침 없음
+PASS polar_foundry.json 다음 위치 파괴 준비
+PASS polar_foundry.json 10초 직전까지 보호
+PASS polar_foundry.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS polar_foundry.json 떠난 칸 다시 금감
+PASS polar_foundry.json 새 위치 보호
+PASS polar_foundry.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS polar_foundry.json 안전 경로 겹침 없음
+PASS polar_foundry.json 다음 위치 파괴 준비
+PASS polar_foundry.json 10초 직전까지 보호
+PASS polar_foundry.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS polar_foundry.json 떠난 칸 다시 금감
+PASS polar_foundry.json 새 위치 보호
+PASS polar_foundry.json 경로 반복
+PASS polar_foundry.json 클라이언트 보호 예측 금지
+PASS polar_foundry.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS polar_foundry.json 이전 안전 칸 원격 파괴 적용
+PASS tidal_shuttles.json 안전 경로 두 개
+PASS tidal_shuttles.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS tidal_shuttles.json 안전 경로 겹침 없음
+PASS tidal_shuttles.json 다음 위치 파괴 준비
+PASS tidal_shuttles.json 10초 직전까지 보호
+PASS tidal_shuttles.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS tidal_shuttles.json 떠난 칸 다시 금감
+PASS tidal_shuttles.json 새 위치 보호
+PASS tidal_shuttles.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS tidal_shuttles.json 안전 경로 겹침 없음
+PASS tidal_shuttles.json 다음 위치 파괴 준비
+PASS tidal_shuttles.json 10초 직전까지 보호
+PASS tidal_shuttles.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS tidal_shuttles.json 떠난 칸 다시 금감
+PASS tidal_shuttles.json 새 위치 보호
+PASS tidal_shuttles.json 경로 반복
+PASS tidal_shuttles.json 클라이언트 보호 예측 금지
+PASS tidal_shuttles.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS tidal_shuttles.json 이전 안전 칸 원격 파괴 적용
+PASS windmill_well.json 안전 경로 두 개
+PASS windmill_well.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS windmill_well.json 안전 경로 겹침 없음
+PASS windmill_well.json 다음 위치 파괴 준비
+PASS windmill_well.json 10초 직전까지 보호
+PASS windmill_well.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS windmill_well.json 떠난 칸 다시 금감
+PASS windmill_well.json 새 위치 보호
+PASS windmill_well.json 빈칸을 건너뛰지 않는 인접 순환 경로
+PASS windmill_well.json 안전 경로 겹침 없음
+PASS windmill_well.json 다음 위치 파괴 준비
+PASS windmill_well.json 10초 직전까지 보호
+PASS windmill_well.json 10초 이동·파괴 칸 복구·콜라이더 활성
+PASS windmill_well.json 떠난 칸 다시 금감
+PASS windmill_well.json 새 위치 보호
+PASS windmill_well.json 경로 반복
+PASS windmill_well.json 클라이언트 보호 예측 금지
+PASS windmill_well.json 스냅샷 보호 적용 후 파괴 상태 방어
+PASS windmill_well.json 이전 안전 칸 원격 파괴 적용
+PASS 활성 12개 맵 검사
+MOVING_SAFETY_RESULT: 232 checks, 0 failures

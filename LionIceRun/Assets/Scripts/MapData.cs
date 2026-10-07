@@ -6,7 +6,7 @@ using UnityEngine;
 // 얼음판 맵 한 장 (맵툴이 만들고 IceGrid가 읽는 JSON과 같은 모양).
 //  - 파일 위치: Assets/StreamingAssets/Maps/<파일 이름>.json (빌드한 게임 폴더에도 그대로 들어감, PC 기준)
 //  - rows: 한 행에 한 글자열. rows[0]이 맵툴 화면의 맨 위 행 = z가 가장 큰 행, 글자 순서는 x 0부터
-//  - 칸 글자: '.' 빈칸(바다), 'I' 얼음, 'C' 금 간 얼음, 'T' 두꺼운 얼음 (C·T는 3단계 전까지 얼음과 같음)
+//  - 칸 글자: '.' 바다, 'I' 얼음, 'C' 금 간 얼음, 'T' 두꺼운 얼음, 'S' 이동 안전 효과의 시작 칸
 //  - playerStart / botStarts: 칸 번호 (x, y = z 칸 번호)
 // 읽고 쓰기는 Unity 기본 JsonUtility.
 [Serializable]
@@ -20,6 +20,7 @@ public class MapData
     public const char Ice = 'I';
     public const char Cracked = 'C';
     public const char Thick = 'T';
+    public const char Safe = 'S';
 
     // JsonUtility로 {"x":3,"y":3} 모양을 확실히 쓰려고 Vector2Int 대신 둠
     [Serializable]
@@ -40,6 +41,10 @@ public class MapData
 
     public int version = CurrentVersion;
     public string name = "";
+    public bool archived;
+    public string theme = "";
+    public string description = "";
+    public MapGimmickData[] gimmicks = new MapGimmickData[0];
     public int width;
     public int depth;
     public string[] rows = new string[0];
@@ -136,12 +141,13 @@ public class MapData
             for (int x = 0; x < width; x++)
             {
                 char c = x < row.Length ? char.ToUpperInvariant(row[x]) : Empty;
-                chars[x] = c == Empty || c == Ice || c == Cracked || c == Thick ? c : Ice;
+                chars[x] = c == Empty || c == Ice || c == Cracked || c == Thick || c == Safe ? c : Ice;
             }
             fixedRows[r] = new string(chars);
         }
         rows = fixedRows;
         if (botStarts == null) botStarts = new Point[0];
+        if (gimmicks == null) gimmicks = new MapGimmickData[0];
     }
 
     public string ToJson() => JsonUtility.ToJson(this, true);
@@ -160,6 +166,9 @@ public class MapData
     public static MapData Load(string fileName)
     {
         if (string.IsNullOrEmpty(fileName)) return null;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        return WebMapCatalog.Load(fileName);
+#else
         string path = FilePath(fileName);
         if (!File.Exists(path))
         {
@@ -177,23 +186,32 @@ public class MapData
             Debug.LogError($"MapData: 맵 파일 형식이 잘못되었습니다: {path}\n{e.Message}");
             return null;
         }
+#endif
     }
 
     public void Save(string fileName)
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        throw new NotSupportedException("웹에서는 배포된 맵을 수정할 수 없습니다. Unity 맵툴에서 저장하세요.");
+#else
         Normalize();
         Directory.CreateDirectory(FolderPath);
         File.WriteAllText(FilePath(fileName), ToJson());
+#endif
     }
 
     // StreamingAssets/Maps 안의 맵 파일 이름들 (확장자 포함, 이름순)
     public static string[] ListFiles()
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        return WebMapCatalog.ListFiles();
+#else
         if (!Directory.Exists(FolderPath)) return new string[0];
         var names = new List<string>();
         foreach (string path in Directory.GetFiles(FolderPath, "*.json")) names.Add(Path.GetFileName(path));
         names.Sort(StringComparer.OrdinalIgnoreCase);
         return names.ToArray();
+#endif
     }
 }
 

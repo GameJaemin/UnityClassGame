@@ -191,7 +191,7 @@ public class BotBrain : MonoBehaviour
         if (under == null && body.GroundCollider != null)
         {
             under = body.GroundCollider.GetComponent<IceBlock>();
-            if (under != null) here = under.Cell;
+            if (under != null) here = grid.WorldToCell(under.transform.position);
         }
 
         // 흔들리는 칸이면 하던 것을 그만두고 바로 옆으로 피한다

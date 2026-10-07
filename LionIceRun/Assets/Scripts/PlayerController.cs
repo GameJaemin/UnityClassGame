@@ -22,6 +22,12 @@ public class PlayerController : MonoBehaviour
     [Tooltip("켜면 키보드 대신 SetExternalInput으로 조종 (AI 봇)")]
     public bool useExternalInput;
     [System.NonSerialized] public bool networkReplica;
+    [System.NonSerialized] public bool localPrediction;
+    uint externalInputSequence;
+    uint consumedInputSequence;
+    public uint SimulatedInputSequence { get; private set; }
+    public float DownRemaining => Mathf.Max(0, knockDownEndTime - Time.time);
+    public float ShoveRemaining => Mathf.Max(0, shoveEndTime - Time.time);
     Vector3 replicaVelocity;
     public Vector3 Velocity => networkReplica ? replicaVelocity : body.linearVelocity;
 
@@ -97,12 +103,14 @@ public class PlayerController : MonoBehaviour
     bool externalDivePressed;
     bool externalPushPressed;
     Vector3 pendingPush;
+    float impactUntil;
     float boostJump = 1f;
     float boostSpeed = 1f;
     float boostUntil = float.NegativeInfinity;
 
     bool Boosted => Time.time < boostUntil;
     bool isJumping;
+    IceStepTracker iceStepTracker;
     float lastJumpPressedTime = float.NegativeInfinity;
     float lastGroundedTime = float.NegativeInfinity;
     bool diveQueued;
@@ -150,14 +158,10 @@ public class PlayerController : MonoBehaviour
         moveAction = InputSystem.actions.FindAction("Player/Move", true);
         jumpAction = InputSystem.actions.FindAction("Player/Jump", true);
 
-        diveAction = new InputAction("Dive", InputActionType.Button);
-        diveAction.AddBinding("<Keyboard>/leftCtrl");
-        diveAction.AddBinding("<Keyboard>/rightCtrl");
-        diveAction.AddBinding("<Gamepad>/buttonWest");
+        diveAction = GamePreferences.CreateButton("Dive", 5, "<Gamepad>/buttonWest");
 
-        pushAction = new InputAction("Push", InputActionType.Button);
-        pushAction.AddBinding("<Mouse>/leftButton");
-        pushAction.AddBinding("<Gamepad>/rightTrigger");
+        pushAction = GamePreferences.CreateButton("Push", 6, "<Gamepad>/rightTrigger");
+        GamePreferences.Changed += RefreshBindings;
     }
 
     void OnEnable()
@@ -166,6 +170,9 @@ public class PlayerController : MonoBehaviour
         pushAction.Enable();
         if (!All.Contains(this)) All.Add(this);
     }
+
+    void RefreshBindings()
+    { GamePreferences.RefreshButton(diveAction, 5); GamePreferences.RefreshButton(pushAction, 6); }
 
     void OnDisable()
     {
@@ -176,6 +183,7 @@ public class PlayerController : MonoBehaviour
 
     void OnDestroy()
     {
+        GamePreferences.Changed -= RefreshBindings;
         diveAction.Dispose();
         pushAction.Dispose();
     }
@@ -193,7 +201,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (networkReplica) return;
-        if (!InputEnabled)
+        if (!InputEnabled || (!useExternalInput && GamePreferences.InputBlocked))
         {
             moveDirection = Vector3.zero;
             jumpHeld = false;
@@ -203,6 +211,7 @@ public class PlayerController : MonoBehaviour
 
         if (useExternalInput)
         {
+            consumedInputSequence = externalInputSequence;
             moveDirection = Vector3.ClampMagnitude(Vector3.ProjectOnPlane(externalMove, Vector3.up), 1f);
             jumpHeld = externalJumpHeld;
             if (externalJumpPressed) lastJumpPressedTime = Time.time;
@@ -234,16 +243,26 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if (networkReplica || body.isKinematic) return;
+        if (IsGrounded && GroundCollider != null)
+        {
+            var surface = GroundCollider.GetComponentInParent<MapMovingSurface>();
+            if (surface != null) body.position += surface.CarryDelta(body.position);
+        }
         Vector3 velocity = body.linearVelocity;
 
         // 위로 올라가는 중에는 땅으로 보지 않는다 (점프 직후 다시 착지 판정되는 것 방지)
-        IsGrounded = velocity.y <= 0.5f && CheckGround();
+        IsGrounded = CheckGround() && (velocity.y <= 0.5f || (!isJumping && State==MoveState.Normal && TryTilt(out _,out _)));
         if (!IsGrounded) GroundCollider = null;
         if (IsGrounded)
         {
             lastGroundedTime = Time.time;
             isJumping = false;
         }
+
+        // 착지와 재점프가 같은 물리 프레임이어도 밟힘을 먼저 기록한다.
+        // 코드로 만든 봇은 Awake 뒤에 트래커가 추가될 수 있다.
+        if (iceStepTracker == null) iceStepTracker = GetComponent<IceStepTracker>();
+        if (iceStepTracker != null) iceStepTracker.TrackGroundContact();
 
         if (IsShoved)
         {
@@ -271,7 +290,15 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case MoveState.KnockedDown:
-                if (IsGrounded) ApplyMovement(ref velocity, 1f, Vector3.zero);
+                if (IsGrounded)
+                {
+                    if (Time.time < impactUntil)
+                    {
+                        Vector3 slide = Vector3.MoveTowards(new Vector3(velocity.x, 0, velocity.z), Vector3.zero, 4f * Time.fixedDeltaTime);
+                        velocity = new Vector3(slide.x, velocity.y, slide.z);
+                    }
+                    else ApplyMovement(ref velocity, 1f, Vector3.zero);
+                }
                 if (Time.time >= knockDownEndTime) SetState(MoveState.Normal);
                 break;
         }
@@ -288,11 +315,13 @@ public class PlayerController : MonoBehaviour
         velocity += pendingPush * Time.fixedDeltaTime;
         pendingPush = Vector3.zero;
         body.linearVelocity = velocity;
+        SimulatedInputSequence = consumedInputSequence;
     }
 
     // AI 봇용 입력. move는 월드 방향(크기 0~1), 누름(pressed)은 다음 Update에서 한 번 처리된다
-    public void SetExternalInput(Vector3 move, bool holdJump, bool pressJump, bool pressDive, bool pressPush = false)
+    public void SetExternalInput(Vector3 move, bool holdJump, bool pressJump, bool pressDive, bool pressPush = false, uint sequence = 0)
     {
+        externalInputSequence = sequence;
         externalMove = move;
         externalJumpHeld = holdJump;
         externalJumpPressed |= pressJump;
@@ -303,9 +332,19 @@ public class PlayerController : MonoBehaviour
     // 시련: 세게 밀려나며 넘어짐 (펭귄 충돌 등)
     public void Knockback(Vector3 velocity, float downTime)
     {
+        if (networkReplica) return;
+        shoveEndTime = 0; impactUntil = Time.time + downTime;
         body.linearVelocity = velocity;
         IsGrounded = false;
         KnockDown(downTime);
+    }
+
+    // 점프 발사대는 넘어뜨리지 않고 수직으로 띄우며 공중 조작을 유지한다.
+    public void Launch(float speed)
+    {
+        if (networkReplica || body == null) return;
+        var velocity = body.linearVelocity; velocity.y = Mathf.Max(velocity.y, speed);
+        body.linearVelocity = velocity; IsGrounded = false;
     }
 
     // 다른 캐릭터에게 밀림: 넘어지지 않고 서 있는 채로 from.pushDistance만큼 밀려난다.
@@ -338,6 +377,7 @@ public class PlayerController : MonoBehaviour
     // 봇이 다시 떨어져 들어올 때 상태를 처음으로
     public void ResetMotion(Vector3 position)
     {
+        externalInputSequence = consumedInputSequence = SimulatedInputSequence = 0;
         body.isKinematic = false;
         body.position = position;
         transform.position = position;
@@ -346,6 +386,7 @@ public class PlayerController : MonoBehaviour
         lastJumpPressedTime = float.NegativeInfinity;
         diveQueued = false;
         shoveEndTime = 0f;
+        impactUntil = 0f;
         externalMove = Vector3.zero;
         externalJumpHeld = externalJumpPressed = externalDivePressed = externalPushPressed = false;
         HasMoved = false;
@@ -365,6 +406,35 @@ public class PlayerController : MonoBehaviour
         boostUntil = Time.time + boostRemaining;
     }
 
+    // 로컬 조작은 유지하고, 호스트가 확정한 타격/파워업만 즉시 반영한다.
+    public void ApplyPredictionAuthority(Vector3 velocity, MoveState state, float downRemaining,
+        float shoveRemaining, float boostRemaining, bool reset)
+    {
+        if (reset)
+        {
+            body.linearVelocity = velocity;
+            SetState(state);
+            shoveEndTime = 0;
+        }
+        if (state == MoveState.KnockedDown && downRemaining > 0)
+        {
+            if (State != MoveState.KnockedDown) Knockback(velocity, downRemaining);
+            else knockDownEndTime = Time.time + downRemaining;
+        }
+        if (shoveRemaining > 0)
+        {
+            shoveVelocity = new Vector3(velocity.x, 0, velocity.z);
+            shoveStartTime = Time.time;
+            shoveEndTime = Time.time + shoveRemaining;
+        }
+        if (boostRemaining > 0)
+        {
+            var power = GetComponent<PlayerPowerUps>();
+            if (power != null) SetBoost(power.superJumpHeight, power.superJumpSpeed, boostRemaining);
+        }
+        else boostUntil = Time.time;
+    }
+
     // 몇 초 동안 조작을 막는다. 다이브 착지, 눈덩이 기절 등에서 공통으로 쓴다.
     public void KnockDown(float duration)
     {
@@ -379,12 +449,37 @@ public class PlayerController : MonoBehaviour
 
     void ApplyMovement(ref Vector3 velocity, float control, Vector3 targetHorizontal)
     {
+        Vector3 downhill=Vector3.zero; float steepness=0;
+        bool onTilt=IsGrounded && TryTilt(out downhill,out steepness);
+        Vector3 normal=onTilt?GroundCollider.GetComponentInParent<MapMovingSurface>().transform.up:Vector3.up;
+        if(onTilt)
+        {
+            // 높은 쪽으로 걷는 힘을 줄이고, 낮은 쪽으로 지속적으로 미끄러진다.
+            float uphill=Mathf.Min(0,Vector3.Dot(targetHorizontal,downhill));
+            targetHorizontal-=downhill*uphill*(steepness*.8f);
+            targetHorizontal+=downhill*(4f*steepness);
+        }
         Vector3 horizontal = new Vector3(velocity.x, 0f, velocity.z);
         // 가속보다 감속을 강하게 해서 출발은 묵직하고 멈춤은 깔끔하게
         bool speedingUp = targetHorizontal.sqrMagnitude > 0.001f && Vector3.Dot(targetHorizontal, horizontal) >= 0f;
         float rate = (speedingUp ? groundAcceleration : groundDeceleration) * control;
         horizontal = Vector3.MoveTowards(horizontal, targetHorizontal, rate * Time.fixedDeltaTime);
         velocity = new Vector3(horizontal.x, velocity.y, horizontal.z);
+        if(onTilt) velocity.y=-(normal.x*horizontal.x+normal.z*horizontal.z)/Mathf.Max(.3f,normal.y);
+    }
+
+    bool TryTilt(out Vector3 downhill,out float steepness)
+    {
+        downhill=Vector3.zero; steepness=0;
+        if(GroundCollider==null || GameManager.Instance==null || GameManager.Instance.State!=GameManager.GameState.Playing) return false;
+        var surface=GroundCollider.GetComponentInParent<MapMovingSurface>();
+        if(surface==null) return false;
+        var normal=surface.transform.up;
+        if(normal.y<.3f) return false;
+        float angle=Vector3.Angle(normal,Vector3.up);
+        steepness=Mathf.InverseLerp(3,25,angle);
+        downhill=Vector3.ProjectOnPlane(Vector3.ProjectOnPlane(Vector3.down,normal),Vector3.up).normalized;
+        return steepness>0 && downhill.sqrMagnitude>.5f;
     }
 
     void ApplyGravity(ref Vector3 velocity)
@@ -403,6 +498,7 @@ public class PlayerController : MonoBehaviour
 
     void Jump(ref Vector3 velocity)
     {
+        if (iceStepTracker != null) iceStepTracker.LeaveForJump();
         velocity.y = JumpSpeed;
         isJumping = true;
         lastGroundedTime = float.NegativeInfinity;
@@ -428,7 +524,7 @@ public class PlayerController : MonoBehaviour
     // 상대의 이동 코드가 매 물리 단계마다 속도를 0으로 줄여서, 그냥 두면 벽처럼 버티기 때문
     void OnCollisionStay(Collision collision)
     {
-        if (networkReplica) return;
+        if (networkReplica || localPrediction) return;
         if (bodyShove <= 0f || collision.rigidbody == null) return;
         PlayerController other = collision.rigidbody.GetComponent<PlayerController>();
         if (other == null || other == this || !other.isActiveAndEnabled) return;
@@ -518,6 +614,7 @@ public class PlayerController : MonoBehaviour
     // 판정 시간 동안 부채꼴 안에 들어온 상대를 민다 (한 상대는 한 번만)
     void PushHits()
     {
+        if (localPrediction) return; // 타격 확정은 호스트가 처리하고 로컬에서는 팔 동작만 예측한다.
         foreach (PlayerController other in All.ToArray())
         {
             if (pushHits.Contains(other)) continue;

@@ -33,14 +33,19 @@ public class IceGrid : MonoBehaviour
     [Min(0f)] public float seaMargin = 190f;
 
     [Header("얼음 깨짐 (Thin Ice 바탕, 무적 시간 없음)")]
-    [Tooltip("같은 발걸음이 이음새에서 두 번 세어지지 않게 막는 짧은 시간. 점프 착지는 이보다 길어서 항상 바로 한 단계 진행")]
-    [Min(0f)] public float touchDebounceTime = 0.2f;
+    [Tooltip("같은 발걸음이 이음새에서 두 번 세어지지 않게 막는 시간. 실제 점프 착지는 이 시간과 무관하게 한 단계 진행")]
+    [Min(0f)] public float stepIntervalSeconds = 0.5f;
     [Tooltip("흔들리기 시작해서 깨져 떨어질 때까지. 이 안에 점프로 탈출할 수 있고, 다시 밟으면 즉시 깨짐")]
-    [Min(0f)] public float breakDelay = 1f;
+    [Min(0f)] public float iceBreakDelay = 2f;
     [Tooltip("한 블럭에 이 시간 이상 서 있으면 다시 밟지 않아도 한 단계 진행")]
-    [Min(0.1f)] public float standTimeToCrack = 2f;
+    [Min(0.1f)] public float idleCrackSeconds = 4f;
     [Tooltip("금이 간 블럭은 아무도 안 밟아도 이 시간마다 한 단계씩 진행 (0이면 끔)")]
-    [Min(0f)] public float decayInterval = 6f;
+    [Min(0f)] public float passiveCrackSeconds = 12f;
+    // 기존 코드 접근은 유지하고, 새 저장 필드로 기존 씬에도 변경한 기본 시간을 적용한다.
+    public float touchDebounceTime { get => stepIntervalSeconds; set => stepIntervalSeconds = value; }
+    public float breakDelay { get => iceBreakDelay; set => iceBreakDelay = value; }
+    public float standTimeToCrack { get => idleCrackSeconds; set => idleCrackSeconds = value; }
+    public float decayInterval { get => passiveCrackSeconds; set => passiveCrackSeconds = value; }
     [Tooltip("단계별 색: 멀쩡함, 살짝 금, 많이 금, 흔들림")]
     public Color[] stageColors =
     {
@@ -71,6 +76,9 @@ public class IceGrid : MonoBehaviour
     readonly List<IceBlock> iceBlocks = new List<IceBlock>();
     // 칸 번호로 블럭 찾기 (빈칸은 null). 게임 중에만 채워진다
     IceBlock[,] cellBlocks;
+    IceBlock[,] movingCells;
+    public MapGimmickRig Gimmicks { get; private set; }
+    public MovingSafeZones SafeZones { get; private set; }
     ParticleSystem iceBurst;
     MapData map;
     string loadedMapFile;
@@ -106,8 +114,10 @@ public class IceGrid : MonoBehaviour
     public IceBlock GetBlock(Vector2Int cell)
     {
         if (!InBounds(cell) || cellBlocks == null) return null;
+        if (movingCells != null) return movingCells[cell.x, cell.y];
         if (cell.x >= cellBlocks.GetLength(0) || cell.y >= cellBlocks.GetLength(1)) return null;
-        return cellBlocks[cell.x, cell.y];
+        var block = cellBlocks[cell.x, cell.y];
+        return block != null && block.SurfacePresent ? block : null;
     }
 
     // 맵 파일이 바뀌었으면 다시 읽고 가로·세로를 맵 크기로 맞춘다
@@ -124,6 +134,16 @@ public class IceGrid : MonoBehaviour
 
     // 해당 칸 블럭 윗면 중앙의 월드 좌표
     public Vector3 CellTop(Vector2Int cell)
+    {
+        if (movingCells != null && InBounds(cell))
+        {
+            var block = movingCells[cell.x, cell.y];
+            if (block != null) return block.transform.position + Vector3.up * (blockHeight / 2);
+        }
+        return StaticCellTop(cell);
+    }
+
+    public Vector3 StaticCellTop(Vector2Int cell)
     {
         Vector3 local = new Vector3((cell.x - (width - 1) / 2f) * Spacing, 0f, (cell.y - (depth - 1) / 2f) * Spacing);
         return transform.TransformPoint(local);
@@ -142,6 +162,46 @@ public class IceGrid : MonoBehaviour
     {
         EnsureMap();
         UpdateSea();
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (Application.isPlaying || Map == null) return;
+        foreach (var g in Map.gimmicks)
+        {
+            if (g == null) continue;
+            Vector3 origin = StaticCellTop(Vector2Int.zero) + new Vector3(g.x, 0, g.z) * Spacing;
+            Gizmos.color = g.kind == "piston" || g.kind == "sweeper" ? Color.magenta : Color.cyan;
+            Gizmos.DrawWireCube(origin, new Vector3(g.width * Spacing, 0.5f, g.depth * Spacing));
+            Vector3 travel = g.kind == "piston" ? Quaternion.Euler(0, g.angle, 0) * new Vector3(0, 0, g.dz * Spacing)
+                : new Vector3(g.dx, 0, g.dz) * Spacing;
+            Gizmos.DrawLine(origin, origin + travel);
+            if (g.kind == "move") Gizmos.DrawWireCube(origin + travel, new Vector3(g.width * Spacing, 0.5f, g.depth * Spacing));
+#if UNITY_EDITOR
+            UnityEditor.Handles.Label(origin + Vector3.up, g.kind);
+#endif
+        }
+    }
+
+    // 이동/회전 뒤 실제 발 디딜 곳을 AI의 그리드에 투영한다.
+    public void RefreshMovingCells()
+    {
+        if (Gimmicks == null || !Gimmicks.HasMovingIce) return;
+        if (movingCells == null) movingCells = new IceBlock[width, depth];
+        System.Array.Clear(movingCells, 0, movingCells.Length);
+        foreach (var block in iceBlocks)
+        {
+            if (block == null || !block.SurfacePresent) continue;
+            var center = WorldToCell(block.transform.position);
+            for (int x = center.x - 1; x <= center.x + 1; x++)
+            for (int z = center.y - 1; z <= center.y + 1; z++)
+            {
+                var cell = new Vector2Int(x, z);
+                if (!InBounds(cell)) continue;
+                Vector3 local = block.transform.InverseTransformPoint(StaticCellTop(cell));
+                if (Mathf.Abs(local.x) <= 0.5f && Mathf.Abs(local.z) <= 0.5f) movingCells[x, z] = block;
+            }
+        }
     }
 
     [ContextMenu("그리드 생성")]
@@ -181,17 +241,35 @@ public class IceGrid : MonoBehaviour
             }
         }
         UpdateSea();
+        CreateGimmicks();
+        if (Application.isPlaying)
+        {
+            SafeZones = GetComponent<MovingSafeZones>();
+            if (SafeZones == null) SafeZones = gameObject.AddComponent<MovingSafeZones>();
+            SafeZones.Initialize(this);
+        }
+    }
+
+    void CreateGimmicks()
+    {
+        if (!Application.isPlaying || map == null || map.gimmicks.Length == 0) return;
+        var go = new GameObject("MapGimmicks"); go.transform.SetParent(transform, false);
+        Gimmicks = go.AddComponent<MapGimmickRig>(); Gimmicks.Create(this);
+        RefreshMovingCells();
     }
 
     [ContextMenu("그리드 삭제")]
     public void Clear()
     {
+        if (SafeZones != null) SafeZones.ClearRoutes();
+        Gimmicks = null; movingCells = null;
         blocks.Clear();
         iceBlocks.Clear();
         cellBlocks = null;
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             GameObject child = transform.GetChild(i).gameObject;
+            child.SetActive(false);
             if (Application.isPlaying) Destroy(child);
             else DestroyImmediate(child);
         }
@@ -201,6 +279,7 @@ public class IceGrid : MonoBehaviour
     public void PlayIceBurst(Vector3 position, int count, float spread)
     {
         if (particleMaterial == null) return;
+        if (WebRuntimePerformance.Enabled) count = Mathf.Min(count, 8);
         if (iceBurst == null) iceBurst = CreateIceBurst();
 
         var emit = new ParticleSystem.EmitParams { applyShapeToPosition = true };

@@ -1,0 +1,84 @@
+{
+    "version":  1,
+    "name":  "극지 공장",
+    "theme":  "foundry",
+    "description":  "회전 빙판·왕복 발판·피스톤을 모두 통과하는 복합 생존 공장이에요.",
+    "width":  15,
+    "depth":  15,
+    "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III.......III.",
+    ".III....IIIIII.",
+    ".IIIIII.IIIIII.",
+    ".III....IIIIII.",
+    ".III.II....III.",
+    ".III.II....III.",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".SIIIIIIIIIIIS.",
+    "..............."
+  ],
+    "playerStart":  {
+                        "y":  2,
+                        "x":  2
+                    },
+    "botStarts":  [
+                      {
+                          "y":  2,
+                          "x":  12
+                      },
+                      {
+                          "y":  12,
+                          "x":  2
+                      },
+                      {
+                          "y":  12,
+                          "x":  12
+                      }
+                  ],
+    "gimmicks":  [
+                     {
+                         "x":  5.5,
+                         "kind":  "rotate",
+                         "dz":  0,
+                         "angle":  0,
+                         "period":  8,
+                         "phase":  0,
+                         "dx":  0,
+                         "width":  2,
+                         "speed":  -20,
+                         "depth":  2,
+                         "z":  5.5
+                     },
+                     {
+                         "x":  9,
+                         "kind":  "move",
+                         "dz":  -1,
+                         "angle":  0,
+                         "period":  8,
+                         "phase":  0,
+                         "dx":  0,
+                         "width":  3,
+                         "speed":  25,
+                         "depth":  3,
+                         "z":  8
+                     },
+                     {
+                         "x":  4,
+                         "kind":  "piston",
+                         "dz":  2,
+                         "angle":  180,
+                         "period":  6.5,
+                         "phase":  0,
+                         "dx":  0,
+                         "width":  2,
+                         "speed":  25,
+                         "depth":  0.7,
+                         "z":  9.5
+                     }
+                 ]
+}

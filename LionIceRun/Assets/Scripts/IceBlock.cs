@@ -28,10 +28,21 @@ public class IceBlock : MonoBehaviour
     Vector3 restPosition;
     Vector3 restScale;
     int variant;
+    float safeAppearance;
+    float surfaceWarning;
+    public void SetSurfaceWarning(float amount) { surfaceWarning = Mathf.Clamp01(amount); UpdateLook(); }
 
     public Stage CurrentStage { get; private set; }
     public Vector2Int Cell { get; private set; }
     public bool IsBroken => CurrentStage == Stage.Broken;
+    public bool IsSafe { get; private set; }
+    public bool SurfacePresent { get; private set; } = true;
+    public void SetSurfacePresent(bool present)
+    {
+        SurfacePresent = present;
+        if (blockCollider != null) blockCollider.enabled = present && !IsBroken;
+        if (blockRenderer != null) blockRenderer.enabled = present && !IsBroken;
+    }
 
     // AI가 도착 전에 저절로 흔들리기 시작할 칸을 피할 수 있도록 남은 시간을 제공한다.
     public float SecondsUntilShaking
@@ -54,6 +65,8 @@ public class IceBlock : MonoBehaviour
     {
         grid = owner;
         Cell = cell;
+        IsSafe = grid.Map != null && grid.Map.Get(cell) == MapData.Safe;
+        safeAppearance = IsSafe ? 1f : 0f;
         blockRenderer = GetComponent<Renderer>();
         blockCollider = GetComponent<Collider>();
         properties = new MaterialPropertyBlock();
@@ -66,14 +79,66 @@ public class IceBlock : MonoBehaviour
         bool flipX = UnityEngine.Random.value < 0.5f, flipY = UnityEngine.Random.value < 0.5f;
         properties.SetVector(BaseMapStId, new Vector4(flipX ? -1f : 1f, flipY ? -1f : 1f, flipX ? 1f : 0f, flipY ? 1f : 0f));
         UpdateLook();
+        if (IsSafe) EnsureSafeMark();
+    }
+
+    void EnsureSafeMark()
+    {
+        if (blockRenderer != null && transform.Find("SafeMark") == null)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                var mark = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                mark.name = i == 0 ? "SafeMark" : "SafeMarkCross";
+                mark.transform.SetParent(transform, false); mark.transform.localPosition = new Vector3(0, 0.51f, 0);
+                mark.transform.localScale = i == 0 ? new Vector3(0.5f, 0.02f, 0.12f) : new Vector3(0.12f, 0.02f, 0.5f);
+                mark.GetComponent<Collider>().enabled = false; Destroy(mark.GetComponent<Collider>());
+                var renderer = mark.GetComponent<Renderer>(); renderer.sharedMaterial = blockRenderer.sharedMaterial;
+                var tint = new MaterialPropertyBlock(); tint.SetColor(BaseColorId, new Color(1, 0.9f, 0.25f)); renderer.SetPropertyBlock(tint);
+            }
+        }
+    }
+
+    public void SetSafeProtection(bool protect)
+    {
+        if (IsSafe == protect) return;
+        IsSafe = protect;
+        if (protect)
+        {
+            bool wasBroken = IsBroken;
+            StopAllCoroutines(); shaking = punching = growing = decaying = null;
+            CurrentStage = Stage.Clean;
+            lastStepTime = float.NegativeInfinity; lastStageChangeTime = Time.time;
+            gameObject.SetActive(true);
+            transform.localPosition = restPosition; transform.localScale = restScale;
+            blockCollider.enabled = blockRenderer.enabled = true;
+            EnsureSafeMark();
+            if (wasBroken) Restored?.Invoke(this);
+        }
+        SetSafeAppearance(protect ? 1f : 0f);
+    }
+
+    public void SetSafeAppearance(float weight)
+    {
+        safeAppearance = Mathf.Clamp01(weight);
+        UpdateLook();
+        for (int i = 0; i < 2; i++)
+        {
+            var mark = transform.Find(i == 0 ? "SafeMark" : "SafeMarkCross");
+            if (mark == null) continue;
+            mark.gameObject.SetActive(safeAppearance > 0.001f);
+            var size = i == 0 ? new Vector3(0.5f, 0.02f, 0.12f) : new Vector3(0.12f, 0.02f, 0.5f);
+            mark.localScale = size * safeAppearance;
+        }
     }
 
     // 밟힘 1회. 한 단계 진행하고, 이미 흔들리는 블럭이면 즉시 깨진다.
     // 이음새에서 같은 발걸음이 두 번 세어지는 것만 막는다 (touchDebounceTime).
-    public void Step()
+    public void Step(bool landingImpact = false)
     {
-        if (grid.networkReplica) return;
-        if (IsBroken || Time.time - lastStepTime < grid.touchDebounceTime) return;
+        if (grid.networkReplica || IsSafe) return;
+        // 실제 점프 착지는 짧은 점프여도 새 충격이다. 이음새 중복만 시간으로 막는다.
+        if (IsBroken || (!landingImpact && Time.time - lastStepTime < grid.touchDebounceTime)) return;
         lastStepTime = Time.time;
 
         if (CurrentStage == Stage.Shaking)
@@ -89,7 +154,7 @@ public class IceBlock : MonoBehaviour
     // 시련(눈덩이): 밟힘 중복 방지 없이 한 단계. 흔들리는 중이면 바로 깨짐
     public void ForceAdvance()
     {
-        if (grid.networkReplica) return;
+        if (grid.networkReplica || IsSafe) return;
         if (IsBroken) return;
         if (CurrentStage == Stage.Shaking) ForceBreak();
         else Advance();
@@ -98,7 +163,7 @@ public class IceBlock : MonoBehaviour
     // 시련(고드름): 단계와 상관없이 바로 깨짐
     public void ForceBreak()
     {
-        if (grid.networkReplica) return;
+        if (grid.networkReplica || IsSafe) return;
         if (IsBroken) return;
         if (shaking != null) StopCoroutine(shaking);
         Break();
@@ -151,7 +216,8 @@ public class IceBlock : MonoBehaviour
         if (blockRenderer == null) return;
         int index = (int)CurrentStage;
         if (grid.stageColors != null && grid.stageColors.Length > 0)
-            properties.SetColor(BaseColorId, grid.stageColors[Mathf.Min(index, grid.stageColors.Length - 1)]);
+            properties.SetColor(BaseColorId, Color.Lerp(Color.Lerp(grid.stageColors[Mathf.Min(index, grid.stageColors.Length - 1)],
+                new Color(0.25f, 0.95f, 0.6f), safeAppearance), new Color(1, 0.55f, 0.15f), surfaceWarning));
 
         Texture2D texture = overrideTexture;
         if (texture == null && grid.stageTextures != null && grid.stageTextures.Length > 0)
@@ -243,8 +309,8 @@ public class IceBlock : MonoBehaviour
         transform.localScale = restScale;
         CurrentStage = Stage.Clean;
         lastStepTime = float.NegativeInfinity;
-        blockCollider.enabled = true;
-        blockRenderer.enabled = true;
+        blockCollider.enabled = SurfacePresent;
+        blockRenderer.enabled = SurfacePresent;
         UpdateLook();
 
         punching = StartCoroutine(Refreeze());
@@ -255,6 +321,7 @@ public class IceBlock : MonoBehaviour
     // 확정된 상태만 반영하며 참가자 PC에서 파괴 타이머를 동작시키지 않는다.
     public void ApplyNetworkStage(Stage stage)
     {
+        if (IsSafe) stage = Stage.Clean;
         if (!grid.networkReplica || stage == CurrentStage) return;
         StopAllCoroutines();
         shaking = growing = decaying = punching = null;
@@ -264,7 +331,7 @@ public class IceBlock : MonoBehaviour
         transform.localScale = restScale;
         bool exists = stage != Stage.Broken;
         gameObject.SetActive(exists);
-        blockCollider.enabled = blockRenderer.enabled = exists;
+        blockCollider.enabled = blockRenderer.enabled = exists && SurfacePresent;
         if (exists) UpdateLook();
         else { SpawnShards(); grid.PlayIceBurst(TopCenter, 20, 0.8f); Broken?.Invoke(this); }
         if (wasBroken && exists) { grid.PlayIceBurst(TopCenter, 12, 0.5f); Restored?.Invoke(this); }
@@ -288,6 +355,7 @@ public class IceBlock : MonoBehaviour
     void SpawnShards()
     {
         int n = Mathf.Max(1, grid.shardsPerAxis);
+        if (WebRuntimePerformance.Enabled) n = Mathf.Min(n, 2);
         int ny = Mathf.Max(1, n - 1);
         Vector3 size = new Vector3(restScale.x / n, restScale.y / ny, restScale.z / n);
         Color color = grid.stageColors != null && grid.stageColors.Length > 0 ? grid.stageColors[grid.stageColors.Length - 1] : Color.white;
@@ -298,6 +366,7 @@ public class IceBlock : MonoBehaviour
         for (int y = 0; y < ny; y++)
         for (int z = 0; z < n; z++)
         {
+            if (!WebRuntimePerformance.TryBeginShard()) return;
             Vector3 local = new Vector3((x + 0.5f) / n - 0.5f, (y + 0.5f) / ny - 0.5f, (z + 0.5f) / n - 0.5f);
             Vector3 offset = Vector3.Scale(local, restScale);
 

@@ -1,0 +1,97 @@
+PASS candy_carousel.json 4인 출발
+PASS candy_carousel.json 기믹 해시
+PASS candy_carousel.json 생성
+PASS candy_carousel.json 이전 기믹 제거
+PASS candy_carousel.json 얼음 이동/회전
+MOTION candy_carousel.json max=1.322006 timer=2.75 grid=candy_carousel.json rotated=71.50001,299.5
+PASS candy_carousel.json 룰렛 미리보기
+PASS candy_carousel.json 접촉점 운반
+PASS candy_carousel.json 접촉점 운반
+PASS candy_carousel.json 이동 경로의 얼음 간섭 없음
+PASS candy_carousel.json 클라이언트 붕괴 차단
+PASS candy_carousel.json 60초 붕괴
+PASS clockwork_floe.json 4인 출발
+PASS clockwork_floe.json 기믹 해시
+PASS clockwork_floe.json 생성
+PASS clockwork_floe.json 이전 기믹 제거
+PASS clockwork_floe.json 얼음 이동/회전
+MOTION clockwork_floe.json max=3.789276 timer=2.75 grid=clockwork_floe.json rotated=49.5
+PASS clockwork_floe.json 룰렛 미리보기
+PASS clockwork_floe.json 접촉점 운반
+PASS clockwork_floe.json 이동 경로의 얼음 간섭 없음
+PASS clockwork_floe.json 클라이언트 붕괴 차단
+PASS clockwork_floe.json 60초 붕괴
+PASS conveyor_docks.json 4인 출발
+PASS conveyor_docks.json 기믹 해시
+PASS conveyor_docks.json 생성
+PASS conveyor_docks.json 이전 기믹 제거
+PASS conveyor_docks.json 룰렛 미리보기
+PASS conveyor_docks.json 접촉점 운반
+PASS conveyor_docks.json 접촉점 운반
+PASS conveyor_docks.json 이동 경로의 얼음 간섭 없음
+PASS conveyor_docks.json 클라이언트 붕괴 차단
+PASS conveyor_docks.json 60초 붕괴
+PASS default_6x6.json 4인 출발
+PASS four_outposts.json 4인 출발
+PASS frost_ring.json 4인 출발
+PASS harbor_ferries.json 4인 출발
+PASS harbor_ferries.json 기믹 해시
+PASS harbor_ferries.json 생성
+PASS harbor_ferries.json 이전 기믹 제거
+PASS harbor_ferries.json 얼음 이동/회전
+MOTION harbor_ferries.json max=2.85093 timer=2.75 grid=harbor_ferries.json rotated=0,0
+PASS harbor_ferries.json 룰렛 미리보기
+PASS harbor_ferries.json 접촉점 운반
+PASS harbor_ferries.json 접촉점 운반
+PASS harbor_ferries.json 이동 경로의 얼음 간섭 없음
+PASS harbor_ferries.json 클라이언트 붕괴 차단
+PASS harbor_ferries.json 60초 붕괴
+PASS hourglass_glacier.json 4인 출발
+PASS piston_pass.json 4인 출발
+PASS piston_pass.json 기믹 해시
+PASS piston_pass.json 생성
+PASS piston_pass.json 이전 기믹 제거
+PASS piston_pass.json 룰렛 미리보기
+PASS piston_pass.json 이동 경로의 얼음 간섭 없음
+PASS piston_pass.json 클라이언트 붕괴 차단
+PASS piston_pass.json 60초 붕괴
+PASS polar_foundry.json 4인 출발
+PASS polar_foundry.json 기믹 해시
+PASS polar_foundry.json 생성
+PASS polar_foundry.json 이전 기믹 제거
+PASS polar_foundry.json 얼음 이동/회전
+MOTION polar_foundry.json max=1.244456 timer=2.75 grid=polar_foundry.json rotated=305,0
+PASS polar_foundry.json 룰렛 미리보기
+PASS polar_foundry.json 접촉점 운반
+PASS polar_foundry.json 접촉점 운반
+PASS polar_foundry.json 이동 경로의 얼음 간섭 없음
+PASS polar_foundry.json 클라이언트 붕괴 차단
+PASS polar_foundry.json 60초 붕괴
+PASS tidal_shuttles.json 4인 출발
+PASS tidal_shuttles.json 기믹 해시
+PASS tidal_shuttles.json 생성
+PASS tidal_shuttles.json 이전 기믹 제거
+PASS tidal_shuttles.json 얼음 이동/회전
+MOTION tidal_shuttles.json max=3.145482 timer=2.75 grid=tidal_shuttles.json rotated=0,0
+PASS tidal_shuttles.json 룰렛 미리보기
+PASS tidal_shuttles.json 접촉점 운반
+PASS tidal_shuttles.json 접촉점 운반
+PASS tidal_shuttles.json 이동 경로의 얼음 간섭 없음
+PASS tidal_shuttles.json 클라이언트 붕괴 차단
+PASS tidal_shuttles.json 60초 붕괴
+PASS windmill_well.json 4인 출발
+PASS windmill_well.json 기믹 해시
+PASS windmill_well.json 생성
+PASS windmill_well.json 이전 기믹 제거
+PASS windmill_well.json 룰렛 미리보기
+PASS windmill_well.json 이동 경로의 얼음 간섭 없음
+PASS windmill_well.json 클라이언트 붕괴 차단
+PASS windmill_well.json 60초 붕괴
+PASS 기본 4개 + 기믹 8개 선택 목록
+PASS 이동 발판 실제 착지
+PASS 이동 발판 실제 승객 이동
+RIDER original=(-1.60, 1.00, -3.20) current=(0.36, 1.00, -3.20) grounded=True surface=(0.36, 0.00, -3.20)
+PASS 승객 미끄러짐 제한
+PASS 피스톤 예고 중 무타격
+PASS 피스톤 실제 타격
+RESULT checks=90 failures=0

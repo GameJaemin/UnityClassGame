@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "name": "구름 위 피크닉",
+  "theme": "lagoon",
+  "description": "왕복 셔틀과 시소 섬을 갈아타요. 중앙 발사대에서 점프해 돌아오는 다리의 타이밍을 맞춰요.",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III...IIIIIII.",
+    ".III...IIIIISI.",
+    ".III...IIIIIII.",
+    ".III.III...III.",
+    ".III.III...III.",
+    ".ISI.III...III.",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    "..............."
+  ],
+  "playerStart": {
+    "x": 2,
+    "y": 2
+  },
+  "botStarts": [
+    {
+      "x": 12,
+      "y": 2
+    },
+    {
+      "x": 2,
+      "y": 12
+    },
+    {
+      "x": 12,
+      "y": 12
+    }
+  ],
+  "gimmicks": [
+    {
+      "kind": "move",
+      "x": 6,
+      "z": 6,
+      "width": 3,
+      "depth": 3,
+      "dx": 1,
+      "period": 7
+    },
+    {
+      "kind": "seesaw",
+      "x": 9,
+      "z": 9,
+      "width": 3,
+      "depth": 3,
+      "period": 8,
+      "tiltAngle": 20
+    },
+    {
+      "kind": "launcher",
+      "x": 7,
+      "z": 9,
+      "width": 1,
+      "depth": 1,
+      "liftSpeed": 7
+    }
+  ]
+}

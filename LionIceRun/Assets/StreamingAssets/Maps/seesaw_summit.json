@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "name": "시소 눈마루",
+  "theme": "candy",
+  "description": "반대 타이밍으로 기울어지는 두 시소. 중앙에서 균형을 잡거나 넓은 외곽으로 돌아가요.",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III.......III.",
+    ".IIIIIIIIIIISI.",
+    ".IIIIIIIIIIIII.",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".ISIIIIIIIIIII.",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    "..............."
+  ],
+  "playerStart": {
+    "x": 2,
+    "y": 2
+  },
+  "botStarts": [
+    {
+      "x": 12,
+      "y": 2
+    },
+    {
+      "x": 2,
+      "y": 12
+    },
+    {
+      "x": 12,
+      "y": 12
+    }
+  ],
+  "gimmicks": [
+    {
+      "kind": "seesaw",
+      "x": 7,
+      "z": 5.5,
+      "width": 7,
+      "depth": 2,
+      "period": 7,
+      "tiltAngle": 18
+    },
+    {
+      "kind": "seesaw",
+      "x": 7,
+      "z": 8.5,
+      "width": 7,
+      "depth": 2,
+      "period": 7,
+      "phase": 3.5,
+      "tiltAngle": 18
+    }
+  ]
+}

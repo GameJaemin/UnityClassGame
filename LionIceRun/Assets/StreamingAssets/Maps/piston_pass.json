@@ -1,0 +1,71 @@
+{
+    "version":  1,
+    "name":  "피스톤 협곡",
+    "theme":  "factory",
+    "description":  "노란 불빛 뒤에 피스톤이 튀어나와요. 통로 사이의 대피 구역을 이용해요.",
+    "width":  15,
+    "depth":  15,
+    "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III..III..III.",
+    ".III..III..III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III..III..III.",
+    ".III..III..III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".SIIIIIIIIIIIS.",
+    "..............."
+  ],
+    "playerStart":  {
+                        "y":  2,
+                        "x":  2
+                    },
+    "botStarts":  [
+                      {
+                          "y":  2,
+                          "x":  12
+                      },
+                      {
+                          "y":  12,
+                          "x":  2
+                      },
+                      {
+                          "y":  12,
+                          "x":  12
+                      }
+                  ],
+    "gimmicks":  [
+                     {
+                         "x":  5,
+                         "kind":  "piston",
+                         "dz":  3,
+                         "angle":  0,
+                         "period":  5.5,
+                         "phase":  0,
+                         "dx":  0,
+                         "width":  2,
+                         "speed":  25,
+                         "depth":  0.7,
+                         "z":  4.5
+                     },
+                     {
+                         "x":  9,
+                         "kind":  "piston",
+                         "dz":  3,
+                         "angle":  180,
+                         "period":  6,
+                         "phase":  2.5,
+                         "dx":  0,
+                         "width":  2,
+                         "speed":  25,
+                         "depth":  0.7,
+                         "z":  9.5
+                     }
+                 ]
+}

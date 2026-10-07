@@ -95,6 +95,9 @@ public class RepairItemSpawner : MonoBehaviour
         foreach (IceBlock block in grid.IceBlocks)
         {
             if (block.IsBroken || block.CurrentStage == IceBlock.Stage.Shaking || block == under) continue;
+            // 아이템은 움직이지 않는 얼음에 놓는다. 이동 발판에 남겨 공중에 떠 있는 상태를 막는다.
+            var moving = block.GetComponentInParent<MapMovingSurface>();
+            if (moving != null && moving.MovingGeometry) continue;
             float weight = chosen switch
             {
                 RepairItem.Kind.Repair => Squared(Count(block.Cell, repairRadius, b => b.IsBroken)),

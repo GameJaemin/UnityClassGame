@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "name": "반짝 다리 거리",
+  "theme": "clock",
+  "description": "빨간 경고등이 켜지면 다리가 잠시 사라져요. 위아래 다리가 교대로 열리니 타이밍을 골라요.",
+  "width": 15,
+  "depth": 15,
+  "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III.......III.",
+    ".IIIIIIIIIIISI.",
+    ".IIIIIIIIIIIII.",
+    ".III...I...III.",
+    ".IIIIIIIIIIIII.",
+    ".ISIIIIIIIIIII.",
+    ".III.......III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    "..............."
+  ],
+  "playerStart": {
+    "x": 2,
+    "y": 2
+  },
+  "botStarts": [
+    {
+      "x": 12,
+      "y": 2
+    },
+    {
+      "x": 2,
+      "y": 12
+    },
+    {
+      "x": 12,
+      "y": 12
+    }
+  ],
+  "gimmicks": [
+    {
+      "kind": "blink",
+      "x": 7,
+      "z": 5.5,
+      "width": 7,
+      "depth": 2,
+      "period": 8,
+      "activeDuration": 5,
+      "phase": 0
+    },
+    {
+      "kind": "blink",
+      "x": 7,
+      "z": 8.5,
+      "width": 7,
+      "depth": 2,
+      "period": 8,
+      "activeDuration": 5,
+      "phase": 4
+    }
+  ]
+}

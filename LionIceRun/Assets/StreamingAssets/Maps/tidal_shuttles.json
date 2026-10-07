@@ -1,0 +1,71 @@
+{
+    "version":  1,
+    "name":  "밀물 셔틀",
+    "theme":  "lagoon",
+    "description":  "위아래로 오가는 빙판 두 개. 바깥 다리와 이동 지름길을 선택해요.",
+    "width":  15,
+    "depth":  15,
+    "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III....IIIIII.",
+    ".III....IIIIII.",
+    ".III....IIIIII.",
+    ".III.......III.",
+    ".IIIIII....III.",
+    ".IIIIII....III.",
+    ".IIIIII....III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".SIIIIIIIIIIIS.",
+    "..............."
+  ],
+    "playerStart":  {
+                        "y":  2,
+                        "x":  2
+                    },
+    "botStarts":  [
+                      {
+                          "y":  2,
+                          "x":  12
+                      },
+                      {
+                          "y":  12,
+                          "x":  2
+                      },
+                      {
+                          "y":  12,
+                          "x":  12
+                      }
+                  ],
+    "gimmicks":  [
+                     {
+                         "x":  5,
+                         "kind":  "move",
+                         "dz":  2,
+                         "angle":  0,
+                         "period":  6,
+                         "phase":  0,
+                         "dx":  0,
+                         "width":  3,
+                         "speed":  25,
+                         "depth":  3,
+                         "z":  5
+                     },
+                     {
+                         "x":  9,
+                         "kind":  "move",
+                         "dz":  -2,
+                         "angle":  0,
+                         "period":  10,
+                         "phase":  0,
+                         "dx":  0,
+                         "width":  3,
+                         "speed":  25,
+                         "depth":  3,
+                         "z":  9
+                     }
+                 ]
+}

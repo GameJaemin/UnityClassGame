@@ -77,8 +77,10 @@ public abstract class TrialBase : MonoBehaviour
         foreach (IceBlock block in grid.IceBlocks)
         {
             if (block.IsBroken) continue;
-            if (near && (Mathf.Abs(block.Cell.x - center.x) > nearRadius || Mathf.Abs(block.Cell.y - center.y) > nearRadius)) continue;
-            candidates.Add(block.Cell);
+            var candidate = grid.WorldToCell(block.transform.position);
+            if (grid.GetBlock(candidate) != block) continue;
+            if (near && (Mathf.Abs(candidate.x - center.x) > nearRadius || Mathf.Abs(candidate.y - center.y) > nearRadius)) continue;
+            candidates.Add(candidate);
         }
         cell = candidates.Count > 0 ? candidates[Random.Range(0, candidates.Count)] : default;
         return candidates.Count > 0;

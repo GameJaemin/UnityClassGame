@@ -1,0 +1,72 @@
+PASS seesaw_summit.json 기믹 종류
+PASS seesaw_summit.json 기믹 생성
+PASS seesaw_summit.json 얼음 생성 개수
+PASS seesaw_summit.json 네 출발 칸
+PASS seesaw_summit.json 온라인 시작 위치
+PASS seesaw_summit.json 이동 안전 경로 두 개
+PASS seesaw_summit.json 룰렛 미리보기
+PASS seesaw_summit.json 시소 기울기 변화
+PASS seesaw_summit.json 접촉점 운반
+PASS seesaw_summit.json 접촉점 운반
+PASS blink_boulevard.json 기믹 종류
+PASS blink_boulevard.json 기믹 생성
+PASS blink_boulevard.json 얼음 생성 개수
+PASS blink_boulevard.json 네 출발 칸
+PASS blink_boulevard.json 온라인 시작 위치
+PASS blink_boulevard.json 이동 안전 경로 두 개
+PASS blink_boulevard.json 룰렛 미리보기
+PASS blink_boulevard.json 접촉점 운반
+PASS blink_boulevard.json 접촉점 운반
+PASS blink_boulevard.json 꺼짐·콜라이더·AI 경로 제외
+PASS blink_boulevard.json 다시 켜져도 파괴 상태 유지
+PASS blink_boulevard.json 얼음 복구 연동
+PASS blink_boulevard.json 복제 PC 발판 주기 동일
+PASS bounce_carnival.json 기믹 종류
+PASS bounce_carnival.json 기믹 생성
+PASS bounce_carnival.json 얼음 생성 개수
+PASS bounce_carnival.json 네 출발 칸
+PASS bounce_carnival.json 온라인 시작 위치
+PASS bounce_carnival.json 이동 안전 경로 두 개
+PASS bounce_carnival.json 룰렛 미리보기
+PASS bounce_carnival.json 발사대 공중 조작·기절 없음
+PASS bounce_carnival.json 발사 호스트 판정
+PASS bounce_carnival.json 실제 발사대 접촉으로 점프
+PASS hammer_junction.json 기믹 종류
+PASS hammer_junction.json 기믹 생성
+PASS hammer_junction.json 얼음 생성 개수
+PASS hammer_junction.json 네 출발 칸
+PASS hammer_junction.json 온라인 시작 위치
+PASS hammer_junction.json 이동 안전 경로 두 개
+PASS hammer_junction.json 룰렛 미리보기
+PASS hammer_junction.json 해머 왕복 회전
+PASS hammer_junction.json 실제 해머 접촉 기절·밀침
+PASS trick_garden.json 기믹 종류
+PASS trick_garden.json 기믹 생성
+PASS trick_garden.json 얼음 생성 개수
+PASS trick_garden.json 네 출발 칸
+PASS trick_garden.json 온라인 시작 위치
+PASS trick_garden.json 이동 안전 경로 두 개
+PASS trick_garden.json 룰렛 미리보기
+PASS trick_garden.json 시소 기울기 변화
+PASS trick_garden.json 접촉점 운반
+PASS trick_garden.json 접촉점 운반
+PASS trick_garden.json 꺼짐·콜라이더·AI 경로 제외
+PASS trick_garden.json 다시 켜져도 파괴 상태 유지
+PASS trick_garden.json 얼음 복구 연동
+PASS trick_garden.json 복제 PC 발판 주기 동일
+PASS trick_garden.json 해머 왕복 회전
+PASS trick_garden.json 실제 해머 접촉 기절·밀침
+PASS sky_picnic.json 기믹 종류
+PASS sky_picnic.json 기믹 생성
+PASS sky_picnic.json 얼음 생성 개수
+PASS sky_picnic.json 네 출발 칸
+PASS sky_picnic.json 온라인 시작 위치
+PASS sky_picnic.json 이동 안전 경로 두 개
+PASS sky_picnic.json 룰렛 미리보기
+PASS sky_picnic.json 시소 기울기 변화
+PASS sky_picnic.json 접촉점 운반
+PASS sky_picnic.json 접촉점 운반
+PASS sky_picnic.json 발사대 공중 조작·기절 없음
+PASS sky_picnic.json 발사 호스트 판정
+PASS sky_picnic.json 실제 발사대 접촉으로 점프
+PARTY_STAGE_RESULT: 71 checks, 0 failures

@@ -1,0 +1,71 @@
+{
+    "version":  1,
+    "name":  "왕복 항구",
+    "theme":  "harbor",
+    "description":  "왕복하는 빙판을 타고 바다를 건너요. 긴 외곽 길로 우회할 수도 있어요.",
+    "width":  15,
+    "depth":  15,
+    "rows": [
+    "...............",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".III...III.III.",
+    ".III...III.III.",
+    ".III...III.III.",
+    ".III.......III.",
+    ".III.III...III.",
+    ".III.III...III.",
+    ".III.III...III.",
+    ".IIIIIIIIIIIII.",
+    ".IIIIIIIIIIIII.",
+    ".SIIIIIIIIIIIS.",
+    "..............."
+  ],
+    "playerStart":  {
+                        "y":  2,
+                        "x":  2
+                    },
+    "botStarts":  [
+                      {
+                          "y":  2,
+                          "x":  12
+                      },
+                      {
+                          "y":  12,
+                          "x":  2
+                      },
+                      {
+                          "y":  12,
+                          "x":  12
+                      }
+                  ],
+    "gimmicks":  [
+                     {
+                         "x":  6,
+                         "kind":  "move",
+                         "dz":  0,
+                         "angle":  0,
+                         "period":  7,
+                         "phase":  0,
+                         "dx":  2,
+                         "width":  3,
+                         "speed":  25,
+                         "depth":  3,
+                         "z":  5
+                     },
+                     {
+                         "x":  8,
+                         "kind":  "move",
+                         "dz":  0,
+                         "angle":  0,
+                         "period":  9,
+                         "phase":  0,
+                         "dx":  -2,
+                         "width":  3,
+                         "speed":  25,
+                         "depth":  3,
+                         "z":  9
+                     }
+                 ]
+}

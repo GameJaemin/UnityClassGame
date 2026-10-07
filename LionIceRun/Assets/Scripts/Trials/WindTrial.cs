@@ -10,7 +10,8 @@ public class WindTrial : TrialBase
     [Min(0.3f)] public float warnTime = 1.5f;
     [Min(0.5f)] public float duration = 3f;
     [Tooltip("미는 힘 (가속도). 땅에서 버티는 힘(가속 25)보다 작게")]
-    [Min(0f)] public float strength = 9f;
+    [Min(0f)] public float pushAcceleration = 22f;
+    public float strength { get => pushAcceleration; set => pushAcceleration = value; }
 
     ParticleSystem streaks;
 
