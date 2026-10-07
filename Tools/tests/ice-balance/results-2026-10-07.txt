@@ -1,0 +1,74 @@
+PASS 카운트다운/준비 중 보호
+PASS 기존 Main 씬에도 느려진 시간 적용
+PASS 이동 입력 없이 시작 얼음 금감
+PASS 6초에는 일반 얼음 유지
+PASS 서 있기 파괴 약 10초
+IDLE breakSeconds=10.02529
+PASS candy_carousel.json 안전지대와 일반 시작 칸
+PASS candy_carousel.json 밟기/함정 파괴 면역
+PASS candy_carousel.json 원격 안전지대 보호
+PASS candy_carousel.json 60초 전체 붕괴 제거
+PASS candy_carousel.json 120초 붕괴와 안전지대 유지
+PASS clockwork_floe.json 안전지대와 일반 시작 칸
+PASS clockwork_floe.json 밟기/함정 파괴 면역
+PASS clockwork_floe.json 원격 안전지대 보호
+PASS clockwork_floe.json 60초 전체 붕괴 제거
+PASS clockwork_floe.json 120초 붕괴와 안전지대 유지
+PASS conveyor_docks.json 안전지대와 일반 시작 칸
+PASS conveyor_docks.json 밟기/함정 파괴 면역
+PASS conveyor_docks.json 원격 안전지대 보호
+PASS conveyor_docks.json 60초 전체 붕괴 제거
+PASS conveyor_docks.json 120초 붕괴와 안전지대 유지
+PASS default_6x6.json 안전지대와 일반 시작 칸
+PASS default_6x6.json 밟기/함정 파괴 면역
+PASS default_6x6.json 원격 안전지대 보호
+PASS four_outposts.json 안전지대와 일반 시작 칸
+PASS four_outposts.json 밟기/함정 파괴 면역
+PASS four_outposts.json 원격 안전지대 보호
+PASS frost_ring.json 안전지대와 일반 시작 칸
+PASS frost_ring.json 밟기/함정 파괴 면역
+PASS frost_ring.json 원격 안전지대 보호
+PASS harbor_ferries.json 안전지대와 일반 시작 칸
+PASS harbor_ferries.json 밟기/함정 파괴 면역
+PASS harbor_ferries.json 원격 안전지대 보호
+PASS harbor_ferries.json 60초 전체 붕괴 제거
+PASS harbor_ferries.json 120초 붕괴와 안전지대 유지
+PASS hourglass_glacier.json 안전지대와 일반 시작 칸
+PASS hourglass_glacier.json 밟기/함정 파괴 면역
+PASS hourglass_glacier.json 원격 안전지대 보호
+PASS piston_pass.json 안전지대와 일반 시작 칸
+PASS piston_pass.json 밟기/함정 파괴 면역
+PASS piston_pass.json 원격 안전지대 보호
+PASS piston_pass.json 60초 전체 붕괴 제거
+PASS piston_pass.json 120초 붕괴와 안전지대 유지
+PASS polar_foundry.json 안전지대와 일반 시작 칸
+PASS polar_foundry.json 밟기/함정 파괴 면역
+PASS polar_foundry.json 원격 안전지대 보호
+PASS polar_foundry.json 60초 전체 붕괴 제거
+PASS polar_foundry.json 120초 붕괴와 안전지대 유지
+PASS tidal_shuttles.json 안전지대와 일반 시작 칸
+PASS tidal_shuttles.json 밟기/함정 파괴 면역
+PASS tidal_shuttles.json 원격 안전지대 보호
+PASS tidal_shuttles.json 60초 전체 붕괴 제거
+PASS tidal_shuttles.json 120초 붕괴와 안전지대 유지
+PASS windmill_well.json 안전지대와 일반 시작 칸
+PASS windmill_well.json 밟기/함정 파괴 면역
+PASS windmill_well.json 원격 안전지대 보호
+PASS windmill_well.json 60초 전체 붕괴 제거
+PASS windmill_well.json 120초 붕괴와 안전지대 유지
+PASS 회전 막대 강한 타격과 기존 밀침 해제
+PASS 넘어지면서 실제로 2m 이상 밀림
+PASS 회전 막대 연속 타격 보호
+PASS 강한 함정도 방패 1회 방어
+SIDE root=(-2.40, 0.00, -2.40) radius=0.5 scale=(1.00, 1.00, 1.00) speed=26
+CONTACT 기믹_rotate (0.71, 0.00, -0.70) @(-1.50, 0.00, -3.63),(0.71, 0.00, -0.70) @(-1.50, -0.32, -3.63)
+CONTACT 기믹_rotate (0.55, 0.00, -0.84) @(-1.42, 0.00, -3.57),(0.55, 0.00, -0.84) @(-1.42, 0.04, -3.57)
+CONTACT 기믹_rotate (0.71, 0.00, -0.71) @(-1.49, 0.00, -3.65),(0.71, 0.00, -0.71) @(-1.49, 0.20, -3.65)
+CONTACT 기믹_rotate (0.55, 0.00, -0.83) @(-1.41, -0.36, -3.59),(0.55, 0.00, -0.83) @(-1.41, 0.00, -3.59)
+CONTACT 기믹_rotate (0.71, 0.00, -0.71) @(-1.48, 0.00, -3.65),(0.71, 0.00, -0.71) @(-1.48, -0.42, -3.65)
+CONTACT 기믹_rotate (0.55, 0.00, -0.83) @(-1.41, -0.42, -3.59),(0.55, 0.00, -0.83) @(-1.41, 0.00, -3.59)
+SIDE player=(-1.41, 0.10, -4.28) state=KnockedDown grounded=False
+PASS 회전 발판 옆면 실제 충돌 타격
+PASS 기존 씬의 바람 강화 적용
+RESULT checks=63 failures=0
+PASS: existing gimmick regression checks=90; editor only, no EXE/ZIP build.

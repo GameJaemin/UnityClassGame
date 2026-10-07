@@ -1,0 +1,11 @@
+PASS 준비 중 접지는 얼음을 깨지 않음
+PASS 즉시 점프한 새 칸의 밟힘 1회 0 stage=Cracked
+PASS 즉시 점프한 새 칸의 밟힘 1회 1 stage=Cracked
+PASS 즉시 점프한 새 칸의 밟힘 1회 2 stage=Cracked
+PASS 실제 물리에서 연속 점프 3회 실행
+PASS 같은 칸의 예약 재점프 착지마다 금 진행
+PASS 공중 통과만으로 밟힘 판정하지 않음
+PASS 접지 유지 여러 물리 프레임에도 중복 금 방지
+PASS 안전지대 점프 보호 유지
+PASS 클라이언트 얼음 상태를 임의로 변경하지 않음
+RESULT checks=10 failures=0

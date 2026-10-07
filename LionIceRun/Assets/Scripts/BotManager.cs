@@ -71,8 +71,8 @@ public class BotManager : MonoBehaviour
 
     void OnStateChanged(GameManager.GameState state)
     {
-        if (state != GameManager.GameState.Playing) return;
-        foreach (BotBrain bot in bots) bot.Activate();
+        if (!isActiveAndEnabled || OnlineGameSession.InRoom || state != GameManager.GameState.Playing) return;
+        foreach (BotBrain bot in bots) if (bot != null) bot.Activate();
     }
 
     // 지정 시작 칸으로 채우지 못한 봇만 안전한 무작위 칸에 배치한다.
@@ -83,7 +83,7 @@ public class BotManager : MonoBehaviour
         float total = 0f;
         foreach (IceBlock block in grid.IceBlocks)
         {
-            if (block.IsBroken || block.CurrentStage == IceBlock.Stage.Shaking) continue;
+            if (block.IsBroken || block.IsSafe || block.CurrentStage == IceBlock.Stage.Shaking) continue;
             if (used != null && used.Contains(block.Cell)) continue;
             Vector2Int d = block.Cell - grid.StartCell;
             if (Mathf.Abs(d.x) <= startClearance && Mathf.Abs(d.y) <= startClearance) continue;
@@ -156,7 +156,7 @@ public class BotManager : MonoBehaviour
             skin.animatorController = playerSkin.animatorController;
             skin.modelOffset = playerSkin.modelOffset;
             skin.modelYaw = playerSkin.modelYaw;
-            skin.skin = (PlayerSkin.Skin)Random.Range(0, System.Enum.GetValues(typeof(PlayerSkin.Skin)).Length);
+            skin.skin = (PlayerSkin.Skin)SoloGameSeries.BotSkin(index, Random.Range(0, System.Enum.GetValues(typeof(PlayerSkin.Skin)).Length));
         }
 
         var brain = go.AddComponent<BotBrain>();

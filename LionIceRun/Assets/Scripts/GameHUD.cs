@@ -270,6 +270,8 @@ public class GameHUD : MonoBehaviour
         }
 
         if (manager != null && manager.State == GameManager.GameState.GameOver
+            && !OnlineGameSession.InRoom
+            && !GamePreferences.InputBlocked
             && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
             manager.Restart();
     }
@@ -433,6 +435,7 @@ public class GameHUD : MonoBehaviour
         if (bannerRoutine != null) StopCoroutine(bannerRoutine);
         bannerRoutine = StartCoroutine(PlayBanner(won ? "우승!" : "경기 끝!", won ? winBandColor : gameOverBandColor, gameOverBannerTime));
         yield return bannerRoutine;
+        if (OnlineGameSession.InRoom || SoloGameSeries.Active) yield break;
         yield return ShowResult();
     }
 

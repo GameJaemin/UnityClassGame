@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Multiplayer;
@@ -15,7 +16,7 @@ using UnityEngine.SceneManagement;
 
 // 방 코드 로비와 호스트 권한 경기. 씬을 재로드하지 않고 맵/참가자를 재구성해 Relay 접속을 유지한다.
 [DefaultExecutionOrder(-550)]
-public class OnlineGameSession : MonoBehaviour
+public partial class OnlineGameSession : MonoBehaviour
 {
     public enum Phase { Title, Connecting, Lobby, Rolling, Loading, Countdown, Playing, Results, Leaving }
     const string ControlChannel = "LionIceRun.Control.v1";
@@ -46,11 +47,18 @@ public class OnlineGameSession : MonoBehaviour
         && members.Count == network.ConnectedClientsIds.Count && members.All(m => m.ready) && CommonFiles.Count > 0;
 
     ISession session;
-    bool onlineMode, registered, leaving, disposed;
+    bool onlineMode, registered, leaving, disposed, pendingDisconnect, pendingLobbyReset;
+#if UNITY_WEBGL && !UNITY_EDITOR
+    // 같은 브라우저의 두 탭도 서로 다른 게스트로 참가한다. 방 재입장에는 같은 프로필을 쓴다.
+    readonly string webProfile = "web" + Guid.NewGuid().ToString("N").Substring(0, 16);
+#endif
     PlayerController originalPlayer;
     readonly List<OnlineMember> members = new List<OnlineMember>();
     readonly Dictionary<ulong, OnlineActor> actors = new Dictionary<ulong, OnlineActor>();
     readonly Dictionary<int, GameObject> remoteVisuals = new Dictionary<int, GameObject>();
+    readonly Dictionary<int, Renderer[]> remoteRenderers = new Dictionary<int, Renderer[]>();
+    readonly HashSet<int> visualIds = new HashSet<int>();
+    readonly List<int> removedVisuals = new List<int>();
     readonly HashSet<ulong> loadedClients = new HashSet<ulong>();
     readonly Dictionary<ulong, double> awaitingHello = new Dictionary<ulong, double>();
     OnlineMapStamp[] catalog;
@@ -69,16 +77,21 @@ public class OnlineGameSession : MonoBehaviour
     public bool SeriesComplete => series.Complete;
     public string ResultsTitle => SeriesComplete ? "5판 최종 결과" : $"{seriesRound} / 5 라운드 결과";
     public string ResultsHint => SeriesComplete ? "합산 점수 우승: " + series.Winners()
-        : $"{Math.Max(0, (int)Math.Ceiling(nextRoundAt - ServerNow))}초 뒤 {seriesRound + 1} / 5 라운드 자동 시작";
+        : OnlineSeries.ContinueHint(nextRoundAt - ServerNow, seriesRound + 1);
     public int LocalTotal => series.Scores.FirstOrDefault(s => actors.TryGetValue(s.actorId, out var a)
         && !a.spawn.bot && a.spawn.ownerId == network.LocalClientId)?.total ?? 0;
     double deadline, countdownAt;
     float nextPose, nextWorld, nextInput, nextHello;
     uint inputSequence, poseSequence, receivedPose;
+    uint jumpSequence, diveSequence, pushSequence;
     Vector3 inputMove;
     bool held, jump, dive, push;
     InputAction diveAction, pushAction;
+    InputAction moveAction, jumpAction;
+    Transform inputCamera;
     public double ServerNow => network != null && network.IsListening ? network.ServerTime.Time : Time.unscaledTimeAsDouble;
+    public float GimmickSeconds => CurrentPhase == Phase.Playing ? (float)Math.Max(0, ServerNow - countdownAt)
+        : CurrentPhase == Phase.Results ? manager.timer.Elapsed : 0f;
     public string ResultLines
     {
         get
@@ -112,12 +125,18 @@ public class OnlineGameSession : MonoBehaviour
             enabled = false; return;
         }
         network.OnClientConnectedCallback += OnConnected;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        if (network.NetworkConfig.NetworkTransport is UnityTransport transport) transport.UseWebSockets = true;
+#else
+        if (network.NetworkConfig.NetworkTransport is UnityTransport transport) transport.UseWebSockets = false;
+#endif
         network.NetworkConfig.ProtocolVersion = OnlineRules.Protocol;
         network.OnClientDisconnectCallback += OnDisconnected;
-        diveAction = new InputAction("OnlineDive", InputActionType.Button, "<Keyboard>/leftCtrl");
-        diveAction.AddBinding("<Keyboard>/rightCtrl"); diveAction.AddBinding("<Gamepad>/buttonWest");
-        pushAction = new InputAction("OnlinePush", InputActionType.Button, "<Mouse>/leftButton");
-        pushAction.AddBinding("<Gamepad>/rightTrigger");
+        diveAction = GamePreferences.CreateButton("OnlineDive", 5, "<Gamepad>/buttonWest");
+        moveAction = InputSystem.actions.FindAction("Player/Move", true);
+        jumpAction = InputSystem.actions.FindAction("Player/Jump", true);
+        pushAction = GamePreferences.CreateButton("OnlinePush", 6, "<Gamepad>/rightTrigger");
+        GamePreferences.Changed += RefreshSocialBindings;
         diveAction.Enable(); pushAction.Enable();
     }
 
@@ -127,10 +146,20 @@ public class OnlineGameSession : MonoBehaviour
         foreach (string file in MapData.ListFiles().Take(48))
         {
             MapData map = MapData.Load(file);
-            if (map == null || map.version != MapData.CurrentVersion || !OnlineRules.TrySpawns(map, 4, out _)) continue;
+            if (map == null || map.archived || map.version != MapData.CurrentVersion || !OnlineRules.TrySpawns(map, 4, out _)) continue;
             result.Add(new OnlineMapStamp { file = file, hash = OnlineRules.MapHash(map) });
         }
         return result.ToArray();
+    }
+
+    static NetworkOptions PlatformNetworkOptions()
+    {
+        // 세션 참가 때도 지정하여 웹/Windows가 서로 다른 Relay 연결을 쓸 수 있다.
+#if UNITY_WEBGL && !UNITY_EDITOR
+        return new NetworkOptions { RelayProtocol = RelayProtocol.WSS };
+#else
+        return new NetworkOptions { RelayProtocol = RelayProtocol.DTLS };
+#endif
     }
 
     async Task InitializeServices()
@@ -144,8 +173,13 @@ public class OnlineGameSession : MonoBehaviour
         if (!AuthenticationService.Instance.IsSignedIn)
         {
             string profile = Application.isEditor ? "editor" : "player";
+#if UNITY_WEBGL && !UNITY_EDITOR
+            profile = webProfile;
+#endif
+#if !UNITY_WEBGL || UNITY_EDITOR
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-onlineProfile") profile = args[i + 1];
+#endif
             AuthenticationService.Instance.SwitchProfile(profile);
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
@@ -163,7 +197,7 @@ public class OnlineGameSession : MonoBehaviour
             {
                 Name = OnlineRules.Nickname(nickname) + "의 얼음 로비", Type = "LionIceRun.v1",
                 MaxPlayers = Mathf.Clamp(maxPlayers, 2, 4), IsPrivate = true
-            }.WithRelayNetwork();
+            }.WithRelayNetwork().WithNetworkOptions(PlatformNetworkOptions());
             ISession created = await MultiplayerService.Instance.CreateSessionAsync(options);
             if (disposed) { await created.LeaveAsync(); return; }
             session = created;
@@ -191,7 +225,7 @@ public class OnlineGameSession : MonoBehaviour
             EnterOnline();
             await InitializeServices();
             ISession joined = await MultiplayerService.Instance.JoinSessionByCodeAsync(code,
-                new JoinSessionOptions { Type = "LionIceRun.v1" });
+                new JoinSessionOptions { Type = "LionIceRun.v1" }.WithNetworkOptions(PlatformNetworkOptions()));
             if (disposed) { await joined.LeaveAsync(); return; }
             session = joined;
             RegisterHandlers();
@@ -212,13 +246,14 @@ public class OnlineGameSession : MonoBehaviour
 
     void EnterOnline()
     {
+        SoloGameSeries.Reset();
         onlineMode = true;
         catalog = ReadCatalog();
         Time.timeScale = 1f;
         originalPlayer.InputEnabled = false;
         originalPlayer.gameObject.SetActive(false);
         var botManager = manager.GetComponent<BotManager>();
-        if (botManager != null) botManager.enabled = false;
+        if (botManager != null) { botManager.StopAllCoroutines(); botManager.enabled = false; }
         foreach (var brain in FindObjectsByType<BotBrain>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         { brain.gameObject.SetActive(false); Destroy(brain.gameObject); }
         roulette.gameCanvas.enabled = false;
@@ -255,6 +290,7 @@ public class OnlineGameSession : MonoBehaviour
         network.CustomMessagingManager.RegisterNamedMessageHandler(ControlChannel, OnControl);
         network.CustomMessagingManager.RegisterNamedMessageHandler(InputChannel, OnInput);
         network.CustomMessagingManager.RegisterNamedMessageHandler(PoseChannel, OnPose);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(SocialChannel, OnSocial);
         registered = true;
     }
 
@@ -263,7 +299,8 @@ public class OnlineGameSession : MonoBehaviour
         RegisterHandlers();
         if (network.IsServer && id != network.LocalClientId && CurrentPhase != Phase.Lobby && CurrentPhase != Phase.Connecting)
         { network.DisconnectClient(id); return; }
-        if (network.IsServer && id != network.LocalClientId) awaitingHello[id] = ServerNow + 20;
+        if (network.IsServer && id != network.LocalClientId && !members.Any(m => m.clientId == id))
+            awaitingHello[id] = ServerNow + 20;
     }
 
     void OnDisconnected(ulong id)
@@ -280,7 +317,7 @@ public class OnlineGameSession : MonoBehaviour
             ReturnToLobby();
         }
         else if (id == network.LocalClientId || id == NetworkManager.ServerClientId)
-        { Notice = "방장과의 연결이 종료되었어요."; LeaveRoom(); }
+        { Notice = "방장과의 연결이 종료되었어요."; pendingDisconnect = true; }
     }
 
     public void ToggleReady()
@@ -303,7 +340,7 @@ public class OnlineGameSession : MonoBehaviour
     void PublishLobby()
     {
         SendAll(new OnlinePacket { kind = "lobby", members = members.ToArray(), fillBots = FillBots,
-            aggressiveBots = AggressiveBots, maxPlayers = session != null ? session.MaxPlayers : 4, round = round });
+            aggressiveBots = AggressiveBots, maxPlayers = session != null ? session.MaxPlayers : 4, round = round, message = Notice });
     }
 
     void Send(OnlinePacket packet, ulong id)
@@ -360,10 +397,13 @@ public class OnlineGameSession : MonoBehaviour
             awaitingHello.Remove(sender);
             PublishLobby(); return;
         }
-        if (member == null || ServerNow - member.lastCommandTime < 0.15) return;
-        member.lastCommandTime = ServerNow;
+        if (member == null) return;
         if (p.kind == "ready" && CurrentPhase == Phase.Lobby)
-        { member.ready = p.ready; PublishLobby(); }
+        {
+            if (ServerNow - member.lastCommandTime < 0.15) return;
+            member.lastCommandTime = ServerNow;
+            member.ready = p.ready; PublishLobby();
+        }
         else if (p.kind == "loaded" && CurrentPhase == Phase.Loading && p.round == round)
         {
             if (p.mapHash != roll.mapHash) { AbortStart("맵 내용이 달라 시작을 취소했어요."); return; }
@@ -384,7 +424,8 @@ public class OnlineGameSession : MonoBehaviour
                 FillBots = p.fillBots; AggressiveBots = p.aggressiveBots;
                 if (CurrentPhase != Phase.Lobby) ResetLobbyWorld();
                 CurrentPhase = Phase.Lobby;
-                Notice = CommonFiles.Count > 0 ? "준비를 누르면 방장이 경기를 시작할 수 있어요." : "공통 맵이 없어요. 같은 버전의 게임을 사용해 주세요.";
+                Notice = !string.IsNullOrEmpty(p.message) ? p.message : CommonFiles.Count > 0
+                    ? "준비를 누르면 방장이 경기를 시작할 수 있어요." : "공통 맵이 없어요. 같은 버전의 게임을 사용해 주세요.";
                 break;
             case "roll":
                 if (p.round <= round) return;
@@ -456,12 +497,13 @@ public class OnlineGameSession : MonoBehaviour
         for (int i = files.Length - 1; i > 0; i--) { int j = UnityEngine.Random.Range(0, i + 1); (files[i], files[j]) = (files[j], files[i]); }
         seriesRound++; round++; receivedPose = poseSequence = 0; nextRoundAt = 0; finalRanking = null;
         roll = new OnlinePacket { kind = "roll", round = round, seriesRound = seriesRound, files = files,
-            startAt = ServerNow + 0.5, speed = roulette.scrollSpeed, spacing = roulette.cardSpacing,
+            startAt = ServerNow + 0.5, speed = MapRouletteMotion.PlannedSpeed(roulette.scrollSpeed,roulette.cardSpacing,GamePreferences.MapSpinSeconds,GamePreferences.MapBrakeSeconds), spacing = roulette.cardSpacing, selectionHold = GamePreferences.MapConfirmSeconds,
             scores = series.Scores.Count > 0 ? series.Snapshot() : null, completedRounds = series.CompletedRounds };
-        roll.stopAt = roll.startAt + UnityEngine.Random.Range(3.5f, 5.5f);
+        // 방장이 정한 시간을 패킷에 고정해 클라이언트의 개인 설정과 관계없이 동기화한다.
+        roll.stopAt = roll.startAt + GamePreferences.MapSpinSeconds;
         roll.stopFrom = (roll.stopAt - roll.startAt) * roll.speed;
-        roll.stopTo = Math.Ceiling((roll.stopFrom + roll.speed * roulette.stopDuration / 3) / roll.spacing) * roll.spacing;
-        roll.duration = (roll.stopTo - roll.stopFrom) * 3 / roll.speed;
+        roll.stopTo = Math.Round((roll.stopFrom + roll.speed * GamePreferences.MapBrakeSeconds / 3) / roll.spacing) * roll.spacing;
+        roll.duration = GamePreferences.MapBrakeSeconds;
         CurrentPhase = Phase.Rolling;
         frontend.HidePanels(); roulette.ShowOnlineRoll(files, 0, false, $"{seriesRound} / 5 · 맵 자동 선택 중…");
         SendAll(roll);
@@ -469,6 +511,10 @@ public class OnlineGameSession : MonoBehaviour
 
     void Update()
     {
+        if (pendingDisconnect && !Busy && !leaving)
+        { pendingDisconnect = false; LeaveRoom(); return; }
+        if (pendingLobbyReset && !Busy && !leaving)
+        { pendingLobbyReset = false; ReturnToLobby(); return; }
         if (!onlineMode || !network.IsListening || Busy) return;
         RegisterHandlers();
         if (!IsHost && CurrentPhase == Phase.Lobby && Time.unscaledTime >= nextHello && !helloAcknowledged)
@@ -487,7 +533,7 @@ public class OnlineGameSession : MonoBehaviour
             string caption = $"{seriesRound} / 5 · " + (selected ? MapData.Load(roll.files[index])?.name + " 선택!"
                 : ServerNow >= roll.stopAt ? "점점 느려져요…" : "맵 자동 선택 중…");
             roulette.RenderOnlinePosition(position, false, caption);
-            if (IsHost && selected && ServerNow >= roll.stopAt + roll.duration + 1) BeginLoad(roll.files[index]);
+            if (IsHost && selected && ServerNow >= roll.stopAt + roll.duration + roll.selectionHold) BeginLoad(roll.files[index]);
         }
         if (IsHost && CurrentPhase == Phase.Loading && ServerNow >= deadline) AbortStart("맵 로딩 시간이 초과되어 로비로 돌아왔어요.");
         if (CurrentPhase == Phase.Countdown)
@@ -592,7 +638,8 @@ public class OnlineGameSession : MonoBehaviour
             go.SetActive(false);
             var controller = go.GetComponent<PlayerController>();
             controller.grid = manager.grid; controller.spawnAtStartCell = false;
-            controller.useExternalInput = true; controller.networkReplica = !IsHost; controller.InputEnabled = false;
+            controller.localPrediction = !IsHost && !spawn.bot && spawn.ownerId == network.LocalClientId;
+            controller.useExternalInput = true; controller.networkReplica = !IsHost && !controller.localPrediction; controller.InputEnabled = false;
             go.GetComponent<IceStepTracker>().grid = manager.grid;
             var skin = go.GetComponent<PlayerSkin>(); skin.skin = (PlayerSkin.Skin)spawn.skin;
             var actor = go.AddComponent<OnlineActor>(); actor.spawn = spawn; actor.controller = controller;
@@ -611,7 +658,10 @@ public class OnlineGameSession : MonoBehaviour
         }
         if (manager.player == null) { Notice = "내 참가자를 찾지 못했어요."; yield break; }
         inputSequence = 0; receivedPose = 0; jump = dive = push = held = false;
-        foreach (var member in members) { member.lastInput = 0; member.lastInputTime = ServerNow; }
+        jumpSequence = diveSequence = pushSequence = 0;
+        nextInput = 0;
+        foreach (var member in members) { member.lastInput = member.lastJump = member.lastDive = member.lastPush = 0; member.lastInputTime = ServerNow; }
+        inputCamera = Camera.main != null ? Camera.main.transform : null;
         var view = Camera.main != null ? Camera.main.GetComponent<QuarterViewCamera>() : null;
         if (view != null) { view.player = manager.player.transform; view.Fit(); }
         foreach (var trial in manager.GetComponents<TrialBase>()) trial.player = manager.player;
@@ -632,31 +682,43 @@ public class OnlineGameSession : MonoBehaviour
 
     void CaptureInput()
     {
-        if (manager.player == null || !manager.player.gameObject.activeSelf)
+        if (GamePreferences.InputBlocked || manager.player == null || !manager.player.gameObject.activeSelf)
         { held = jump = dive = push = false; inputMove = Vector3.zero; }
         else
         {
-            Vector2 move = InputSystem.actions.FindAction("Player/Move").ReadValue<Vector2>();
-            var jumpInput = InputSystem.actions.FindAction("Player/Jump");
-            Transform camera = Camera.main != null ? Camera.main.transform : null;
+            Vector2 move = moveAction.ReadValue<Vector2>();
+            var jumpInput = jumpAction;
+            Transform camera = inputCamera;
             Vector3 forward = camera != null ? Vector3.ProjectOnPlane(camera.forward, Vector3.up).normalized : Vector3.forward;
             Vector3 right = camera != null ? Vector3.ProjectOnPlane(camera.right, Vector3.up).normalized : Vector3.right;
             inputMove = Vector3.ClampMagnitude(forward * move.y + right * move.x, 1f);
             held = jumpInput.IsPressed(); jump |= jumpInput.WasPressedThisFrame();
             dive |= diveAction.WasPressedThisFrame(); push |= pushAction.WasPressedThisFrame();
         }
-        if (Time.unscaledTime < nextInput && !jump && !dive && !push) return;
-        nextInput = Time.unscaledTime + 1f / 30f;
-        inputSequence++;
-        if (IsHost) ApplyInput(network.LocalClientId, inputSequence, inputMove, held, jump, dive, push);
+        bool sendNow = Time.unscaledTime >= nextInput || jump || dive || push;
+        if (jump) jumpSequence++;
+        if (dive) diveSequence++;
+        if (push) pushSequence++;
+        if (sendNow) inputSequence++;
+        // 내 조작은 전송 타이머/호스트 왕복을 기다리지 않고 매 프레임 적용한다.
+        if (manager.player != null && manager.player.gameObject.activeSelf)
+            manager.player.SetExternalInput(inputMove, held, jump, dive, push, inputSequence);
+        jump = dive = push = false;
+        if (!sendNow) return;
+        nextInput = Mathf.Max(nextInput + 1f / 50f, Time.unscaledTime);
+        if (IsHost)
+        {
+            var member = members.Find(m => m.clientId == network.LocalClientId);
+            if (member != null) { member.lastInput = inputSequence; member.lastInputTime = ServerNow; }
+        }
         else
         {
             using (var writer = new FastBufferWriter(64, Allocator.Temp))
             {
                 writer.WriteValueSafe(round); writer.WriteValueSafe(inputSequence); writer.WriteValueSafe(inputMove);
-                writer.WriteValueSafe(held); writer.WriteValueSafe(jump); writer.WriteValueSafe(dive); writer.WriteValueSafe(push);
+                writer.WriteValueSafe(held); writer.WriteValueSafe(jumpSequence); writer.WriteValueSafe(diveSequence); writer.WriteValueSafe(pushSequence);
                 network.CustomMessagingManager.SendNamedMessage(InputChannel, 0, writer,
-                    NetworkDelivery.ReliableSequenced);
+                    NetworkDelivery.UnreliableSequenced);
             }
         }
         jump = dive = push = false;
@@ -669,21 +731,28 @@ public class OnlineGameSession : MonoBehaviour
         {
             reader.ReadValueSafe(out int messageRound); reader.ReadValueSafe(out uint sequence);
             reader.ReadValueSafe(out Vector3 move); reader.ReadValueSafe(out bool holdJump);
-            reader.ReadValueSafe(out bool pressJump); reader.ReadValueSafe(out bool pressDive); reader.ReadValueSafe(out bool pressPush);
-            if (messageRound == round) ApplyInput(sender, sequence, move, holdJump, pressJump, pressDive, pressPush);
+            reader.ReadValueSafe(out uint jumpCount); reader.ReadValueSafe(out uint diveCount); reader.ReadValueSafe(out uint pushCount);
+            if (messageRound == round) ApplyInput(sender, sequence, move, holdJump, jumpCount, diveCount, pushCount);
         }
         catch (Exception) { /* 잘린 입력 패킷은 무시한다. */ }
     }
 
-    void ApplyInput(ulong sender, uint sequence, Vector3 move, bool holdJump, bool pressJump, bool pressDive, bool pressPush)
+    void ApplyInput(ulong sender, uint sequence, Vector3 move, bool holdJump, uint jumpCount, uint diveCount, uint pushCount)
     {
         var member = members.Find(m => m.clientId == sender);
         if (member == null || !OnlineRules.Newer(sequence, member.lastInput)
             || float.IsNaN(move.x) || float.IsInfinity(move.x) || float.IsNaN(move.z) || float.IsInfinity(move.z)) return;
         member.lastInput = sequence; member.lastInputTime = ServerNow;
+        // 버튼 누름 순번을 후속 패킷에도 넣어서 패킷이 사라져도 다음 최신 입력으로 복구한다.
+        bool pressJump = OnlineRules.Newer(jumpCount, member.lastJump);
+        bool pressDive = OnlineRules.Newer(diveCount, member.lastDive);
+        bool pressPush = OnlineRules.Newer(pushCount, member.lastPush);
+        if (pressJump) member.lastJump = jumpCount;
+        if (pressDive) member.lastDive = diveCount;
+        if (pressPush) member.lastPush = pushCount;
         foreach (var actor in actors.Values)
             if (!actor.spawn.bot && actor.spawn.ownerId == sender && actor.gameObject.activeSelf)
-                actor.controller.SetExternalInput(Vector3.ClampMagnitude(new Vector3(move.x, 0, move.z), 1), holdJump, pressJump, pressDive, pressPush);
+                actor.controller.SetExternalInput(Vector3.ClampMagnitude(new Vector3(move.x, 0, move.z), 1), holdJump, pressJump, pressDive, pressPush, sequence);
     }
 
     void SendPoses()
@@ -694,13 +763,15 @@ public class OnlineGameSession : MonoBehaviour
             foreach (var actor in actors.Values)
             {
                 var c = actor.controller;
+                var motion = actor.CaptureMotion();
                 manager.StatusOf(c, out bool fallen, out float remaining, out bool waiting);
                 writer.WriteValueSafe(actor.spawn.actorId); writer.WriteValueSafe(actor.gameObject.activeSelf);
-                writer.WriteValueSafe(actor.transform.position); writer.WriteValueSafe(actor.transform.rotation);
-                writer.WriteValueSafe(c.Velocity); writer.WriteValueSafe((byte)c.State); writer.WriteValueSafe(c.IsGrounded);
+                writer.WriteValueSafe(motion.position); writer.WriteValueSafe(motion.rotation);
+                writer.WriteValueSafe(motion.velocity); writer.WriteValueSafe((byte)motion.state); writer.WriteValueSafe(motion.grounded);
                 writer.WriteValueSafe(float.IsNegativeInfinity(c.LastPushTime) ? -1f : Time.time - c.LastPushTime);
                 writer.WriteValueSafe(actor.GetComponent<PlayerPowerUps>().HasShield); writer.WriteValueSafe(c.BoostRemaining);
                 writer.WriteValueSafe(fallen); writer.WriteValueSafe(remaining); writer.WriteValueSafe(waiting);
+                writer.WriteValueSafe(motion.acknowledged); writer.WriteValueSafe(motion.down); writer.WriteValueSafe(motion.shove);
             }
             foreach (ulong id in network.ConnectedClientsIds)
                 if (id != network.LocalClientId) network.CustomMessagingManager.SendNamedMessage(PoseChannel, id, writer, NetworkDelivery.UnreliableSequenced);
@@ -722,8 +793,9 @@ public class OnlineGameSession : MonoBehaviour
                 reader.ReadValueSafe(out Vector3 velocity); reader.ReadValueSafe(out byte state); reader.ReadValueSafe(out bool grounded);
                 reader.ReadValueSafe(out float pushAge); reader.ReadValueSafe(out bool shield); reader.ReadValueSafe(out float boost);
                 reader.ReadValueSafe(out bool fallen); reader.ReadValueSafe(out float remaining); reader.ReadValueSafe(out bool waiting);
+                reader.ReadValueSafe(out uint acknowledged); reader.ReadValueSafe(out float down); reader.ReadValueSafe(out float shove);
                 if (actors.TryGetValue(id, out var actor)) actor.ApplyPose(position, rotation, velocity,
-                    (PlayerController.MoveState)state, grounded, pushAge, shield, boost, active, fallen, remaining, waiting);
+                    (PlayerController.MoveState)state, grounded, pushAge, shield, boost, active, fallen, remaining, waiting, acknowledged, down, shove);
             }
         }
         catch (Exception) { /* 잘린 스냅샷은 다음 패킷에서 복구한다. */ }
@@ -731,6 +803,7 @@ public class OnlineGameSession : MonoBehaviour
 
     void SendWorld()
     {
+        manager.grid.SafeZones?.ApplyTime(manager.timer.Elapsed);
         var stages = new StringBuilder();
         foreach (var block in manager.grid.IceBlocks) stages.Append((char)('0' + (int)block.CurrentStage));
         ulong[] ranking = manager.State == GameManager.GameState.GameOver
@@ -745,6 +818,7 @@ public class OnlineGameSession : MonoBehaviour
         seriesRound = p.seriesRound; nextRoundAt = p.nextRoundAt;
         if (p.scores != null) series.ApplySnapshot(p.completedRounds, p.scores);
         RecordSeriesVictory();
+        manager.grid.SafeZones?.ApplyTime(p.elapsed);
         if (p.stages != null && p.stages.Length == manager.grid.IceBlocks.Count)
             for (int i = 0; i < p.stages.Length; i++)
                 if (p.stages[i] >= '0' && p.stages[i] <= '4') manager.grid.IceBlocks[i].ApplyNetworkStage((IceBlock.Stage)(p.stages[i] - '0'));
@@ -756,25 +830,33 @@ public class OnlineGameSession : MonoBehaviour
             int place = Array.FindIndex(p.ranking, id => actors.TryGetValue(id, out var a) && a.controller == manager.player) + 1;
             var winner = actors.TryGetValue(p.ranking[0], out var winningActor) ? winningActor.controller : null;
             manager.ApplyOnlineResult(winner, place); CurrentPhase = Phase.Results;
+            foreach (var actor in actors.Values)
+            { actor.controller.InputEnabled = false; actor.GetComponent<Rigidbody>().isKinematic = true; }
         }
     }
 
     void ApplyVisuals(OnlineVisualState[] visuals)
     {
-        var ids = new HashSet<int>(); bool windActive = false;
+        visualIds.Clear(); bool windActive = false;
         foreach (var v in visuals)
         {
             if (v.kind == 5)
             { manager.GetComponent<WindTrial>()?.ApplyNetworkWind(v.visible, v.rotation); windActive = v.visible; continue; }
-            ids.Add(v.id);
-            if (!remoteVisuals.TryGetValue(v.id, out GameObject go)) { go = CreateVisual(v.kind); if (go == null) continue; remoteVisuals[v.id] = go; }
+            visualIds.Add(v.id);
+            if (!remoteVisuals.TryGetValue(v.id, out GameObject go))
+            {
+                go = CreateVisual(v.kind); if (go == null) continue;
+                remoteVisuals[v.id] = go; remoteRenderers[v.id] = go.GetComponentsInChildren<Renderer>();
+            }
             go.transform.SetPositionAndRotation(v.position, v.rotation); go.transform.localScale = v.scale;
-            foreach (var renderer in go.GetComponentsInChildren<Renderer>()) renderer.enabled = v.visible;
+            foreach (var renderer in remoteRenderers[v.id]) renderer.enabled = v.visible;
             var animator = go.GetComponent<Animator>();
             if (animator != null && animator.runtimeAnimatorController != null && v.animation != 0) animator.Play(v.animation, 0, v.animationTime);
         }
         if (!windActive) manager.GetComponent<WindTrial>()?.ApplyNetworkWind(false, Quaternion.identity);
-        foreach (var entry in remoteVisuals.ToArray()) if (!ids.Contains(entry.Key)) { Destroy(entry.Value); remoteVisuals.Remove(entry.Key); }
+        removedVisuals.Clear();
+        foreach (var entry in remoteVisuals) if (!visualIds.Contains(entry.Key)) removedVisuals.Add(entry.Key);
+        foreach (int id in removedVisuals) { Destroy(remoteVisuals[id]); remoteVisuals.Remove(id); remoteRenderers.Remove(id); }
     }
 
     GameObject CreateVisual(int kind)
@@ -851,7 +933,13 @@ public class OnlineGameSession : MonoBehaviour
         catch (Exception e) { Debug.LogException(e); Notice = "로비 상태 갱신 실패. 나간 뒤 다시 만들어 주세요."; }
     }
 
-    void AbortStart(string message) { Notice = message; seriesActive = false; ReturnToLobby(); }
+    void AbortStart(string message)
+    {
+        Debug.LogWarning("온라인 시리즈 취소: " + message);
+        Notice = message; seriesActive = false;
+        if (Busy) pendingLobbyReset = true;
+        else ReturnToLobby();
+    }
 
     void ResetTrials()
     {
@@ -862,6 +950,7 @@ public class OnlineGameSession : MonoBehaviour
             if (visual != null) { if (visual.kind == 5) visual.GetComponent<ParticleSystem>()?.Stop(); else Destroy(visual.gameObject); }
         foreach (var go in remoteVisuals.Values) if (go != null) Destroy(go);
         remoteVisuals.Clear();
+        remoteRenderers.Clear(); visualIds.Clear(); removedVisuals.Clear();
     }
 
     void DestroyActors()
@@ -873,6 +962,7 @@ public class OnlineGameSession : MonoBehaviour
     void ResetLobbyWorld()
     {
         StopAllCoroutines(); DestroyActors(); ResetTrials(); manager.ResetOnlineMatch(null);
+        GameHUD.Instance?.ResetOnlineHud(null);
         manager.grid.Clear();
         roulette.gameCanvas.enabled = false; roulette.selectionCanvas.gameObject.SetActive(false);
         if (roulette.titleDecorations != null) roulette.titleDecorations.SetActive(true);
@@ -898,26 +988,32 @@ public class OnlineGameSession : MonoBehaviour
             network.CustomMessagingManager.UnregisterNamedMessageHandler(ControlChannel);
             network.CustomMessagingManager.UnregisterNamedMessageHandler(InputChannel);
             network.CustomMessagingManager.UnregisterNamedMessageHandler(PoseChannel);
+            network.CustomMessagingManager.UnregisterNamedMessageHandler(SocialChannel);
         }
         registered = false;
+        ClearSocial();
         try { if (current != null) await current.LeaveAsync(); }
         catch (Exception e) { Debug.LogWarning("로비 나가기 실패: " + e.Message); }
         // 세션 종료 후에도 남은 연결이 있으면 정리한다.
         if (network != null && network.IsListening) network.Shutdown();
+        // Shutdown은 프레임 끝에 완료된다. 그 전에 새 방을 만들면 이전 연결이 새 연결을 종료할 수 있다.
+        while (!disposed && network != null && network.ShutdownInProgress) await Task.Yield();
     }
 
     void RestoreTitle()
     {
         seriesActive = false; seriesRound = 0; nextRoundAt = 0; series.Clear();
         ResetLobbyWorld(); onlineMode = false; CurrentPhase = Phase.Title; members.Clear(); awaitingHello.Clear();
+        pendingDisconnect = pendingLobbyReset = false; helloAcknowledged = false;
         manager.grid.networkReplica = false;
+        roulette.ShowTitle();
         frontend.OpenModes();
     }
 
     public void StartSolo()
     {
         if (Busy || onlineMode) return;
-        // 솔로는 기존의 시작/씬 재로드 경로를 사용한다.
+        SoloGameSeries.Begin(manager);
         var selectedSkin = originalPlayer.GetComponent<PlayerSkin>();
         if (selectedSkin != null)
         {
@@ -925,6 +1021,7 @@ public class OnlineGameSession : MonoBehaviour
             if (selectedSkin.skin != choice) { selectedSkin.skin = choice; selectedSkin.Apply(); }
         }
         originalPlayer.gameObject.SetActive(true); manager.player = originalPlayer;
+        if (selectedSkin != null) originalPlayer.GetComponent<PlayerNameplate>()?.SetName(GamePreferences.PublicName((int)selectedSkin.skin), true, false);
         var botManager = manager.GetComponent<BotManager>();
         if (botManager != null && !botManager.enabled) { MapRoulette.AutoStartSolo = true; ReloadSoloScene(); return; }
         frontend.HidePanels(); roulette.selectionCanvas.gameObject.SetActive(true); roulette.BeginChoosing();
@@ -940,6 +1037,7 @@ public class OnlineGameSession : MonoBehaviour
 
     async void OnDestroy()
     {
+        GamePreferences.Changed -= RefreshSocialBindings;
         disposed = true;
         if (Instance == this) Instance = null;
         if (network != null) { network.OnClientConnectedCallback -= OnConnected; network.OnClientDisconnectCallback -= OnDisconnected; }

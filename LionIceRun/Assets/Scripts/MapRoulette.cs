@@ -22,7 +22,7 @@ public class MapRoulette : MonoBehaviour
     public TMPro.TMP_Text buttonText;
     public UnityEngine.UI.Button stopButton;
     [Min(0.1f)] public float scrollSpeed = 2300f;
-    [Min(0.5f)] public float stopDuration = 3.5f;
+    [HideInInspector] public float stopDuration = .8f;
     [Min(100f)] public float cardSpacing = 440f;
 
     public static bool SkipNextSelection;
@@ -42,6 +42,10 @@ public class MapRoulette : MonoBehaviour
     float brakingDuration;
     float frozenTimeScale;
     bool ownsPause;
+    float soloStopAt;
+    float soloConfirmSeconds;
+    float soloStartTime, soloSpinSeconds, soloSpeed;
+    double soloStartPosition;
 
     void Awake()
     {
@@ -60,7 +64,7 @@ public class MapRoulette : MonoBehaviour
         }
         if (manager == null || manager.grid == null || manager.player == null || selectionCanvas == null
             || titleGroup == null || rouletteGroup == null || startButton == null
-            || stopButton == null || status == null || buttonText == null || cards == null || cards.Length < 3
+            || status == null || cards == null || cards.Length < 3
             || previews == null || previews.Length != cards.Length || names == null || names.Length != cards.Length)
         {
             if (selectionCanvas != null) selectionCanvas.gameObject.SetActive(false);
@@ -92,7 +96,7 @@ public class MapRoulette : MonoBehaviour
         if (OnlineGameSession.Instance != null && OnlineGameSession.Instance.isActiveAndEnabled)
             startButton.onClick.AddListener(OnlineGameSession.Instance.frontend.OpenModes);
         else startButton.onClick.AddListener(BeginChoosing);
-        stopButton.onClick.AddListener(StopChoosing);
+        HideLegacyStopButton();
         if (countdown)
         {
             // 맵 선택 화면의 배경·제목·카드를 모두 숨기고 실제 맵 위에서 준비한다.
@@ -121,16 +125,16 @@ public class MapRoulette : MonoBehaviour
         foreach (string file in MapData.ListFiles())
         {
             MapData map = MapData.Load(file);
-            if (map == null || map.IceCount == 0) continue;
+            if (map == null || map.archived || map.IceCount == 0) continue;
             files.Add(file);
             mapNames.Add(string.IsNullOrWhiteSpace(map.name) ? System.IO.Path.GetFileNameWithoutExtension(file) : map.name);
-            screenshots.Add(Resources.Load<Sprite>("MapPreviews/" + System.IO.Path.GetFileNameWithoutExtension(file)));
+            screenshots.Add(MapPreview.Get(file, map));
         }
         if (files.Count == 0)
         {
             yield return new WaitUntil(() => choosing);
             status.text = "저장된 맵이 없어요\n현재 맵으로 시작합니다";
-            stopButton.gameObject.SetActive(false);
+            HideLegacyStopButton();
             yield return new WaitForSecondsRealtime(1.5f);
             ReleasePause();
             if (gameCanvas != null) gameCanvas.enabled = true;
@@ -167,7 +171,8 @@ public class MapRoulette : MonoBehaviour
         if (!choosing || completed || countdown || files.Count == 0) return;
         if (!stopping)
         {
-            position += scrollSpeed * Time.unscaledDeltaTime;
+            position = soloStartPosition + soloSpeed*Mathf.Min(Time.unscaledTime-soloStartTime,soloSpinSeconds);
+            if (Time.unscaledTime >= soloStopAt) StopChoosing();
         }
         else
         {
@@ -191,8 +196,29 @@ public class MapRoulette : MonoBehaviour
         titleGroup.SetActive(false);
         if (titleDecorations != null) titleDecorations.SetActive(false);
         rouletteGroup.SetActive(true);
-        stopButton.gameObject.SetActive(files.Count > 0);
+        HideLegacyStopButton();
         choosing = true;
+        // 현재 판의 시간을 고정한다. 설정 변경은 다음 맵 선택부터 적용한다.
+        stopDuration = GamePreferences.MapBrakeSeconds;
+        soloConfirmSeconds = GamePreferences.MapConfirmSeconds;
+        soloSpinSeconds = GamePreferences.MapSpinSeconds;
+        soloSpeed = MapRouletteMotion.PlannedSpeed(scrollSpeed,cardSpacing,soloSpinSeconds,stopDuration);
+        soloStartTime=Time.unscaledTime; soloStartPosition=System.Math.Round(position/cardSpacing)*cardSpacing;
+        position=soloStartPosition; soloStopAt = soloStartTime + soloSpinSeconds;
+    }
+
+    public void ShowTitle()
+    {
+        StopAllCoroutines();
+        ReleasePause();
+        choosing = stopping = completed = countdown = false;
+        selectionCanvas.gameObject.SetActive(true);
+        if (gameCanvas != null) gameCanvas.enabled = false;
+        rouletteGroup.SetActive(false);
+        titleGroup.SetActive(true);
+        startButton.interactable = true;
+        HideLegacyStopButton();
+        if (titleDecorations != null) titleDecorations.SetActive(true);
     }
 
     public void StopChoosing()
@@ -200,18 +226,18 @@ public class MapRoulette : MonoBehaviour
         if (OnlineGameSession.InRoom) { OnlineGameSession.Instance.StopRoll(); return; }
         if (!choosing || stopping || completed || files.Count == 0) return;
         stopping = true;
-        stopButton.interactable = false;
-        buttonText.text = "선택 중…";
+        HideLegacyStopButton();
         status.text = "점점 느려져요…";
         stopFrom = position;
         // 감속 시작 속도와 같은 초기 기울기를 갖고, 카드 중심에서 속도 0으로 멈춘다.
-        stopTo = System.Math.Ceiling((position + scrollSpeed * stopDuration / 3f) / cardSpacing) * cardSpacing;
-        brakingDuration = (float)((stopTo - stopFrom) * 3 / scrollSpeed);
+        stopTo = System.Math.Round((position + soloSpeed * stopDuration / 3f) / cardSpacing) * cardSpacing;
+        brakingDuration = stopDuration;
         stopTime = Time.unscaledTime;
     }
 
     void RenderCards()
     {
+        if (SoloGameSeries.Active) status.text = $"{SoloGameSeries.Round} / 5 · " + (stopping ? "점점 느려져요…" : "맵 자동 선택 중…");
         int center = (int)System.Math.Floor(position / cardSpacing);
         double remainder = position - center * cardSpacing;
         for (int i = 0; i < cards.Length; i++)
@@ -242,13 +268,11 @@ public class MapRoulette : MonoBehaviour
             MapData map = MapData.Load(file);
             files.Add(file);
             mapNames.Add(map != null ? map.name : file);
-            screenshots.Add(Resources.Load<Sprite>("MapPreviews/" + System.IO.Path.GetFileNameWithoutExtension(file)));
+            screenshots.Add(MapPreview.Get(file, map));
         }
         position = atPosition;
         status.text = caption;
-        stopButton.interactable = canStop;
-        stopButton.gameObject.SetActive(false);
-        buttonText.text = canStop ? "멈추기" : "방장이 선택 중";
+        HideLegacyStopButton();
         RenderCards();
     }
 
@@ -256,9 +280,7 @@ public class MapRoulette : MonoBehaviour
     {
         position = atPosition;
         status.text = caption;
-        stopButton.interactable = canStop;
-        stopButton.gameObject.SetActive(false);
-        buttonText.text = canStop ? "멈추기" : "선택 중…";
+        HideLegacyStopButton();
         if (files.Count > 0) RenderCards();
     }
 
@@ -267,12 +289,16 @@ public class MapRoulette : MonoBehaviour
         int sequence = (int)System.Math.Round(position / cardSpacing);
         int index = MapRouletteMotion.CardIndex(sequence, files.Count);
         status.text = $"{mapNames[index]} 선택!";
-        buttonText.text = "선택 완료!";
-        yield return new WaitForSecondsRealtime(1f);
+        yield return new WaitForSecondsRealtime(soloConfirmSeconds);
         pendingMap = files[index];
         ReleasePause();
         if (OnlineGameSession.Instance != null && OnlineGameSession.Instance.isActiveAndEnabled) OnlineGameSession.Instance.ReloadSoloScene();
         else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void HideLegacyStopButton()
+    {
+        if (stopButton != null) stopButton.gameObject.SetActive(false);
     }
 
     void ReleasePause()
@@ -288,6 +314,12 @@ public class MapRoulette : MonoBehaviour
 // 화면 프레임 수와 관계없이 진행하는 감속 곡선. 종료 위치는 중앙 카드의 정수 칸이다.
 internal static class MapRouletteMotion
 {
+    // 시간은 고정하고 속도를 맞춰 카드 중앙에서 연속적인 감속으로 끝낸다.
+    internal static float PlannedSpeed(float speed,float spacing,float spin,float brake)
+    {
+        double effective=spin+brake/3d;
+        return (float)(System.Math.Ceiling(speed*effective/spacing)*spacing/effective);
+    }
     internal static int CardIndex(int sequence, int count) => count > 0 ? ((-sequence % count) + count) % count : -1;
 
     internal static double Position(double from, double to, double t)

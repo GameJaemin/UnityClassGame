@@ -1,0 +1,2 @@
+FAIL: local response at 100ms, delta=0, one-way input/pose delay=180ms, drop=10%
+ prediction=True, replica=False, enabled=True, active=True, kinematic=False, state=Normal, move=(0.00, 0.00), jump=False, keyboard=False

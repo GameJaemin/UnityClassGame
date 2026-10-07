@@ -14,7 +14,10 @@ using System.Linq;
 public class OnlineSeries
 {
     public const int RoundCount = 5;
-    public const double ResultsSeconds = 8;
+    public const double ResultsSeconds = 5;
+
+    public static string ContinueHint(double remaining, int nextRound)
+        => $"다음 레벨이 {Math.Max(0, (int)Math.Ceiling(remaining))}초 뒤 이어서 시작돼요!\n{nextRound} / 5 라운드 · 자동 진행";
     readonly List<OnlineScore> scores = new List<OnlineScore>();
     public int CompletedRounds { get; private set; }
     public bool Complete => CompletedRounds == RoundCount;
@@ -28,7 +31,7 @@ public class OnlineSeries
     public bool CompleteRound(int number, ulong[] ranking)
     {
         if (Complete || number != CompletedRounds + 1 || ranking == null || ranking.Length != scores.Count
-            || ranking.Length < 2 || ranking.Length > 4 || ranking.Distinct().Count() != ranking.Length
+            || ranking.Length < 1 || ranking.Length > 4 || ranking.Distinct().Count() != ranking.Length
             || ranking.Any(id => scores.All(s => s.actorId != id))) return false;
         for (int i = 0; i < ranking.Length; i++)
         {

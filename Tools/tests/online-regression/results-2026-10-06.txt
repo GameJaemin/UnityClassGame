@@ -1,0 +1,39 @@
+2026-10-06 / Unity 6000.6.3f1 / 실제 Main 씬 온라인 회귀 검사
+
+수정:
+- 타이틀 복귀 시 룰렛 그룹·선택 플래그·시작 버튼 상태를 함께 초기화.
+- 솔로 봇 생성 코루틴/삭제된 봇에 대한 경기 이벤트가 온라인에 개입하지 않도록 차단.
+- 온라인 결과에서는 솔로 결과 패널·R 키 재시작 흐름을 차단.
+- 준비 연타 제한은 ready 명령에만 적용. 로딩 완료/실패 응답은 제한하지 않음.
+- Busy 처리 중 연결 종료/시리즈 취소 요청은 저장했다가 처리 완료 후 수행.
+- 네트워크 Shutdown 완료 후 타이틀/새 방 생성 허용. 종료 시 HUD 코루틴과 연결 확인 상태 초기화.
+
+검증:
+ONLINE_CHECKS_PASSED: 28개
+ONLINE_SERIES_CHECKS_PASSED: 23개
+
+두 복사 프로젝트의 Unity 에디터 Play 모드와 Windows Development EXE 두 개에서 실제 Sessions/Relay 접속.
+실제 Main 씬·모델·프리팹·UI를 사용. 순위를 재현하기 위해 매 판 지정 참가자 하나만 남겨 종료 유도.
+
+에디터 host/client: PASS
+EXE host/client: PASS
+각자 준비 1회로 rounds=5, 양쪽 totals=17,14,11,8 일치.
+5판 후 로비에서 두 참가자 유지: PASS
+다음 경기 중 호스트 Busy 상태에서 클라이언트 퇴장 → 시리즈 취소 후 호스트 로비 유지: PASS
+타이틀 버튼으로 룰렛 숨김·시작 버튼 재활성화·네트워크 종료: PASS
+타이틀 시작 버튼 이벤트 → 모드 선택: PASS
+같은 NetworkManager로 방 재생성·나가기: PASS
+EXE에서 온라인 후 솔로 선택·감속·카운트다운·경기 시작: PASS
+검증 EXE의 게임 코드 예외 없음. 시리즈 취소 경고 1개는 의도한 퇴장 검사 결과.
+
+배포 빌드:
+BuildResult: Succeeded / Errors: 0 / Warnings: 10 / Bytes: 158967654
+출력: Builds/Windows/LionIceRun-20261006-online-fix/LionIceRun.exe
+ZIP: Builds/Windows/LION_ICE-online-fix.zip
+배포본에는 검증 러너를 포함하지 않음. 원본 Main 씬과 기존 배포본은 변경하지 않음.
+
+제한:
+기존 EXE의 한 판 후 추방은 남아 있는 실행 로그에서 원인을 확정하지 못함.
+수정본의 동일 흐름은 실제 EXE로 5판 및 후속 전환까지 통과.
+EXE 검사는 -nographics로 수행: 포인터 클릭/실제 렌더와 서로 다른 PC·인터넷·지연/손실은 별도 확인 필요.
+초기 복사 프로젝트의 Unity 검색 인덱서 예외는 에디터 내부 문제였으며 게임 컴파일/테스트를 막지 않았음.

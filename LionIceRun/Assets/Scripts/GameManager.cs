@@ -108,6 +108,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (SoloGameSeries.Active) SoloGameSeries.Update(this);
         if (OnlineGameSession.InRoom && (!OnlineGameSession.Authority || !OnlineGameSession.MatchPlaying)) return;
         if (player == null) return;
 
@@ -131,6 +132,7 @@ public class GameManager : MonoBehaviour
     public void BeginSelectedMatch()
     {
         if (State != GameState.Ready || player == null) return;
+        SoloGameSeries.MatchStarted(this);
         player.InputEnabled = true;
         if (timer != null) timer.Begin();
         SetState(GameState.Playing);
@@ -263,11 +265,14 @@ public class GameManager : MonoBehaviour
         foreach (IceBlock block in grid.IceBlocks)
         {
             if (block.IsBroken || block.CurrentStage == IceBlock.Stage.Shaking) continue;
-            any.Add(block.Cell);
+            Vector2Int candidate = grid.WorldToCell(block.transform.position);
+            if (grid.GetBlock(candidate) != block) continue;
+            any.Add(candidate);
             bool near = false;
             foreach (Vector2Int o in occupied)
-                if (Mathf.Abs(o.x - block.Cell.x) <= 1 && Mathf.Abs(o.y - block.Cell.y) <= 1) near = true;
-            if (!near) free.Add(block.Cell);
+                if (Mathf.Abs(o.x - candidate.x) <= 1 && Mathf.Abs(o.y - candidate.y) <= 1) near = true;
+            var moving = block.GetComponentInParent<MapMovingSurface>();
+            if (!near && (moving == null || !moving.MovingGeometry)) free.Add(candidate);
         }
         List<Vector2Int> pool = free.Count > 0 ? free : any;
         cell = pool.Count > 0 ? pool[UnityEngine.Random.Range(0, pool.Count)] : default;
@@ -288,7 +293,7 @@ public class GameManager : MonoBehaviour
         Winner = competitors.Count >= 2 || !order[0].outOfMap ? order[0].body : null;
         PlayerPlace = order.FindIndex(c => c.body == player) + 1;
 
-        if (PlayerWon && !OnlineGameSession.InRoom)
+        if (PlayerWon && !OnlineGameSession.InRoom && !SoloGameSeries.Active)
         {
             Wins++;
             PlayerPrefs.SetInt(OnlineGameSession.InRoom ? "LionIceRun.OnlineWins" : WinsKey, Wins);
@@ -296,6 +301,8 @@ public class GameManager : MonoBehaviour
         }
         if (timer != null) timer.Stop();
         player.InputEnabled = false;
+
+        SoloGameSeries.MatchFinished(this);
 
         SetState(GameState.GameOver);
     }
@@ -312,6 +319,13 @@ public class GameManager : MonoBehaviour
         Wins++; PlayerPrefs.SetInt("LionIceRun.OnlineWins", Wins); PlayerPrefs.Save();
     }
 
+    public List<PlayerController> Bodies() => competitors.ConvertAll(c => c.body);
+
+    public void RecordSoloSeriesWin()
+    {
+        Wins++; PlayerPrefs.SetInt(WinsKey, Wins); PlayerPrefs.Save();
+    }
+
     // 개발용: 우승 횟수 지우기 (Inspector 컴포넌트 메뉴)
     [ContextMenu("우승 횟수 지우기")]
     void ResetWins()
@@ -324,6 +338,7 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         if (OnlineGameSession.InRoom) { OnlineGameSession.Instance.ReturnToLobby(); return; }
+        if (SoloGameSeries.Active) { if (SoloGameSeries.Complete) SoloGameSeries.ReturnToTitle(); return; }
         if (OnlineGameSession.Instance != null && OnlineGameSession.Instance.isActiveAndEnabled)
         { OnlineGameSession.Instance.ReloadSoloScene(); return; }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

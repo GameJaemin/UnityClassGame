@@ -14,6 +14,7 @@ using UnityEngine;
     public bool ready;
     public OnlineMapStamp[] maps;
     [NonSerialized] public uint lastInput;
+    [NonSerialized] public uint lastJump, lastDive, lastPush;
     [NonSerialized] public double lastInputTime;
     [NonSerialized] public double lastCommandTime;
 }
@@ -44,7 +45,7 @@ using UnityEngine;
     public ulong actorId;
     public double startAt, stopAt, stopFrom, stopTo, duration;
     public float elapsed;
-    public float speed, spacing;
+    public float speed, spacing, selectionHold;
     public OnlineMember[] members;
     public OnlineSpawn[] spawns;
     public OnlineMapStamp[] maps;
@@ -58,17 +59,25 @@ using UnityEngine;
 
 public static class OnlineRules
 {
-    public const int Protocol = 2;
+    public const int Protocol = 4;
     public const int MaxHumans = 4;
     public const int MaxPacketBytes = 32768;
 
     public static string Nickname(string value)
     {
+        string result = OptionalNickname(value);
+        return result.Length == 0 ? "얼음 친구" : result;
+    }
+
+    // 입력창에는 빈 이름을 보존하고 실제 참가 이름은 선택한 동물로 결정한다.
+    public static string OptionalNickname(string value)
+    {
         value = (value ?? "").Trim();
         var result = new StringBuilder();
         foreach (char c in value)
             if (!char.IsControl(c) && c != '<' && c != '>') result.Append(c);
-        return result.Length == 0 ? "얼음 친구" : result.ToString(0, Math.Min(16, result.Length));
+        string cleaned = result.ToString().Trim();
+        return cleaned.Substring(0, Math.Min(16, cleaned.Length));
     }
 
     public static string Code(string value) => (value ?? "").Trim().Replace(" ", "").ToUpperInvariant();
@@ -83,6 +92,9 @@ public static class OnlineRules
         foreach (string row in map.rows) text.Append(row).Append('|');
         text.Append(map.playerStart.x).Append(',').Append(map.playerStart.y).Append('|');
         foreach (MapData.Point p in map.botStarts) text.Append(p.x).Append(',').Append(p.y).Append('|');
+        // 기믹이 없는 기존 맵의 해시는 유지한다.
+        foreach (var g in map.gimmicks)
+            text.Append(JsonUtility.ToJson(g)).Append('|');
         using (var sha = SHA256.Create())
         {
             byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(text.ToString()));
@@ -140,7 +152,7 @@ public static class OnlineRules
             for (int x = 0; x < map.width; x++)
             {
                 var cell = new Vector2Int(x, y);
-                if (!connected.Contains(cell) || result.Contains(cell)) continue;
+                if (!connected.Contains(cell) || result.Contains(cell) || map.Get(cell) == MapData.Safe) continue;
                 int neighbors = 0;
                 foreach (var direction in directions) if (connected.Contains(cell + direction)) neighbors++;
                 if (neighbors < 3) continue;
