@@ -1,0 +1,9 @@
+Playing round=1
+Result delay=5.016608
+Playing round=2
+Result delay=5.047573
+Playing round=3
+Result delay=5.049519
+Playing round=4
+Result delay=5.0634
+Playing round=5

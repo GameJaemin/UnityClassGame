@@ -29,9 +29,10 @@ public static class OnlineSeriesSetup
         front.resultsTitle = front.resultsPanel.transform.Find("Title").GetComponent<TMP_Text>();
         front.resultsHint = front.resultsPanel.transform.Find("Hint").GetComponent<TMP_Text>();
         front.resultsTitle.text = "1 / 5 라운드 결과";
-        front.resultsHint.text = "8초 뒤 2 / 5 라운드 자동 시작";
+        front.resultsHint.text = OnlineSeries.ContinueHint(OnlineSeries.ResultsSeconds, 2);
         front.resultText.enableAutoSizing = true; front.resultText.fontSizeMin = 22f; front.resultText.fontSizeMax = 38f;
         front.resultsHint.enableAutoSizing = true; front.resultsHint.fontSizeMin = 16f; front.resultsHint.fontSizeMax = 24f;
+        SeriesResultsLayout.Apply(front, false);
         var existing = front.transform.Find("SeriesProgress");
         if (existing == null)
         {

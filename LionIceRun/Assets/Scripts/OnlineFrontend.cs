@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 레이아웃은 에디터 메뉴에서 씬에 저장한다. 런타임에는 상태/문구/활성 여부만 바꾼다.
+// 기본 배치는 에디터에 저장하고 결과 안내/우측 상단 나가기는 화면 비율에 맞춰 유지한다.
 public class OnlineFrontend : MonoBehaviour
 {
     public OnlineGameSession session;
@@ -19,41 +19,53 @@ public class OnlineFrontend : MonoBehaviour
     public Image[] slotPortraits;
     public Sprite[] characterPortraits;
     public TMP_Text resultsTitle, resultsHint, seriesStatus;
-    int SelectedSkin => characterSelection != null ? characterSelection.Index : skin.value;
+    int SelectedSkin => characterSelection != null && characterSelection.IsConfigured ? characterSelection.Index : skin.value;
     bool ignoreOptions;
 
     void Start()
     {
+        // 씬 재로드를 끈 에디터에서도 최신 설정 UI를 연결한다.
+        if(GetComponent<IceExperienceUI>()==null) gameObject.AddComponent<IceExperienceUI>().front=this;
         // 에디터에서 저장한 UI 미리보기를 닫고 정상 타이틀 흐름으로 시작한다.
         HidePanels();
         if (resultsTitle == null) resultsTitle = resultsPanel.transform.Find("Title")?.GetComponent<TMP_Text>();
         if (resultsHint == null) resultsHint = resultsPanel.transform.Find("Hint")?.GetComponent<TMP_Text>();
-        nickname.text = PlayerPrefs.GetString("LionIceRun.Nickname", "얼음 친구");
-        soloButton.onClick.AddListener(() => { SaveName(); session.StartSolo(); });
-        createButton.onClick.AddListener(() => { SaveName(); session.CreateRoom(nickname.text, SelectedSkin, capacity.value + 2); });
-        joinButton.onClick.AddListener(() => { SaveName(); session.JoinRoom(joinCode.text, nickname.text, SelectedSkin); });
-        backButton.onClick.AddListener(() =>
-        {
-            HidePanels(); session.roulette.selectionCanvas.gameObject.SetActive(true);
-            session.roulette.titleGroup.SetActive(true);
-        });
-        readyButton.onClick.AddListener(session.ToggleReady);
-        startButton.onClick.AddListener(session.StartRound);
-        copyButton.onClick.AddListener(() => GUIUtility.systemCopyBuffer = session.RoomCode);
-        leaveButton.onClick.AddListener(session.LeaveRoom);
-        returnButton.onClick.AddListener(session.ReturnToLobby);
-        resultLeaveButton.onClick.AddListener(session.LeaveRoom);
-        matchLeaveButton.onClick.AddListener(session.LeaveRoom);
-        fillBots.onValueChanged.AddListener(_ => { if (!ignoreOptions) session.SetBotOptions(fillBots.isOn, aggressive.value); });
-        aggressive.onValueChanged.AddListener(_ => { if (!ignoreOptions) session.SetBotOptions(fillBots.isOn, aggressive.value); });
+        SeriesResultsLayout.Apply(this, false);
+        nickname.text = GamePreferences.Nickname;
+        if (nickname.placeholder is TMP_Text placeholder) placeholder.text = "비워두면 동물 이름으로 시작해요";
+        BindActions();
     }
+
+    void OnEnable() { if (Application.isPlaying) BindActions(); }
+    void BindActions()
+    {
+        if (session == null) return;
+        Bind(soloButton, StartSolo); Bind(createButton, CreateRoom); Bind(joinButton, JoinRoom);
+        Bind(backButton, BackToTitle); Bind(readyButton, session.ToggleReady); Bind(startButton, session.StartRound);
+        Bind(copyButton, CopyCode); Bind(leaveButton, session.LeaveRoom);
+        Bind(returnButton, ReturnFromResults); Bind(resultLeaveButton, LeaveMatch); Bind(matchLeaveButton, LeaveMatch);
+        if (fillBots != null) { fillBots.onValueChanged.RemoveListener(OnFillBots); fillBots.onValueChanged.AddListener(OnFillBots); }
+        if (aggressive != null) { aggressive.onValueChanged.RemoveListener(OnAggressive); aggressive.onValueChanged.AddListener(OnAggressive); }
+    }
+    static void Bind(Button button, UnityEngine.Events.UnityAction action)
+    { if (button != null) { button.onClick.RemoveListener(action); button.onClick.AddListener(action); } }
+    void StartSolo() { SaveName(); session.StartSolo(); }
+    void CreateRoom() { SaveName(); session.CreateRoom(GamePreferences.PublicName(SelectedSkin), SelectedSkin, capacity.value + 2); }
+    void JoinRoom() { SaveName(); session.JoinRoom(joinCode.text, GamePreferences.PublicName(SelectedSkin), SelectedSkin); }
+    void BackToTitle() { HidePanels(); session.roulette.ShowTitle(); }
+    void CopyCode() => GUIUtility.systemCopyBuffer = session.RoomCode;
+    void ReturnFromResults() { if (SoloGameSeries.Active) SoloGameSeries.ReturnToTitle(); else session.ReturnToLobby(); }
+    void LeaveMatch() { if (SoloGameSeries.Active) SoloGameSeries.ReturnToTitle(); else session.LeaveRoom(); }
+    void OnFillBots(bool value) { if (!ignoreOptions) session.SetBotOptions(fillBots.isOn, aggressive.value); }
+    void OnAggressive(int value) { if (!ignoreOptions) session.SetBotOptions(fillBots.isOn, aggressive.value); }
 
     void SaveName()
     {
-        nickname.text = OnlineRules.Nickname(nickname.text);
+        nickname.text = OnlineRules.OptionalNickname(nickname.text);
         PlayerPrefs.SetString("LionIceRun.Nickname", nickname.text);
         PlayerPrefs.SetInt("LionIceRun.Skin", SelectedSkin);
         PlayerPrefs.Save();
+        GamePreferences.Apply();
     }
 
     public void HidePanels()
@@ -66,6 +78,8 @@ public class OnlineFrontend : MonoBehaviour
     public void OpenModes()
     {
         HidePanels(); modesPanel.SetActive(true);
+        characterSelection?.BindButtons();
+        if (skin != null) skin.gameObject.SetActive(characterSelection == null || !characterSelection.IsConfigured);
         session.roulette.titleGroup.SetActive(false);
     }
     public void ShowLobby() { HidePanels(); lobbyPanel.SetActive(true); }
@@ -86,6 +100,10 @@ public class OnlineFrontend : MonoBehaviour
         nickname.interactable = skin.interactable = capacity.interactable = joinCode.interactable = !busy;
         if (characterSelection != null) characterSelection.SetInteractable(!busy);
         notice.text = session.Notice;
+        if (SoloGameSeries.Active)
+        {
+            UpdateSoloSeries(); return;
+        }
         var phase = session.CurrentPhase;
         if (seriesStatus != null)
         {
@@ -139,5 +157,36 @@ public class OnlineFrontend : MonoBehaviour
             returnButton.interactable = session.IsHost && !busy;
             resultLeaveButton.interactable = !busy;
         }
+    }
+
+    void UpdateSoloSeries()
+    {
+        var manager = session.manager;
+        bool playing = manager.State == GameManager.GameState.Playing;
+        bool results = manager.State == GameManager.GameState.GameOver;
+        if (seriesStatus != null)
+        {
+            seriesStatus.gameObject.SetActive(!results && session.roulette.gameCanvas.enabled);
+            seriesStatus.text = $"{SoloGameSeries.Round} / 5 라운드 · 총 {SoloGameSeries.LocalTotal}점";
+        }
+        leavePanel.SetActive(playing);
+        matchLeaveButton.GetComponentInChildren<TMP_Text>().text = "타이틀로";
+        if (!results) return;
+        if (!resultsPanel.activeSelf) { HidePanels(); resultsPanel.SetActive(true); }
+        if (GameHUD.Instance != null && GameHUD.Instance.resultGroup != null) GameHUD.Instance.resultGroup.SetActive(false);
+        resultText.text = SoloGameSeries.ResultLines;
+        if (resultsTitle != null) resultsTitle.text = SoloGameSeries.Title;
+        if (resultsHint != null) resultsHint.text = SoloGameSeries.Hint;
+        returnButton.gameObject.SetActive(SoloGameSeries.Complete);
+        returnButton.interactable = true;
+        returnButton.GetComponentInChildren<TMP_Text>().text = "타이틀로 돌아가기";
+        resultLeaveButton.interactable = true;
+    }
+
+    void LateUpdate()
+    {
+        // 화면 비율이 바뀌어도 화면 우측 상단을 유지한다.
+        if (resultsPanel.activeSelf || leavePanel.activeSelf)
+            SeriesResultsLayout.Apply(this, SoloGameSeries.Active ? SoloGameSeries.Complete : session != null && session.SeriesComplete);
     }
 }

@@ -1,0 +1,1 @@
+PASS: host timing shared with localSpeed=2

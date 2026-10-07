@@ -1,0 +1,1 @@
+PASS: round=1, selectionSeconds=1.970, localSpeed=2

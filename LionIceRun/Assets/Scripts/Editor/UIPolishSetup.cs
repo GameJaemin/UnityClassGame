@@ -30,6 +30,7 @@ public static class UIPolishSetup
             {
                 if (text.GetComponentInParent<TMP_InputField>() != null) continue;
                 Undo.RecordObject(text, "UI 글자 대비 개선");
+                text.font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath);
                 bool light = LightBackground(text.transform);
                 text.fontSharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(light || rootName == "OnlineUI" ? PlainPath : "Assets/UI/Fonts/MalgunGothicBold OutlinedThin.mat");
                 text.color = light ? Ink : Color.white;
@@ -45,6 +46,14 @@ public static class UIPolishSetup
         if (botCheck != null) { botCheck.text = "●"; botCheck.color = Gold; botCheck.fontSize = 24f; }
         BuildPortraits(front);
         OnlineSeriesSetup.Apply(front);
+        UIConsistency.Apply(front.gameObject.scene, AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath));
+        var roulette = Object.FindAnyObjectByType<MapRoulette>(FindObjectsInactive.Include);
+        if (roulette != null && roulette.stopButton != null)
+        {
+            Undo.DestroyObjectImmediate(roulette.stopButton.gameObject);
+            roulette.stopButton = null; roulette.buttonText = null;
+            EditorUtility.SetDirty(roulette);
+        }
         front.gameObject.SetActive(true);
         front.GetComponent<Canvas>().enabled = true;
         front.OpenModes();

@@ -1,0 +1,24 @@
+PASS 모델 선택 버튼 참조
+HIT Next
+HIT AvatarPicker
+HIT Modes
+HIT Background
+PASS 다음 버튼 실제 UI 레이캐스트 도달
+PASS 다음 버튼 북극곰 선택
+PASS 다음 버튼 호랑이 선택
+PASS 마지막 뒤 사자 순환
+PASS 이전 버튼 역순 순환
+PASS 선택 모델 활성 0
+PASS 선택 모델 활성 1
+PASS 선택 모델 활성 2
+PASS 화면 재진입 중복 리스너 없음
+PASS 코드 재로딩으로 연결 손실 후 화면 재진입 복구
+PASS 중복 복구 시 한 칸만 변경
+PASS 연결 중 선택 잠금
+PASS 모델 선택 불완전 시 드롭다운 유지
+PASS 정상 모델 선택과 중복 드롭다운 숨김
+PASS 선택 스킨 저장
+PASS 솔로 플레이어에 선택 스킨 적용
+PASS 실제 Play 중 스크립트 재로딩 직후 버튼 동작
+PASS 선택 스킨 저장
+CHARACTER_SELECTION_RESULT: 19 checks, 0 failures

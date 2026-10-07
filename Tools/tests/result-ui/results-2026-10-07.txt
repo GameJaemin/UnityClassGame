@@ -1,0 +1,8 @@
+PASS: rounds=5, totals=17,14,11,8, winsDelta=1
+1등  얼음 친구  17점
+2등  NPC 1  14점
+3등  NPC 2  11점
+4등  NPC 3  8점
+PASS: stable skins, result UI, no sixth round, title return, fresh series, mid-series departure
+PASS: corner exit 144x44, alpha=0.55, margin=24, highlighted countdown; four transitions=5.017/5.048/5.050/5.063 seconds.
+PASS: existing online rules=36, series rules=23; editor only, no EXE build.

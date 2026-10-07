@@ -1,0 +1,1 @@
+PASS: chat=2, emote=2, rateLimited=True, anonymous=True

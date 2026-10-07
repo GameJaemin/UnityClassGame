@@ -1,0 +1,2 @@
+PASS: local response at 100ms, delta=0.5371664, one-way input/pose delay=180ms, drop=10%
+ prediction=True, replica=False, enabled=True, active=True, kinematic=False, state=Normal, move=(1.00, 0.00), jump=True, keyboard=True

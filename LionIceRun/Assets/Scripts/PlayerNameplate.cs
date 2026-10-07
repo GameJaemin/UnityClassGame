@@ -8,9 +8,12 @@ public class PlayerNameplate : MonoBehaviour
     public RectTransform plate;
     public TMP_Text label;
 
+    void Awake() { UIConsistency.ApplyWebFont(label); }
+
     public void SetName(string nickname, bool local, bool bot)
     {
         if (label == null) return;
+        UIConsistency.ApplyWebFont(label);
         label.text = OnlineRules.Nickname(nickname) + (bot ? " · AI" : local ? " · 나" : "");
         label.color = local ? new Color(1f, 0.87f, 0.3f) : bot ? new Color(0.65f, 0.85f, 1f) : Color.white;
     }

@@ -114,13 +114,9 @@ public static class Step7UISetup
         }
         Label(selectionScreen, "Marker", "▼", 48, Yellow, outlinedThin,
             Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(0, 190), new Vector2(100, 60), TextAlignmentOptions.Center, false);
-        Image stop = Img(selectionScreen, "StopButton", Sprite("Btn_YellowRetry"), new Vector2(0.5f, 0), Vector2.one * 0.5f, new Vector2(0, 210), new Vector2(360, 130));
-        stop.raycastTarget = true;
-        roulette.stopButton = stop.gameObject.AddComponent<Button>();
-        roulette.stopButton.targetGraphic = stop;
-        roulette.buttonText = Label(stop.transform, "Text", "멈추기", 44, Brown, plain,
-            Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(20, 4), new Vector2(270, 80), TextAlignmentOptions.Center, false);
-        Label(selectionScreen, "Hint", "멈추기를 누르면 천천히 멈추며 가운데 맵이 선택돼요", 28, LightBlue, outlinedThin,
+        roulette.stopButton = null;
+        roulette.buttonText = null;
+        Label(selectionScreen, "Hint", UIConsistency.MapHint, 28, LightBlue, outlinedThin,
             new Vector2(0.5f, 0), Vector2.one * 0.5f, new Vector2(0, 100), new Vector2(1300, 50), TextAlignmentOptions.Center, false);
         EnsureEventSystem();
         selectionScreen.gameObject.SetActive(false);
@@ -739,7 +735,7 @@ public static class Step7UISetup
         RectTransform controlsRect = Place(controls, bottom, new Vector2(1, 0), new Vector2(1, 0), new Vector2(-40, 40), new Vector2(1200, 64));
         hud.controlsGroup = controls;
         float x = 0f;
-        foreach (var (key, label) in new[] { ("좌클릭", "밀치기"),("Ctrl", "다이브"), ("Space", "점프"), ("WASD", "이동") })
+        foreach (var (key, label) in new[] { ("좌클릭", "밀치기"),("Shift", "다이브"), ("Space", "점프"), ("WASD", "이동") })
         {
             RectTransform chip = Chip(controlsRect, key, label, new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-x, 0));
             x += chip.sizeDelta.x + 14f;
@@ -917,7 +913,7 @@ public static class Step7UISetup
         text.fontSize = size;
         text.color = color;
         text.alignment = alignment;
-        text.fontStyle = italic ? FontStyles.Italic : FontStyles.Normal;
+        text.fontStyle = FontStyles.Normal;
         text.textWrappingMode = TextWrappingModes.NoWrap;
         text.overflowMode = TextOverflowModes.Overflow;
         text.raycastTarget = false;

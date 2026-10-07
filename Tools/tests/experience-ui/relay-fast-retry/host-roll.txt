@@ -1,0 +1,5 @@
+PASS: round=1, selectionSeconds=1.970, localSpeed=0
+PASS: round=2, selectionSeconds=1.970, localSpeed=0
+PASS: round=3, selectionSeconds=1.970, localSpeed=0
+PASS: round=4, selectionSeconds=1.970, localSpeed=0
+PASS: round=5, selectionSeconds=1.970, localSpeed=0

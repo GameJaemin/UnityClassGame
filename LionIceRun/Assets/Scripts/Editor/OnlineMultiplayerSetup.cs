@@ -108,7 +108,7 @@ public static class OnlineMultiplayerSetup
         frontend.resultText = Text(result, "Ranking", "순위", 38, new Vector2(0, 20), new Vector2(760, 340));
         frontend.returnButton = Button(result, "Return", "로비로 돌아가기", new Vector2(-180, -265), new Vector2(430, 95));
         frontend.resultLeaveButton = Button(result, "Leave", "나가기", new Vector2(250, -265), new Vector2(260, 75), false);
-        Text(result, "Hint", "다음 경기는 방장이 로비로 돌아간 뒤 준비해요", 24, new Vector2(0, -340), new Vector2(800, 45));
+        Text(result, "Hint", "5초 뒤 다음 라운드가 이어집니다!", 24, new Vector2(0, -340), new Vector2(800, 45));
         var leave = Group(ui.transform, "MatchLeave", new Vector2(260, 80), new Vector2(-785, -460)); frontend.leavePanel = leave.gameObject;
         frontend.matchLeaveButton = Button(leave, "Leave", "로비 나가기", Vector2.zero, new Vector2(260, 75), false);
 

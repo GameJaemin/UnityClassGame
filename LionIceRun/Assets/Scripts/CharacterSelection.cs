@@ -14,16 +14,18 @@ public class CharacterSelection : MonoBehaviour
     public RawImage image;
     [SerializeField] int selected;
     public int Index => selected;
+    public bool IsConfigured => enabled && previous != null && next != null
+        && models != null && models.Length == 3 && models[0] != null && models[1] != null && models[2] != null;
 
     void Awake()
     {
         if (!Application.isPlaying) return;
         selected = Mathf.Clamp(PlayerPrefs.GetInt("LionIceRun.Skin", selected), 0, 2);
-        previous?.onClick.AddListener(() => Select(selected - 1));
-        next?.onClick.AddListener(() => Select(selected + 1));
     }
     void OnEnable()
     {
+        if (Application.isPlaying) BindButtons();
+        if (image != null) image.raycastTarget = false;
         if (previewRig != null) previewRig.SetActive(true);
         if (previewCamera != null) previewCamera.enabled = Application.isPlaying;
         Refresh();
@@ -34,10 +36,30 @@ public class CharacterSelection : MonoBehaviour
     }
     void OnDisable()
     {
+        previous?.onClick.RemoveListener(SelectPrevious);
+        next?.onClick.RemoveListener(SelectNext);
         if (previewCamera != null) previewCamera.enabled = false;
         if (previewRig != null) previewRig.SetActive(false);
     }
     public void Select(int index) { selected = ((index % 3) + 3) % 3; Refresh(); }
+    // Play 중 코드 재로딩과 화면 재진입에서도 정확히 한 번만 연결한다.
+    public void BindButtons()
+    {
+        if (previous != null)
+        {
+            previous.onClick.RemoveListener(SelectPrevious);
+            previous.onClick.AddListener(SelectPrevious);
+            if (previous.targetGraphic != null) previous.targetGraphic.raycastTarget = true;
+        }
+        if (next != null)
+        {
+            next.onClick.RemoveListener(SelectNext);
+            next.onClick.AddListener(SelectNext);
+            if (next.targetGraphic != null) next.targetGraphic.raycastTarget = true;
+        }
+    }
+    void SelectPrevious() { if (previous != null && previous.IsInteractable()) Select(selected - 1); }
+    void SelectNext() { if (next != null && next.IsInteractable()) Select(selected + 1); }
     public void SetInteractable(bool value)
     { if (previous != null) previous.interactable = value; if (next != null) next.interactable = value; }
     void Refresh()
@@ -45,7 +67,7 @@ public class CharacterSelection : MonoBehaviour
         selected = Mathf.Clamp(selected, 0, 2);
         if (models != null) for (int i = 0; i < models.Length; i++) if (models[i] != null) models[i].SetActive(i == selected);
 #if UNITY_EDITOR
-        if (!Application.isPlaying && models != null && models[selected] != null && models[selected].activeInHierarchy)
+        if (!Application.isPlaying && models != null && selected < models.Length && models[selected] != null && models[selected].activeInHierarchy)
         {
             var animator = models[selected].GetComponent<Animator>();
             if (animator != null && animator.runtimeAnimatorController != null)

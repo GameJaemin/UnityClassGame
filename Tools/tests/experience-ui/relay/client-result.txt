@@ -1,0 +1,5 @@
+PASS: rounds=5, readyCalls=1, totals=17,14,11,8, localTotal=14
+1등  검증 방장  17점
+2등  북극곰  14점
+3등  NPC 1 (공격)  11점
+4등  NPC 2 (공격)  8점
