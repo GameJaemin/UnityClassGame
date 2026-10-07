@@ -1,0 +1,5 @@
+Noto Sans CJK KR Bold
+https://github.com/notofonts/noto-cjk/blob/main/Sans/OTF/Korean/NotoSansCJKkr-Bold.otf
+License: SIL Open Font License 1.1 (OFL.txt)
+https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE
+Downloaded: 2026-10-07
