@@ -46,3 +46,11 @@ crashlytics-build.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# Downloaded audio source caches (selected clips and licenses live in Assets/Audio)
+/Tools/audio/SourcePacks/
+/Tools/audio/SourcePages/*.html
+
+# Local build/test execution logs and temporary Relay room codes
+/Tools/**/*.log
+/Tools/tests/**/room-code.txt
