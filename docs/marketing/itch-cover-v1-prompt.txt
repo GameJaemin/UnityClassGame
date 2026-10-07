@@ -1,0 +1,11 @@
+제작 도구: 내장 imagegen
+용도: itch.io 게임 썸네일
+참조: Assets/UI/Sprites/Logo_Title.png, Tools/blender/characters_preview.png, docs/screenshots/web-final-gameplay.jpg
+
+Use case: ads-marketing.
+Create a polished landscape game cover thumbnail for itch.io for the Korean voxel ice survival party game "사자 타일 러너". Desired canvas aspect ratio 1.26:1, ideally 1260 x 1000. Full opaque background.
+Reference 1 is the existing title logo: faithfully reproduce its exact Korean lettering "사자" above "타일 러너", orange gold upper line and cyan lower line, white snow caps and blue ice crystals, dark outlines. Integrate this logo large in the upper third, all lettering unobstructed and readable at thumbnail size.
+Reference 2 is the exact playable character design sheet: match these original cubic voxel designs closely. Main hero is the golden lion with square orange-brown stepped mane, black square eyes, beige muzzle/belly/paws, tiny pink cheeks. White polar bear with blue scarf and orange black-striped tiger are supporting characters. Keep their chunky block-built bodies and faces rather than rounded toy designs.
+Reference 3 is actual gameplay, used only to understand the cyan square ice tiles, open water, and bright pink obstacle accents. Remove all screenshot HUD/UI.
+Composition: dynamic three-quarter perspective, large lion leaping toward viewer over cracked pale cyan ice tiles, polar bear balancing on a nearby tile and tiger dodging a bright pink rotating sweep bar further behind. Recognizable square ice arena suspended over deep turquoise ocean, a few broken tile shards and small splashes, one rotating platform and a pink mechanical pusher in the middle distance. Convey playful frantic survival and motion with clean readable silhouettes. No weapons. Keep character faces visible. Background snowy icebergs with soft atmospheric depth, bright cool daylight and warm rim lighting on lion.
+Render style: attractive high-quality 3D game key art, strongly cubic voxel characters consistent with reference models, crisp edges, soft shadows, vibrant cyan/blue with orange hero and small magenta obstacle highlights. Hero and title dominate; restrained background detail. All important content safely inside margins, no crop of title or hero face. No additional text, slogan, watermark, badges, menu buttons, browser frame, or other franchise characters/logos.

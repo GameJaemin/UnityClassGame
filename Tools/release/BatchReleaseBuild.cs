@@ -18,7 +18,7 @@ public static class BatchReleaseBuild
             || front.nickname.textComponent.richText)
             throw new Exception("전체 UI 업데이트가 씬에 저장되어 있지 않습니다.");
         // 편집용 미리보기는 닫아 배포 씬을 타이틀 상태로 저장한다.
-        front.HidePanels(); front.session.roulette.titleGroup.SetActive(true);
+        front.HidePanels(); front.session.roulette.ShowTitle();
         EditorSceneManager.MarkSceneDirty(front.gameObject.scene);
         EditorSceneManager.SaveScene(front.gameObject.scene);
         PlayerSettings.runInBackground = true;
